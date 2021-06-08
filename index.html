@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>nØllejump</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="Game of the Year 2021">
+	<!--<meta name="keywords" content="Campus, Fysik, Teknisk Fysik, Fysiksektionen, KTH">
+	<meta name="author" content="Pyro & Cryo">
+	<meta name="theme-color" content="#069080">-->
+
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="style.css">
+	<!--<link rel="icon" type="image/png" href="img/fadderietslogga.png" />-->
+
+	<script type="text/javascript" src="js/controller.js"></script>
+</head>
+<body>
+	<div id="topbar" style="height: 64px">
+		Score: <span id="score">X</span>
+	</div>
+	<div id="gameboardContainer">
+		<canvas id="gameboard" width="100" height="100"style="transform: scale(3);"></canvas>
+	</div>
+	<script type="text/javascript">
+		let con;
+		window.addEventListener("load", () => {
+			con = new Controller();
+			con.init(64, 32);
+		});
+	</script>
+</body>
+</html>
