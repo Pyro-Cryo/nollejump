@@ -1,11 +1,12 @@
 // Aspect ratio: width / height
-MAX_ASPECT_RATIO = 1 / 1;
-MIN_ASPECT_RATIO = 1 / 2;
-WIDTH_PX = 384;
+const MAX_ASPECT_RATIO = 1 / 1;
+const MIN_ASPECT_RATIO = 1 / 2;
+const WIDTH_PX = 384;
 
 class Controller {
 	constructor() {
 		this.canvas = document.getElementById("gameboard");
+		this.canvasContainer = document.getElementById("gameboardContainer");
 	}
 
 	init(barHeight, margin) {
@@ -14,15 +15,24 @@ class Controller {
 	}
 
 	setCanvasDimensions(barHeight, margin) {
-		let height = document.documentElement.clientHeight - barHeight - margin;
-		let width = Math.min(height * MAX_ASPECT_RATIO, document.documentElement.clientWidth - margin);
-		height = Math.min(this.canvas.width / MIN_ASPECT_RATIO, height);
+		const maxHeightPx = document.documentElement.clientHeight - barHeight - margin;
+		const maxWidthPx = document.documentElement.clientWidth - margin;
 
-		const scale = width / WIDTH_PX;
-		const height_px = Math.round(height / scale);
+		// Limit the width to not exceed MAX_ASPECT_RATIO
+		const targetWidthPx = Math.min(maxHeightPx * MAX_ASPECT_RATIO, maxWidthPx);
+		// Limit the height to not exceed MIN_ASPECT_RATIO
+		const targetHeightPx = Math.min(targetWidthPx / MIN_ASPECT_RATIO, maxHeightPx);
+
+		// Achieve the desired width by scaling the canvas
+		const scale = targetWidthPx / WIDTH_PX;
+		// Compute the unscaled height
+		const height_px = Math.round(targetHeightPx / scale);
+		
 		this.canvas.width = WIDTH_PX;
 		this.canvas.height = height_px;
 		this.canvas.style = `transform: scale(${scale});`;
+		
+		this.canvasContainer.style = `height: ${targetHeightPx}px;`;
 
 		// for debug purposes, draw a 100x100 rectangle
 		const ctx = this.canvas.getContext("2d");

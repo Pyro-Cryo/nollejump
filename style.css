@@ -2,8 +2,8 @@ body {
 	margin: 0;
 }
 #gameboard {
-	border: 1px solid green;
-	/*transform-origin: 0 0;*/
+	/*border: 1px solid green;*/
+	transform-origin: top center;
 }
 #gameboardContainer {
 	text-align: center;
