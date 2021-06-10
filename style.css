@@ -1,8 +1,9 @@
 body {
 	margin: 0;
+	font-family: Nunito, sans-serif;
 }
 #gameboard {
-	/*border: 1px solid green;*/
+	border: 1px solid black;
 	transform-origin: top center;
 }
 #gameboardContainer {
@@ -10,4 +11,12 @@ body {
 }
 #topbar {
 	width: 100%;
+	background-color: lightgreen;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+#topbar > div {
+	border: 1px solid black;
+	margin: 0 2em;
 }
