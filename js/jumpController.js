@@ -3,7 +3,7 @@ const MAX_ASPECT_RATIO = 1 / 1;
 const MIN_ASPECT_RATIO = 1 / 2;
 const WIDTH_PX = 384;
 
-class Controller {
+class JumpController {
 	constructor() {
 		this.canvas = document.getElementById("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
