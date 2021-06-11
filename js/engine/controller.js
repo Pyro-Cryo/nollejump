@@ -1,5 +1,5 @@
 class Controller {
-    constructor(canvas, gridWidth, gridHeight, fastForwardFactor = 3, cancelFFOnPause = false) {
+    constructor(canvas, gridWidth = null, gridHeight = null, fastForwardFactor = 3, cancelFFOnPause = false) {
         // Store the game area, which can be drawn to
         this.gameArea = new GameArea(canvas, gridWidth, gridHeight);
         // Essentially the frame rate inverse
@@ -38,13 +38,13 @@ class Controller {
         this.messagebox = document.getElementById("messagebox");
     }
 
-    set fastForwardFactor(v) {
+    set fastForwardFactor(value) {
         if (this.isFF) {
             this.toggleFastForward();
-            this._fastForwardFactor = v;
+            this._fastForwardFactor = value;
             this.toggleFastForward();
         } else
-            this._fastForwardFactor = v;
+            this._fastForwardFactor = value;
     }
     get fastForwardFactor() {
         return this._fastForwardFactor;

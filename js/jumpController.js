@@ -5,7 +5,7 @@ const WIDTH_PX = 384;
 
 class JumpController extends Controller {
 	constructor() {
-		super(document.getElementById("gameboard"), 10, 10);
+		super(document.getElementById("gameboard"));
 		this.canvasContainer = document.getElementById("gameboardContainer");
 	}
 
@@ -31,15 +31,24 @@ class JumpController extends Controller {
 		// Compute the unscaled height
 		const height_px = Math.round(targetHeightPx / scale);
 		
-		this.gameArea.canvas.width = WIDTH_PX;
-		this.gameArea.canvas.height = height_px;
+		this.gameArea.width = WIDTH_PX;
+		this.gameArea.height = height_px;
 		this.gameArea.canvas.style = `transform: scale(${scale});`;
 		
 		this.canvasContainer.style = `height: ${targetHeightPx}px;`;
+	}
 
-		// for debug purposes, draw a 100x100 rectangle
-		//const ctx = this.canvas.getContext("2d");
-		//ctx.fillStyle = "red";
-		//ctx.fillRect(50, 50, 100, 100);
+	draw() {
+		super.draw();
+		
+		// Debug
+		const x = this.gameArea.width / 2;
+		const y = this.gameArea.height - 100;
+		const radius = 50;
+		this.gameArea.disc(x, y, radius, "lightgrey");
+		this.gameArea.disc(x, y - radius * 2 * 0.7, radius * 0.9, "lightgrey");
+		this.gameArea.disc(x, y - radius * 2 * 1.3, radius * 0.8, "lightgrey");
+		this.gameArea.disc(x - radius * 0.3, y - radius * 2 * 1.4, radius * 0.1, "black");
+		this.gameArea.disc(x + radius * 0.3, y - radius * 2 * 1.4, radius * 0.1, "black");
 	}
 }
