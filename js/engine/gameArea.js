@@ -159,7 +159,7 @@ class GameArea {
         return (y * this._gridHeight / this.canvas.height) - 0.5;
     }
 
-    disc(_x, _y, radius, color = "#000000") {
+    disc(_x, _y, radius = 1, color = "#000000") {
         let x = this.gridToCanvasX(_x);
         let y = this.gridToCanvasY(_y);
         let fillStyle = this.context.fillStyle;
@@ -170,12 +170,16 @@ class GameArea {
         this.context.fillStyle = fillStyle;
     }
 
-    square(_x, _y, color = "#000000") {
-        let x = this.gridToCanvasX(_x - 0.5);
-        let y = this.gridToCanvasY(_y - 0.5);
+    square(_x, _y, side = 1, color = "#000000") {
+        this.rect(_x, _y, side, side, color);
+    }
+
+    rect(_x, _y, width = 1, height = 1, color = "#000000") {
+        let x = this.gridToCanvasX(_x - width / 2);
+        let y = this.gridToCanvasY(_y - height / 2);
         let fillStyle = this.context.fillStyle;
         this.context.fillStyle = color;
-        this.context.fillRect(x, y, this.unitWidth, this.unitHeight);
+        this.context.fillRect(x, y, width * this.unitWidth, height * this.unitHeight);
         this.context.fillStyle = fillStyle;
     }
 

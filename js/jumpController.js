@@ -41,14 +41,21 @@ class JumpController extends Controller {
 	draw() {
 		super.draw();
 		
-		// Debug
+		// Debug snowman
 		const x = this.gameArea.width / 2;
 		const y = this.gameArea.height - 100;
 		const radius = 50;
+
 		this.gameArea.disc(x, y, radius, "lightgrey");
 		this.gameArea.disc(x, y - radius * 2 * 0.7, radius * 0.9, "lightgrey");
 		this.gameArea.disc(x, y - radius * 2 * 1.3, radius * 0.8, "lightgrey");
+
 		this.gameArea.disc(x - radius * 0.3, y - radius * 2 * 1.4, radius * 0.1, "black");
 		this.gameArea.disc(x + radius * 0.3, y - radius * 2 * 1.4, radius * 0.1, "black");
+
+		this.gameArea.rect(x, y - radius * 2 * 1.25, radius * 0.08, radius * 0.4, "orange");
+
+		this.gameArea.rect(x - radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
+		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
 	}
 }
