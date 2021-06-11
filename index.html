@@ -13,10 +13,12 @@
 	<link rel="stylesheet" type="text/css" href="style.css">
 	<!--<link rel="icon" type="image/png" href="img/fadderietslogga.png" />-->
 
+	<script type="text/javascript" src="js/engine/gameArea.js"></script>
+	<script type="text/javascript" src="js/engine/controller.js"></script>
 	<script type="text/javascript" src="js/jumpController.js"></script>
 </head>
 <body>
-	<div id="topbar" style="height: 64px">
+	<div id="topbar" style="height: 64px; margin-bottom: 16px;">
 		<div id="scoreContainer">
 			Score: <span id="score">X</span>
 		</div>
@@ -30,8 +32,8 @@
 	<script type="text/javascript">
 		let con;
 		window.addEventListener("load", () => {
-			con = new Controller();
-			con.init(64, 32);
+			con = new JumpController();
+			con.begin(64, 16);
 		});
 	</script>
 </body>

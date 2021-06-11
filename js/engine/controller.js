@@ -1,15 +1,15 @@
 class Controller {
-    constructor(gridWidth, gridHeight) {
+    constructor(canvas, gridWidth, gridHeight, fastForwardFactor = 3, cancelFFOnPause = false) {
         // Store the game area, which can be drawn to
-        this.gameArea = new GameArea(document.getElementsByTagName("canvas")[0], gridWidth, gridHeight);
-        this.isPaused = true;
-        this.isFF = false;
+        this.gameArea = new GameArea(canvas, gridWidth, gridHeight);
         // Essentially the frame rate inverse
         this.updateInterval = 20; //milliseconds
-        // Framerate for real
-        //this.drawInterval = 30;
         // Store the inteval object so that we can abort the main loop
         this.mainInterval = null;
+        this.isPaused = true;
+        this.isFF = false;
+        this.fastForwardFactor = fastForwardFactor;
+        this.cancelFFOnPause = cancelFFOnPause;
 
         this.drawLoop = null;
         // All objects which receive update calls
@@ -18,104 +18,121 @@ class Controller {
         this.idCounter = 0;
         // Objects which are drawn over all others
         this.delayedRenderObjects = [];
-        // The type of objects which are inserted into delayedRenderObjects
-        this.delayedRenderType = null;
 
         // Buttons
-        this.playbutton = document.querySelector("button.controllerButton#playButton");
-        this.ffbutton = document.querySelector("button.controllerButton#fastForwardButton");
-        this.resetbutton = document.querySelector("button.controllerButton#resetButton");
-        this.difficultySelect = document.querySelector("select#difficultySelect");
+        this.playbutton = document.getElementById("playButton");
+        this.ffbutton = document.getElementById("fastForwardButton");
+        this.resetbutton = document.getElementById("resetButton");
+        this.difficultySelect = document.getElementById("difficultySelect");
 
-        this.playbutton.onclick = this.playpause.bind(this);
-        this.ffbutton.onclick = this.fastforward.bind(this);
-        this.ffbutton.disabled = true;
-        this.difficultySelect.onchange = this.difficultyChange.bind(this);
+        if (this.playbutton)
+            this.playbutton.onclick = this.togglePause.bind(this);
+        if (this.ffbutton) {
+            this.ffbutton.onclick = this.toggleFastForward.bind(this);
+            this.ffbutton.disabled = this.isPaused;
+        }
+        if (this.difficultySelect)
+            this.difficultySelect.onchange = this.onDifficultyChange.bind(this);
 
         // Info field
         this.messagebox = document.getElementById("messagebox");
     }
 
+    set fastForwardFactor(v) {
+        if (this.isFF) {
+            this.toggleFastForward();
+            this._fastForwardFactor = v;
+            this.toggleFastForward();
+        } else
+            this._fastForwardFactor = v;
+    }
+    get fastForwardFactor() {
+        return this._fastForwardFactor;
+    }
+
     begin() {
-        // this.drawLoop = setInterval(() => this.draw(), this.drawInterval);
         this.drawLoop = window.requestAnimationFrame(this.draw.bind(this));
     }
 
-    playpause() {
+    onDifficultyChange(e) { }
+
+    togglePause() {
         if (this.isPaused)
             this.onPlay();
         else
             this.onPause();
     }
 
-    fastforward() {
+    toggleFastForward() {
         if (this.isFF) {
             clearInterval(this.mainInterval);
             this.mainInterval = setInterval(() => this.update(), this.updateInterval);
-            this.offFF();
             this.isFF = false;
+            this.offFastForward();
         }
         else {
             clearInterval(this.mainInterval);
-            this.mainInterval = setInterval(() => this.update(), this.updateInterval / 3);
-            this.onFF();
+            this.mainInterval = setInterval(() => this.update(), this.updateInterval / this.fastForwardFactor);
             this.isFF = true;
+            this.onFastForward();
         }
     }
 
-    difficultyChange() {
-    }
-
-
     onPlay() {
-
         this.isPaused = false;
         if (this.isFF)
-            this.mainInterval = setInterval(() => this.update(), this.updateInterval / 3);
+            this.mainInterval = setInterval(() => this.update(), this.updateInterval / this.fastForwardFactor);
         else
             this.mainInterval = setInterval(() => this.update(), this.updateInterval);
 
         this.playbutton.children[0].classList.add("hideme");
         this.playbutton.children[1].classList.remove("hideme");
         this.ffbutton.disabled = false;
-
     }
 
     onPause() {
-
         this.isPaused = true;
         clearInterval(this.mainInterval);
+        this.mainInterval = null;
+
         this.playbutton.children[0].classList.remove("hideme");
         this.playbutton.children[1].classList.add("hideme");
-        // this.ffbutton.classList.remove("keptPressed");
         this.ffbutton.disabled = true;
-        // this.isFF = false;
-
+        if (this.cancelFFOnPause) {
+            this.isFF = false;
+            this.offFastForward();
+        }
     }
 
-    onFF() {
+    onFastForward() {
         this.ffbutton.classList.add("keptPressed");
     }
 
-    offFF() {
+    offFastForward() {
         this.ffbutton.classList.remove("keptPressed");
     }
 
     setMessage(message, pureText) {
-        if (pureText)
-            this.messagebox.innerText = message;
-        else
-            this.messagebox.innerHTML = message;
+        if (this.messagebox) {
+            if (pureText)
+                this.messagebox.innerText = message;
+            else
+                this.messagebox.innerHTML = message;
+        } else
+            console.warn("Tried to set message, but no message box found: " + message);
     }
 
     clearMessage() {
-        this.messagebox.innerText = "\xa0";
+        if (this.messagebox)
+            this.messagebox.innerText = "\xa0";
+        else
+            console.warn("Tried to set message, but no message box found: " + message);
     }
 
     // Clear the canvas and let all objects redraw themselves
     update() {
-
         for (let current = this.objects.first; current !== null; current = current.next) {
+            // Setting an object's id to null indicates it is to be destroyed
             if (current.obj.id === null) {
                 let c = current.prev;
                 this.objects.remove(current);
@@ -128,54 +145,48 @@ class Controller {
             if (current.obj.update !== undefined)
                 current.obj.update();
         }
-        for (let i = 0; i < this.delayedRenderObjects.length; i++)
+        // Objects with delayed rendering are updated as usual,
+        // but the separate list tracking them must also be kept clean from null-id objects
+        for (let i = 0; i < this.delayedRenderObjects.length; i++) {
             if (this.delayedRenderObjects[i].id === null) {
                 this.delayedRenderObjects = this.delayedRenderObjects.filter(o => o.id !== null);
                 break;
             }
+        }
     }
-    draw() {
 
+    draw() {
         this.gameArea.clear();
         for (let current = this.objects.first; current !== null; current = current.next) {
-            if (current.obj.id === null) {
-                continue
+            if (current.obj.id !== null) {
+                current.obj.draw(this.gameArea);
             }
-            current.obj.draw(this.gameArea);
         }
 
-        for (let i = 0; i < this.delayedRenderObjects.length; i++)
+        for (let i = 0; i < this.delayedRenderObjects.length; i++) {
             if (this.delayedRenderObjects[i].id !== null) {
                 this.delayedRenderObjects[i].draw(this.gameArea);
             }
+        }
 
         this.drawLoop = window.requestAnimationFrame(this.draw.bind(this));
-        // 
     }
+
     // Register an object to receive update calls.
     // It should have an update method accepting a GameArea and allow for setting an id
-    registerObject(object, prepend) {
+    registerObject(object, prepend = false, delayedRendering = false) {
         if (prepend)
             this.objects.prepend(object);
         else
             this.objects.push(object);
         object.id = this.idCounter++;
-        if (this.delayedRenderType && object instanceof this.delayedRenderType)
+        if (delayedRendering)
             this.delayedRenderObjects.push(object);
     }
+
     // Make the object stop receiving update calls.
     unregisterObject(object) {
         object.id = null;
-    }
-    stop() {
-        if (this.mainInterval !== null) {
-            clearInterval(this.mainInterval);
-            this.mainInterval = null;
-        }
-    }
-    resume() {
-        if (this.mainInterval === null)
-            this.mainInterval = setInterval(() => this.update(), this.updateInterval);
     }
 }
 
@@ -184,6 +195,7 @@ class LinkedList {
     constructor() {
         this.first = null;
         this.last = null;
+        this.count = 0;
     }
     // Add an object at the end of the list
     push(obj) {
@@ -196,6 +208,7 @@ class LinkedList {
             this.last.next = node;
             this.last = node;
         }
+        this.count++;
     }
     // Add an object at the beginning of the list
     prepend(obj) {
@@ -208,6 +221,7 @@ class LinkedList {
             this.first.prev = node;
             this.first = node;
         }
+        this.count++;
     }
     // Remove a node from the list
     // Note that this accept a linked list node, not the data itself,
@@ -236,5 +250,16 @@ class LinkedList {
 
         node.next = undefined;
         node.prev = undefined;
+        this.count--;
+    }
+
+    toArray() {
+        let array = new Array(this.count).fill(null);
+        let i = 0;
+        for (let current = this.first; current !== null; current = current.next) {
+            array[i] = current;
+            i++;
+        }
+        return array;
     }
 }
