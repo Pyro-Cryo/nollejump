@@ -15,6 +15,10 @@
 
 	<script type="text/javascript" src="js/engine/gameArea.js"></script>
 	<script type="text/javascript" src="js/engine/controller.js"></script>
+	
+	<script type="text/javascript" src="js/engine/audio.js"></script>
+	<script type="text/javascript" src="js/engine/loader.js"></script>
+
 	<script type="text/javascript" src="js/jumpController.js"></script>
 </head>
 <body>
@@ -34,6 +38,21 @@
 		window.addEventListener("load", () => {
 			con = new JumpController();
 			con.begin(64, 16);
+			/*
+			// Resource loading tests
+			loadResource("audio/myrstacken.mp3", LoopableAudio).then(audio => {
+				document.getElementById("scoreContainer").addEventListener("click", () => audio.play());
+			});
+			loadResources(
+				["img/aftonbladet.png", "img/beta.png", "img/boom.png"],
+				Image,
+				(progress, total) => {
+					const time = new Date().toJSON();
+					console.log(`${time}: ${progress} of ${total} items loaded`);
+				}).then(
+					items => console.log(items)
+				);
+			*/
 		});
 	</script>
 </body>
