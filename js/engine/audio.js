@@ -5,7 +5,6 @@ class LoopableAudio extends Audio {
         this.preload = true;
         this.addEventListener('timeupdate', () => {
             if (this.currentTime > this.duration - bufferLength) {
-                console.log(this.currentTime, this.duration, bufferLength);
                 this.currentTime = 0;
                 this.play();
             }

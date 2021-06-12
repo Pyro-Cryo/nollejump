@@ -48,9 +48,11 @@ class Controller {
             this.difficultySelect.onchange = this.onDifficultyChange.bind(this);
 
         // Info field
-        this.messagebox = document.getElementById("messagebox");
+        this.messageBox = document.getElementById("messageBox");
 
         this.constructor._instances.push(this);
+
+        Resource.loadAssets(this.onAssetLoadUpdate.bind(this)).then(this.onAssetsLoaded.bind(this));
     }
 
     set fastForwardFactor(value) {
@@ -65,11 +67,18 @@ class Controller {
         return this._fastForwardFactor;
     }
 
-    begin() {
+    startDrawLoop() {
         this.drawLoop = window.requestAnimationFrame(this.draw.bind(this));
     }
+    stopDrawLoop() {
+        window.cancelAnimationFrame(this.drawLoop);
+        this.drawLoop = null;
+    }
 
-    onDifficultyChange(e) { }
+    onAssetLoadUpdate(progress, total) {}
+    onAssetsLoaded() {}
+
+    onDifficultyChange(e) {}
 
     togglePause() {
         if (this.isPaused)
@@ -136,20 +145,20 @@ class Controller {
     }
 
     setMessage(message, pureText) {
-        if (this.messagebox) {
+        if (this.messageBox) {
             if (pureText)
-                this.messagebox.innerText = message;
+                this.messageBox.innerText = message;
             else
-                this.messagebox.innerHTML = message;
+                this.messageBox.innerHTML = message;
         } else
             console.warn("Tried to set message, but no message box found: " + message);
     }
 
     clearMessage() {
-        if (this.messagebox)
-            this.messagebox.innerText = "\xa0";
+        if (this.messageBox)
+            this.messageBox.innerText = "\xa0";
         else
-            console.warn("Tried to set message, but no message box found: " + message);
+            console.warn("Tried to clear message, but no message box found: " + message);
     }
 
     // Clear the canvas and let all objects redraw themselves

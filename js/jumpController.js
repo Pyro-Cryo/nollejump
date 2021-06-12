@@ -9,13 +9,23 @@ class JumpController extends Controller {
 		this.canvasContainer = document.getElementById("gameboardContainer");
 	}
 
-	begin(barHeight, margin) {
-		super.begin();
+	startDrawLoop(barHeight, margin) {
 		this.setCanvasDimensions(barHeight, margin);
 		window.addEventListener("resize", () => this.setCanvasDimensions(barHeight, margin));
+		super.startDrawLoop();
+	}
 
+	onAssetLoadUpdate(progress, total) {
+		this.setMessage(`Loaded ${progress}/${total}`);
+	}
+
+	onAssetsLoaded() {
+		super.onAssetsLoaded();
+		this.startDrawLoop(64, 16);
 		this.testObj = new RotatingTestObject(100, 100);
 		this.togglePause();
+		
+		this.setMessage(`Loading complete`);
 	}
 
 	setCanvasDimensions(barHeight, marginHorizontal, marginVertical = null) {
@@ -63,10 +73,9 @@ class JumpController extends Controller {
 	}
 }
 
-let imgCorn = new Image();
-imgCorn.src = "img/corn.png";
+const cornImg = Resource.addAsset("img/corn.png");
 class RotatingTestObject extends GameObject {
-	static get image() { return imgCorn; }
+	static get image() { return Resource.getAsset(cornImg); }
 
 	update() {
 		super.update();

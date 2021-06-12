@@ -1,83 +1,157 @@
-/**
- * Ger ett Promise som resolvas när alla de listade sakerna hämtats (eller någon failar).
- * @param {any[][]} resources En array med saker att hämta. Dessa är i sig arrayer: [path, type, map, onErr]. De första tre motsvarar argumenten till loadResource(). onErr körs om inte objektet kan hämtas.
- * @param {*} defaultType Om en array i resources inte specificerar en typ används denna.
- * @param {Function} onUpdate Körs varje gång ett objekt har hämtats (och onload körts). Kan t.ex. användas för loading bars.
- */
-function loadResources(resources, defaultType = Image, onUpdate = null) {
-	let progress = 0;
-	let items = [];
+class Resource {
+	/**
+	 * Ger ett Promise som resolvas när alla de listade sakerna hämtats (eller någon failar).
+	 * @param {any[][]} resources En array med saker att hämta. Dessa är i sig arrayer: [path, type, map, onErr]. De första tre motsvarar argumenten till loadSingle(). onErr körs om inte objektet kan hämtas.
+	 * @param {*} defaultType Om en array i resources inte specificerar en typ används denna.
+	 * @param {Function} onUpdate Körs varje gång ett objekt har hämtats (och onload körts). Kan t.ex. användas för loading bars.
+	 */
+	static load(resources, defaultType = Image, onUpdate = null) {
+		let progress = 0;
+		let items = [];
 
-	const singleResource = typeof (resources) === "string";
-	if (singleResource)
-		resources = [resources];
+		const singleResource = typeof (resources) === "string";
+		if (singleResource)
+			resources = [resources];
 
-	for (let resource of resources) {
-		if (typeof (resource) === "string")
-			resource = [resource];
+		for (let resource of resources) {
+			if (typeof (resource) === "string")
+				resource = [resource];
 
-		let path = resource[0];
-		let type = resource.length >= 2 ? resource[1] : defaultType;
-		let map = resource.length >= 3 ? resource[2] : null;
-		let onErr = resource.length >= 4 ? resource[3] : null;
+			let path = resource[0];
+			let type = resource.length >= 2 ? resource[1] : defaultType;
+			let map = resource.length >= 3 ? resource[2] : null;
+			let onErr = resource.length >= 4 ? resource[3] : null;
 
-		let promise = loadResource(path, type, map, onErr);
-		
-		if (onErr)
-			promise = promise.catch(onErr);
+			let promise = this.loadSingle(path, type, map, onErr);
+			
+			if (onErr)
+				promise = promise.catch(onErr);
 
-		promise.finally(() => {
-			progress++;
-			if (onUpdate)
-				onUpdate(progress, items.length);
-		});
+			promise.finally(() => {
+				progress++;
+				if (onUpdate)
+					onUpdate(progress, items.length);
+			});
 
-		items.push(promise);
+			items.push(promise);
+		}
+		if (singleResource)
+			return items[0];
+		else
+			return Promise.all(items);
 	}
-	if (singleResource)
-		return items[0];
-	else
-		return Promise.all(items);
-}
 
-/**
- * Ger ett promise som resolvas när saken hämtats.
- * @param {string} path URI till objektet.
- * @param {*} type Vad för slags objekt det är som hämtas (ex. Image, Audio).
- * @param {Function} map Anropas med objektet när det hämtats. Om ett returvärde ges skickas det vidare till det promise som returneras av loadResource().
- */
-function loadResource(path, type = Image, map = null) {
-	let promise;
-	if (type === JSON)
-		promise = new Promise((resolve, reject) => {
-			fetch(path).then(response => {
-				if (response.ok)
-					resolve(response.json());
+	/**
+	 * Ger ett promise som resolvas när saken hämtats.
+	 * @param {string} path URI till objektet.
+	 * @param {*} type Vad för slags objekt det är som hämtas (ex. Image, Audio).
+	 * @param {Function} map Anropas med objektet när det hämtats. Om ett returvärde ges skickas det vidare till det promise som returneras av loadSingle().
+	 */
+	static loadSingle(path, type = Image, map = null) {
+		let promise;
+		if (type === JSON)
+			promise = new Promise((resolve, reject) => {
+				fetch(path).then(response => {
+					if (response.ok)
+						resolve(response.json());
+					else
+						reject(response);
+				}).catch(reason => reject(reason));
+			});
+		else
+			promise = new Promise((resolve, reject) => {
+				const item = new type();
+				if (item instanceof Audio) {
+					item.addEventListener('canplaythrough', () => resolve(item));
+					item.preload = true;
+				}
 				else
-					reject(response);
+					item.addEventListener('load', () => resolve(item));
+				item.addEventListener('error', reject);
+				item.src = path;
 			}).catch(reason => reject(reason));
-		});
-	else
-		promise = new Promise((resolve, reject) => {
-			const item = new type();
-			if (item instanceof Audio) {
-				item.addEventListener('canplaythrough', () => resolve(item));
-				item.preload = true;
-			}
-			else
-				item.addEventListener('load', () => resolve(item));
-			item.addEventListener('error', reject);
-			item.src = path;
-		}).catch(reason => reject(reason));
 
-	if (map)
-		promise = promise.then(item => {
-			const mappedItem = map(item);
-			if (mappedItem === undefined)
-				return item;
-			else
-				return mappedItem;
-		});
+		if (map)
+			promise = promise.then(item => this._applyMap(item, map));
 
-	return promise;
+		return promise;
+	}
+
+	static _applyMap(item, map) {
+		const mappedItem = map(item);
+		if (mappedItem === undefined)
+			return item;
+		else
+			return mappedItem;
+	}
+
+	static _loadedAssets = new Map();
+	static _registeredAssets = new Map();
+	static _assetsDirty = false;
+	static _assetsCurrentlyLoading = false;
+	static get assetsLoaded() {
+		return !this._assetsDirty;
+	}
+
+	/**
+	 * Registrerar ett objekt som en asset. Dessa hämtas med loadAssets() och cacheas så de kan kommas åt med getAsset().
+	 * @param {string} path URI till objektet.
+	 * @param {*} type Vad för slags objekt det är som hämtas (ex. Image, Audio).
+	 * @param {Function} map Anropas med objektet när det hämtats. Om ett returvärde ges skickas det vidare till det promise som returneras av loadSingle().
+	 * @returns Den URI som angavs.
+	 */
+	static addAsset(path, type = Image, map = null) {
+		if (this._assetsCurrentlyLoading)
+			throw new Error("Cannot add assets while assets are currently loading.");
+
+		this._registeredAssets.set(path, [type, map]);
+
+		if (this._loadedAssets.has(path)) {
+			this._loadedAssets.delete(path);
+			console.warn("Overwriting or reloading asset: " + path);
+		}
+
+		this._assetsDirty = true;
+
+		return path;
+	}
+
+	static getAsset(path, checkDirty = true) {
+		if (checkDirty && this._assetsDirty)
+			throw new Error("All assets not loaded");
+		
+		if (this._loadedAssets.has(path))
+			return this._loadedAssets.get(path);
+		else if (!checkDirty && this._registeredAssets.has(path))
+			throw new Error("Asset not yet loaded: " + path);
+		else
+			throw new Error("Asset not registered: " + path);
+	}
+
+	static loadAssets(onUpdate = null) {
+		if (this._assetsDirty) {
+			this._assetsCurrentlyLoading = true;
+
+			let resources = Array.from(this._registeredAssets)
+				.map(assetSpec => [
+					assetSpec[0], // path
+					assetSpec[1][0], // type
+					item => { // map
+						if (assetSpec[1][1])
+							item = this._applyMap(item, assetSpec[1][1])
+						this._loadedAssets.set(assetSpec[0], item);
+						return item;
+					}
+				])
+				.filter(assetSpec => !this._loadedAssets.has(assetSpec[0]));
+
+			// Defaulttypen behövs inte då alla assets definierar egna
+			return this.load(resources, null, onUpdate).then(assets => {
+				this._assetsDirty = false;
+				this._assetsCurrentlyLoading = false;
+			});
+		} else {
+			return new Promise((resolve, _) => resolve());
+		}
+	}
 }
