@@ -136,6 +136,10 @@ class GameObject extends PrerenderedObject {
 		}
 	}
 
+	/**
+	 * Draw the object
+	 * @param {GameArea} gameArea 
+	 */
 	draw(gameArea) {
 		super.draw(gameArea, this.x, this.y);
 	}

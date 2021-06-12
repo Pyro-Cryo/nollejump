@@ -1,5 +1,5 @@
 // Aspect ratio: width / height
-const MAX_ASPECT_RATIO = 1 / 1;
+const MAX_ASPECT_RATIO = 2 / 3;
 const MIN_ASPECT_RATIO = 1 / 2;
 const WIDTH_PX = 384;
 
@@ -22,7 +22,8 @@ class JumpController extends Controller {
 	onAssetsLoaded() {
 		super.onAssetsLoaded();
 		this.startDrawLoop(64, 16);
-		this.testObj = new JumpPlayer(100, 100);
+		new BG(0, 0);
+		this.testObj = new JumpPlayer(this.gameArea.gridWidth / 2, this.gameArea.gridHeight / 2);
 		this.togglePause();
 
 		this.setMessage(`Loading complete`);
@@ -71,4 +72,9 @@ class JumpController extends Controller {
 		this.gameArea.rect(x - radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
 		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");*/
 	}
+}
+
+const mapImg = Resource.addAsset("img/map.png");
+class BG extends GameObject {
+	static get image() { return Resource.getAsset(mapImg); }
 }

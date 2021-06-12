@@ -24,6 +24,10 @@ class GameArea {
         else {
             throw new Error(`Either set both gridWidth and gridHeight to null, or neither: ${gridWidth} x ${gridHeight}`);
         }
+
+        // Draw offset in grid coordinate units
+        this.drawOffsetX = 0;
+        this.drawOffsetY = 0;
     }
 
     set width(value) {
@@ -78,14 +82,67 @@ class GameArea {
         return this._gridHeight;
     }
 
+    gridToCanvasX(x) {
+        return (x + 0.5) * this.canvas.width / this._gridWidth;
+    }
+    gridToCanvasY(y) {
+        return (y + 0.5) * this.canvas.height / this._gridHeight;
+    }
+
+    canvasToGridX(x) {
+        return (x * this._gridWidth / this.canvas.width) - 0.5;
+    }
+    canvasToGridY(y) {
+        return (y * this._gridHeight / this.canvas.height) - 0.5;
+    }
+
+    resetDrawOffset() {
+        this.drawOffsetX = 0;
+        this.drawOffsetY = 0;
+    }
+
+	centerCameraOn(_x, _y, horizontally = true, vertically = true) {
+        if (horizontally)
+		    this.drawOffsetX = _x - this.gridWidth / 2;
+        if (vertically)
+		    this.drawOffsetY = _y - this.gridHeight / 2;
+	}
+
+	keepInFrame(_x, _y, width = 0, height = null, marginTop = 0, marginRight = null, marginBottom = null, marginLeft = null) {
+        if (height === null)
+            height = width;
+        if (marginRight === null)
+            marginRight = marginTop;
+        if (marginBottom === null)
+            marginBottom = marginTop;
+        if (marginLeft === null)
+            marginLeft = marginRight;
+        
+		const xLeft = this.gridToCanvasX(_x - width / 2);
+        const xRight = this.gridToCanvasX(_x + width / 2);
+		const yTop = this.gridToCanvasY(_y - height / 2);
+        const yBottom = this.gridToCanvasY(_y + height / 2);
+
+		if (xLeft - this.drawOffsetX < marginLeft) {
+			this.drawOffsetX = xLeft - marginLeft;
+        }
+		else if (this.drawOffsetX + this.canvas.width - xRight < marginRight) {
+			this.drawOffsetX = xRight + marginRight - this.canvas.width;
+        }
+		if (yTop - this.drawOffsetY < marginTop)
+			this.drawOffsetY = yTop - marginTop;
+		else if (this.drawOffsetY + this.canvas.height - yBottom < marginBottom)
+			this.drawOffsetY = yBottom + marginBottom - this.canvas.height;
+	}
+
     clear() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    //Draws an image centered around (x, y) with the specified angle (in radians) and scale
-    draw(image, _x, _y, angle, scale) {
-        let x = this.gridToCanvasX(_x);
-        let y = this.gridToCanvasY(_y);
+    // Draws an image centered around (x, y) with the specified angle (in radians) and scale
+    draw(image, _x, _y, angle, scale, considerOffset = true) {
+        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
+        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
         if (!angle) {
             if (scale == 1)
                 this.context.drawImage(
@@ -118,10 +175,10 @@ class GameArea {
         }
     }
 
-    //Draws a subimage from an image, centered around (x, y) with the specified angle (in radians) and scale
-    drawSubimage(image, subimageIndex, subimageWidth, _x, _y, angle, scale) {
-        let x = this.gridToCanvasX(_x);
-        let y = this.gridToCanvasY(_y);
+    // Draws a subimage from an image, centered around (x, y) with the specified angle (in radians) and scale
+    drawSubimage(image, subimageIndex, subimageWidth, _x, _y, angle, scale, considerOffset) {
+        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
+        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
         if (!angle) {
             this.context.drawImage(
                 image,
@@ -145,24 +202,10 @@ class GameArea {
         }
     }
 
-    gridToCanvasX(x) {
-        return (x + 0.5) * this.canvas.width / this._gridWidth;
-    }
-    gridToCanvasY(y) {
-        return (y + 0.5) * this.canvas.height / this._gridHeight;
-    }
-
-    canvasToGridX(x) {
-        return (x * this._gridWidth / this.canvas.width) - 0.5;
-    }
-    canvasToGridY(y) {
-        return (y * this._gridHeight / this.canvas.height) - 0.5;
-    }
-
-    disc(_x, _y, radius = 1, color = "#000000") {
-        let x = this.gridToCanvasX(_x);
-        let y = this.gridToCanvasY(_y);
-        let fillStyle = this.context.fillStyle;
+    disc(_x, _y, radius = 1, color = "#000000", considerOffset = true) {
+        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
+        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
+        const fillStyle = this.context.fillStyle;
         this.context.fillStyle = color;
         this.context.beginPath();
         this.context.arc(x, y, radius * this._scaleFactor, 0, 2 * Math.PI);
@@ -170,25 +213,25 @@ class GameArea {
         this.context.fillStyle = fillStyle;
     }
 
-    square(_x, _y, side = 1, color = "#000000") {
-        this.rect(_x, _y, side, side, color);
+    square(_x, _y, side = 1, color = "#000000", considerOffset = true) {
+        this.rect(_x, _y, side, side, color, considerOffset);
     }
 
-    rect(_x, _y, width = 1, height = 1, color = "#000000") {
-        let x = this.gridToCanvasX(_x - width / 2);
-        let y = this.gridToCanvasY(_y - height / 2);
-        let fillStyle = this.context.fillStyle;
+    rect(_x, _y, width = 1, height = 1, color = "#000000", considerOffset = true) {
+        const x = this.gridToCanvasX(_x - width / 2 - considerOffset * this.drawOffsetX);
+        const y = this.gridToCanvasY(_y - height / 2 - considerOffset * this.drawOffsetY);
+        const fillStyle = this.context.fillStyle;
         this.context.fillStyle = color;
         this.context.fillRect(x, y, width * this.unitWidth, height * this.unitHeight);
         this.context.fillStyle = fillStyle;
     }
 
-    bar(_x, _y, offset, length, width, ratio, fgColor = "#FF0000", bgColor = "#00FF00") {
-        let x = this.gridToCanvasX(_x);
-        let y = this.gridToCanvasY(_y);
+    bar(_x, _y, offset, length, width, ratio, fgColor = "#FF0000", bgColor = "#00FF00", considerOffset = true) {
+        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
+        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
         offset *= this.unitHeight;
         length *= this.unitWidth;
-        let fillStyle = this.context.fillStyle;
+        const fillStyle = this.context.fillStyle;
         this.context.fillStyle = bgColor;
         this.context.fillRect(x - length / 2, y + offset, length, width);
         this.context.fillStyle = fgColor;
