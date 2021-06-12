@@ -10,20 +10,21 @@ class Controller {
             throw new Error("Multiple controllers exist: " + this._instances.length);
     }
 
-    constructor(canvas, gridWidth = null, gridHeight = null, fastForwardFactor = 3, cancelFFOnPause = false) {
+    constructor(canvas, updateInterval = null, gridWidth = null, gridHeight = null, fastForwardFactor = 3, cancelFFOnPause = false) {
         if (typeof (canvas) === "string")
             canvas = document.getElementById(canvas);
-        // Store the game area, which can be drawn to
         this.gameArea = new GameArea(canvas, gridWidth, gridHeight);
-        // Essentially the frame rate inverse
-        this.updateInterval = 20; //milliseconds
-        // Store the inteval object so that we can abort the main loop
+        
+        this.updateInterval = updateInterval;
+        this._useAnimationFrameForUpdate = this.updateInterval === null;
         this.mainInterval = null;
+        this.timestampLast = null;
         this.isPaused = true;
         this.isFF = false;
+        
         this.fastForwardFactor = fastForwardFactor;
         this.cancelFFOnPause = cancelFFOnPause;
-
+        
         this.drawLoop = null;
         // All objects which receive update calls
         this.objects = new LinkedList();
@@ -88,6 +89,8 @@ class Controller {
     }
 
     toggleFastForward() {
+        if (this._useAnimationFrameForUpdate)
+            throw new Error("Cannot fast forward when using animation frames for update calls.");
         if (this.isFF) {
             clearInterval(this.mainInterval);
             this.mainInterval = setInterval(() => this.update(), this.updateInterval);
@@ -106,6 +109,8 @@ class Controller {
         this.isPaused = false;
         if (this.isFF)
             this.mainInterval = setInterval(() => this.update(), this.updateInterval / this.fastForwardFactor);
+        else if (this._useAnimationFrameForUpdate)
+            this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
         else
             this.mainInterval = setInterval(() => this.update(), this.updateInterval);
 
@@ -119,7 +124,10 @@ class Controller {
 
     onPause() {
         this.isPaused = true;
-        clearInterval(this.mainInterval);
+        if (this._useAnimationFrameForUpdate)
+            window.cancelAnimationFrame(this.mainInterval);
+        else
+            clearInterval(this.mainInterval);
         this.mainInterval = null;
 
         if (this.playbutton) {
@@ -162,7 +170,20 @@ class Controller {
     }
 
     // Clear the canvas and let all objects redraw themselves
-    update() {
+    update(timestamp) {
+        if (!this._useAnimationFrameForUpdate)
+            timestamp = new Date().getTime();
+            
+        const delta = timestamp - this.timestampLast;
+        this.timestampLast = timestamp;
+
+        // Skip first frame and frames where the player has tabbed out a while
+        if (this.timestampLast === null || delta > 1000) {
+            if (this._useAnimationFrameForUpdate)
+                this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
+            return;
+        }
+
         for (let current = this.objects.first; current !== null; current = current.next) {
             // Setting an object's id to null indicates it is to be destroyed
             if (current.obj.id === null) {
@@ -175,7 +196,7 @@ class Controller {
                     continue;
             }
             if (current.obj.update !== undefined)
-                current.obj.update();
+                current.obj.update(delta);
         }
         // Objects with delayed rendering are updated as usual,
         // but the separate list tracking them must also be kept clean from null-id objects
@@ -185,6 +206,9 @@ class Controller {
                 break;
             }
         }
+
+        if (this._useAnimationFrameForUpdate)
+            this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
     }
 
     draw() {

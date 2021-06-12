@@ -22,7 +22,7 @@ class JumpController extends Controller {
 	onAssetsLoaded() {
 		super.onAssetsLoaded();
 		this.startDrawLoop(64, 16);
-		this.testObj = new RotatingTestObject(100, 100);
+		this.testObj = new JumpPlayer(100, 100);
 		this.togglePause();
 
 		this.setMessage(`Loading complete`);
@@ -55,7 +55,7 @@ class JumpController extends Controller {
 		super.draw();
 		
 		// Debug snowman
-		const x = this.gameArea.width / 2;
+		/*const x = this.gameArea.width / 2;
 		const y = this.gameArea.height - 100;
 		const radius = 50;
 
@@ -69,16 +69,6 @@ class JumpController extends Controller {
 		this.gameArea.rect(x, y - radius * 2 * 1.25, radius * 0.08, radius * 0.4, "orange");
 
 		this.gameArea.rect(x - radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
-		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
-	}
-}
-
-const cornImg = Resource.addAsset("img/corn.png");
-class RotatingTestObject extends GameObject {
-	static get image() { return Resource.getAsset(cornImg); }
-
-	update() {
-		super.update();
-		this.angle += 0.001 + RotatingTestObject.angleDeltaDegrees * Math.PI / 180;
+		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");*/
 	}
 }

@@ -128,7 +128,7 @@ class GameObject extends PrerenderedObject {
 			Controller.instance.registerObject(this);
 	}
 
-	update() {
+	update(delta) {
 		if (this.despawnTimer >= 0) {
 			if (--this.despawnTimer <= 0) {
 				this.despawn();
@@ -152,13 +152,13 @@ class EffectObject extends GameObject {
 		this.effects = new Set();
 	}
 
-	update() {
+	update(delta) {
 		// Apply status effects
 		this.effects.forEach(function (obj) {
 			obj.update(this);
 		}.bind(this));
 
-		super.update();
+		super.update(delta);
 	}
 
 	draw(gameArea) {

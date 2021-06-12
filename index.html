@@ -19,8 +19,9 @@
 	<script type="text/javascript" src="js/engine/gameArea.js"></script>
 	<script type="text/javascript" src="js/engine/controller.js"></script>
 	<script type="text/javascript" src="js/engine/gameObject.js"></script>
+	<script type="text/javascript" src="js/engine/player.js"></script>
 	
-
+	<script type="text/javascript" src="js/jumpPlayer.js"></script>
 	<script type="text/javascript" src="js/jumpController.js"></script>
 </head>
 <body>
@@ -39,9 +40,9 @@
 		<canvas id="gameboard" width="100" height="100" style="transform: scale(1);"></canvas>
 	</div>
 	<script type="text/javascript">
-		let con;
+		let controller;
 		window.addEventListener("load", () => {
-			con = new JumpController();
+			controller = new JumpController();
 			/*
 			// Resource loading tests
 			Resource.loadSingle("audio/myrstacken.mp3", LoopableAudio).then(audio => {
