@@ -205,7 +205,7 @@ class Controller {
     }
 
     // Register an object to receive update calls.
-    // It should have an update method accepting a GameArea and allow for setting an id
+    // It should have an update method, a draw method accepting a GameArea, and allow for setting an id
     registerObject(object, prepend = false, delayedRendering = false) {
         if (prepend)
             this.objects.prepend(object);

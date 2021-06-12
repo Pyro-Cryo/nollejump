@@ -24,7 +24,7 @@ class JumpController extends Controller {
 		this.startDrawLoop(64, 16);
 		this.testObj = new RotatingTestObject(100, 100);
 		this.togglePause();
-		
+
 		this.setMessage(`Loading complete`);
 	}
 

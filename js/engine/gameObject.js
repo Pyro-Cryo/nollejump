@@ -121,8 +121,6 @@ class GameObject extends PrerenderedObject {
 		this.y = y;
 		this.id = null;
 
-		// Status effects currently affecting this object
-		this.effects = new Set();
 		this.despawnTimer = -1;
 
 		if (register)
@@ -130,11 +128,6 @@ class GameObject extends PrerenderedObject {
 	}
 
 	update() {
-		// Apply status effects
-		this.effects.forEach(function (obj) {
-			obj.update(this);
-		}.bind(this));
-
 		if (this.despawnTimer >= 0) {
 			if (--this.despawnTimer <= 0) {
 				this.despawn();
@@ -144,15 +137,36 @@ class GameObject extends PrerenderedObject {
 
 	draw(gameArea) {
 		super.draw(gameArea, this.x, this.y);
-
-		var index = 0;
-		this.effects.forEach(function (obj) {
-			index = obj.draw(this, gameArea, index);
-		}.bind(this));
 	}
 
 	despawn() {
 		this.id = null;
+	}
+}
+
+class EffectObject extends GameObject {
+	constructor(x, y, image = null, angle = null, scale = null, register = true) {
+		super(x, y, image, angle, scale, register);
+		// Status effects currently affecting this object
+		this.effects = new Set();
+	}
+
+	update() {
+		// Apply status effects
+		this.effects.forEach(function (obj) {
+			obj.update(this);
+		}.bind(this));
+
+		super.update();
+	}
+
+	draw(gameArea) {
+		super.draw(gameArea);
+		
+		var index = 0;
+		this.effects.forEach(function (obj) {
+			index = obj.draw(this, gameArea, index);
+		}.bind(this));
 	}
 
 	addEffect(effect) {
@@ -173,9 +187,6 @@ class GameObject extends PrerenderedObject {
 }
 
 class BaseEffect extends PrerenderedObject {
-
-	// Om effecten förs över till MatryoshkaCreep-barn
-	static get persistent() { return false; }
 	static get maxInvocations() { return 10; }
 	static get image() { return null; }
 	static get scale() { return 1; }
@@ -215,12 +226,9 @@ class BaseEffect extends PrerenderedObject {
 		return index + 1;
 	}
 
-	apply(object) {
-
-	}
+	apply(object) {}
 
 	remove(object) {
 		object.removeEffect(this);
 	}
-
 }
