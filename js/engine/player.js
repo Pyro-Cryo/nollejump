@@ -19,8 +19,8 @@ class Player extends EffectObject {
 		this.lastPressed = null;
 		this.pressDuration = -1;
 
-		document.body.addEventListener('keydown', this.onKeyDown.bind(this));
-		document.body.addEventListener('keyup', this.onKeyUp.bind(this));
+		document.body.addEventListener("keydown", this.onKeyDown.bind(this));
+		document.body.addEventListener("keyup", this.onKeyUp.bind(this));
 
 		if (cameraTracking !== null) {
 			if (cameraTracking instanceof Array)
@@ -30,6 +30,12 @@ class Player extends EffectObject {
 		}
 			
 		this._gameArea = null;
+	}
+
+	despawn() {
+		document.body.removeEventListener("keydown", this.onKeyDown.bind(this));
+		document.body.removeEventListener("keyup", this.onKeyUp.bind(this));
+		super.despawn();
 	}
 
 	setCameraTracking(mode, param1 = null, param2 = null, param3 = null, param4 = null) {
@@ -56,7 +62,6 @@ class Player extends EffectObject {
 					marginBottom: param3,
 					marginLeft: param4
 				};
-				console.log(this.cameraTrackingParams)
 				break;
 
 			default:

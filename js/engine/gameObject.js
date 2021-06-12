@@ -63,6 +63,13 @@ class PrerenderedObject {
 		return this._mirror;
 	}
 
+	get width() {
+		return this.imagecache.width;
+	}
+	get height() {
+		return this.imagecache.height;
+	}
+
 	/**
 	 * Draw the object, re-rendering it if dirty
 	 * @param {GameArea} gameArea 
@@ -128,6 +135,7 @@ class GameObject extends PrerenderedObject {
 			Controller.instance.registerObject(this);
 	}
 
+	// TODO: gör om timers (även för effektCooldowns och liknande) till att baseras på tidsdeltan istället för antal frames
 	update(delta) {
 		if (this.despawnTimer >= 0) {
 			if (--this.despawnTimer <= 0) {

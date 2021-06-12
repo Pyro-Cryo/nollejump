@@ -89,8 +89,6 @@ class Controller {
     }
 
     toggleFastForward() {
-        if (this._useAnimationFrameForUpdate)
-            throw new Error("Cannot fast forward when using animation frames for update calls.");
         if (this.isFF) {
             clearInterval(this.mainInterval);
             this.mainInterval = setInterval(() => this.update(), this.updateInterval);
@@ -183,21 +181,15 @@ class Controller {
                 this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
             return;
         }
+        
+        if (this._useAnimationFrameForUpdate && this.isFF)
+            delta *= this._fastForwardFactor;
 
-        for (let current = this.objects.first; current !== null; current = current.next) {
-            // Setting an object's id to null indicates it is to be destroyed
-            if (current.obj.id === null) {
-                let c = current.prev;
-                this.objects.remove(current);
-                current = c || this.objects.first;
-                if (current === null)
-                    break;
-                else
-                    continue;
-            }
-            if (current.obj.update !== undefined)
-                current.obj.update(delta);
-        }
+        // Setting an object's id to null indicates it is to be destroyed
+        for (const obj of this.objects.filterIterate(obj => obj.id !== null))
+            if (obj.update !== undefined)
+                obj.update(delta);
+
         // Objects with delayed rendering are updated as usual,
         // but the separate list tracking them must also be kept clean from null-id objects
         for (let i = 0; i < this.delayedRenderObjects.length; i++) {
@@ -213,17 +205,16 @@ class Controller {
 
     draw() {
         this.gameArea.clear();
-        for (let current = this.objects.first; current !== null; current = current.next) {
-            if (current.obj.id !== null) {
-                current.obj.draw(this.gameArea);
-            }
-        }
-
-        for (let i = 0; i < this.delayedRenderObjects.length; i++) {
-            if (this.delayedRenderObjects[i].id !== null) {
+        
+        for (const obj of this.objects)
+            if (obj.id !== null)
+                obj.draw(this.gameArea);
+        
+        // I think this effectively draws delayed render objects twice,
+        // since they are included in this.objects as well?
+        for (let i = 0; i < this.delayedRenderObjects.length; i++)
+            if (this.delayedRenderObjects[i].id !== null)
                 this.delayedRenderObjects[i].draw(this.gameArea);
-            }
-        }
 
         this.drawLoop = window.requestAnimationFrame(this.draw.bind(this));
     }
@@ -309,13 +300,29 @@ class LinkedList {
         this.count--;
     }
 
-    toArray() {
-        let array = new Array(this.count).fill(null);
-        let i = 0;
+    *[Symbol.iterator]() {
         for (let current = this.first; current !== null; current = current.next) {
-            array[i] = current;
-            i++;
+            yield current.obj;
         }
-        return array;
+    }
+
+    *filterIterate(func) {
+        for (let current = this.first; current !== null; current = current.next) {
+            if (func(current.obj))
+                yield current.obj;
+            else {
+                let c = current.prev;
+                this.remove(current);
+                current = c || this.first;
+                if (current === null)
+                    break;
+                else
+                    continue;
+            }
+        }
+    }
+
+    toArray() {
+        return [...this];
     }
 }
