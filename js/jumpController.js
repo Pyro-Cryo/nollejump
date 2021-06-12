@@ -22,8 +22,18 @@ class JumpController extends Controller {
 	onAssetsLoaded() {
 		super.onAssetsLoaded();
 		this.startDrawLoop(64, 16);
-		new BG(0, 0);
-		this.testObj = new JumpPlayer(this.gameArea.gridWidth / 2, this.gameArea.gridHeight / 2);
+		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, this.gameArea.gridHeight / 2);
+
+		const platWidth = Platform.image.width * Platform.scale;
+		// const platHeight = Platform.image.height * Platform.scale;
+		for (let x = 0; x < this.gameArea.gridWidth; x += platWidth)
+			this.player.addCollidible(new Platform(x + platWidth / 2, this.gameArea.gridHeight - 40));
+		
+		for (let y = this.gameArea.gridHeight - 40; y > -10000; y -= 200)
+			this.player.addCollidible(new Platform(
+				Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
+				y));
+
 		this.togglePause();
 
 		this.setMessage(`Loading complete`);
@@ -72,9 +82,4 @@ class JumpController extends Controller {
 		this.gameArea.rect(x - radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
 		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");*/
 	}
-}
-
-const mapImg = Resource.addAsset("img/map.png");
-class BG extends GameObject {
-	static get image() { return Resource.getAsset(mapImg); }
 }
