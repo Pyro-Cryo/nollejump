@@ -14,6 +14,7 @@ class PrerenderedObject {
 	// TODO: Add mirroring logic if needed
 	constructor(image = null, angle = null, scale = null, angleDeltaDegrees = null) {
 		this.image = image === null ? this.constructor.image : image;
+		this._lastDrawnAngle = null;
 		this.angle = angle === null ? this.constructor.angle : angle;
 		this.scale = scale === null ? this.constructor.scale : scale;
 		this.angleDeltaDegrees = angleDeltaDegrees === null ? this.constructor.angleDeltaDegrees : angleDeltaDegrees;
@@ -43,10 +44,9 @@ class PrerenderedObject {
 		//if (Math.abs(value) > Math.PI / 2)
 		//	value -= Math.sign(value) * Math.PI;
 
-		// TODO: many small angle changes should add up
-		if (Math.abs(this._angle - value) < this.angleDeltaDegrees * Math.PI / 180)
-			return;
 		this._angle = value;
+		if (this._lastDrawnAngle !== null && Math.abs(this._angle - this._lastDrawnAngle) < this.angleDeltaDegrees * Math.PI / 180)
+			return;
 		this._imageDirty = true;
 	}
 	get angle() {
@@ -111,6 +111,7 @@ class PrerenderedObject {
 		);
 
 		this._imageDirty = false;
+		this._lastDrawnAngle = this.angle;
 	}
 }
 
