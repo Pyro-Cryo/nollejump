@@ -5,7 +5,7 @@ const WIDTH_PX = 384;
 
 class JumpController extends Controller {
 	constructor() {
-		super(document.getElementById("gameboard"));
+		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
 	}
 
@@ -13,6 +13,9 @@ class JumpController extends Controller {
 		super.begin();
 		this.setCanvasDimensions(barHeight, margin);
 		window.addEventListener("resize", () => this.setCanvasDimensions(barHeight, margin));
+
+		this.testObj = new RotatingTestObject(100, 100);
+		this.togglePause();
 	}
 
 	setCanvasDimensions(barHeight, marginHorizontal, marginVertical = null) {
@@ -57,5 +60,16 @@ class JumpController extends Controller {
 
 		this.gameArea.rect(x - radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
 		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
+	}
+}
+
+let imgCorn = new Image();
+imgCorn.src = "img/corn.png";
+class RotatingTestObject extends GameObject {
+	static get image() { return imgCorn; }
+
+	update() {
+		super.update();
+		this.angle += 0.001 + RotatingTestObject.angleDeltaDegrees * Math.PI / 180;
 	}
 }

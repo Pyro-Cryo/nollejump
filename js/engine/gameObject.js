@@ -1,63 +1,91 @@
+/**
+ * Represents an object with a sprite that can be rotated, scaled or otherwise updated.
+ */
 class PrerenderedObject {
+	// The object's sprite
+	static get image() { return null; }
+	// The object's sprite's default angle
+	static get angle() { return 0; }
+	// The minimum angle change for the object to be re-rendered
+	static get angleDeltaDegrees() { return 5; }
+	// The object's sprite's scale
+	static get scale() { return 1; }
 
-	constructor(image, scale, angle) {
-		this.image = image;
-		this.scale = scale;
-		this.angle = angle;
+	// TODO: Add mirroring logic if needed
+	constructor(image = null, angle = null, scale = null, angleDeltaDegrees = null) {
+		this.image = image === null ? this.constructor.image : image;
+		this.angle = angle === null ? this.constructor.angle : angle;
+		this.scale = scale === null ? this.constructor.scale : scale;
+		this.angleDeltaDegrees = angleDeltaDegrees === null ? this.constructor.angleDeltaDegrees : angleDeltaDegrees;
 		this._mirror = false;
 		// this.mirror = false;
 
-		this.imageDirty = true;
+		this._imageDirty = true;
 	}
 
-	set image(v) {
-		this._image = v;
-		this.imageDirty = true;
+	set image(value) {
+		this._image = value;
+		this._imageDirty = true;
 	}
 	get image() {
 		return this._image;
 	}
-	set scale(v) {
-		this._scale = v;
-		this.imageDirty = true;
+
+	set scale(value) {
+		this._scale = value;
+		this._imageDirty = true;
 	}
 	get scale() {
 		return this._scale;
 	}
-	set angle(v) {
-		if (Math.abs(v) > Math.PI / 2)
-			v -= Math.sign(v) * Math.PI;
 
-		if (Math.abs(this._angle - v) < 5 * Math.PI / 180)
+	set angle(value) {
+		//if (Math.abs(value) > Math.PI / 2)
+		//	value -= Math.sign(value) * Math.PI;
+
+		// TODO: many small angle changes should add up
+		if (Math.abs(this._angle - value) < this.angleDeltaDegrees * Math.PI / 180)
 			return;
-		this._angle = v;
-		this.imageDirty = true;
+		this._angle = value;
+		this._imageDirty = true;
 	}
 	get angle() {
 		return this._angle;
 	}
-	set mirror(v) {
-		if (this._mirror == v)
+
+	set mirror(value) {
+		if (this._mirror === value)
 			return;
-		this._mirror = v;
-		this.imageDirty = true;
+		this._mirror = value;
+		this._imageDirty = true;
 	}
 	get mirror() {
 		return this._mirror;
 	}
-	draw(gameArea, x, y) {
-		if (this.imageDirty)
-			this.prerender();
 
+	/**
+	 * Draw the object, re-rendering it if dirty
+	 * @param {GameArea} gameArea 
+	 * @param {Number} x 
+	 * @param {Number} y 
+	 */
+	draw(gameArea, x, y) {
+		if (this._imageDirty)
+			this.prerender();
 		if (this.imagecache === null)
 			return;
-		if (this.imagecache.width == 0 || this.imagecache.height == 0)
+		if (this.imagecache.width === 0 || this.imagecache.height === 0)
 			return;
 		gameArea.draw(this.imagecache, x, y, 0, 1);
 	}
+
+	/**
+	 * Render the sprite so that it can be drawn without any overhead.
+	 */
 	prerender() {
 		if (this.image === null || (this.image instanceof Image && !this.image.complete)) {
 			this.imagecache = null;
+			console.warn("Trying to prerender null or non-loaded object");
 			return;
 		}
 		if (!this.imagecache)
@@ -72,9 +100,9 @@ class PrerenderedObject {
 		this.imagecontext.translate(this.imagecache.width / 2, this.imagecache.height / 2);
 		this.imagecontext.rotate(this.angle);
 
-		// if (this.mirror){
-		// 	this.imagecontext.translate(this.imagecache.width,0);
-		// 	this.imagecontext.scale(-1,1);
+		// if (this.mirror) {
+		// 	this.imagecontext.translate(this.imagecache.width, 0);
+		// 	this.imagecontext.scale(-1, 1);
 		// }
 
 		this.imagecontext.drawImage(
@@ -82,24 +110,26 @@ class PrerenderedObject {
 			this.image.width * this.scale, this.image.height * this.scale
 		);
 
-		this.imageDirty = false;
+		this._imageDirty = false;
 	}
 }
 
 class GameObject extends PrerenderedObject {
-	constructor(image, x, y, angle, scale) {
-		super(image, scale, angle);
+	constructor(x, y, image = null, angle = null, scale = null, register = true) {
+		super(image, angle, scale);
 		this.x = x;
 		this.y = y;
 		this.id = null;
 
-		// Status effect currently affecting this creep
+		// Status effects currently affecting this object
 		this.effects = new Set();
 		this.despawnTimer = -1;
 
+		if (register)
+			Controller.instance.registerObject(this);
 	}
-	update() {
 
+	update() {
 		// Apply status effects
 		this.effects.forEach(function (obj) {
 			obj.update(this);
@@ -111,6 +141,7 @@ class GameObject extends PrerenderedObject {
 			}
 		}
 	}
+
 	draw(gameArea) {
 		super.draw(gameArea, this.x, this.y);
 
@@ -119,12 +150,14 @@ class GameObject extends PrerenderedObject {
 			index = obj.draw(this, gameArea, index);
 		}.bind(this));
 	}
+
 	despawn() {
 		this.id = null;
 	}
+
 	addEffect(effect) {
 		for (var it = this.effects.values(), val = null; val = it.next().value;) {
-			if (val.constructor == effect.constructor) {
+			if (val.constructor === effect.constructor) {
 				val.cdtime = effect.cooldown;
 				return;
 			}
@@ -133,23 +166,11 @@ class GameObject extends PrerenderedObject {
 		this.effects.add(effect);
 		effect.init(this);
 	}
+
 	removeEffect(effect) {
 		this.effects.delete(effect);
 	}
 }
-
-// //Subimages should be arranged left to right
-// class SubimagedGameObject extends GameObject {
-//     constructor(image, subimageIndex, subimageWidth, x, y, angle, scale) {
-//         super(image, x, y, angle, scale);
-//         this.subimageIndex = subimageIndex;
-//         this.subimageWidth = subimageWidth;
-//     }
-//     draw(gameArea) {
-//         gameArea.drawSubimage(this.image, this.subimageIndex, this.subimageWidth, this.x, this.y, this.angle, this.scale);
-//     }
-// }
-
 
 class BaseEffect extends PrerenderedObject {
 

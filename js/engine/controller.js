@@ -1,5 +1,18 @@
 class Controller {
+    static _instances = [];
+    static get isSingleInstance() {
+        return this._instances.length === 1;
+    }
+    static get instance() {
+        if (this.isSingleInstance)
+            return this._instances[0];
+        else
+            throw new Error("Multiple controllers exist: " + this._instances.length);
+    }
+
     constructor(canvas, gridWidth = null, gridHeight = null, fastForwardFactor = 3, cancelFFOnPause = false) {
+        if (typeof (canvas) === "string")
+            canvas = document.getElementById(canvas);
         // Store the game area, which can be drawn to
         this.gameArea = new GameArea(canvas, gridWidth, gridHeight);
         // Essentially the frame rate inverse
@@ -36,6 +49,8 @@ class Controller {
 
         // Info field
         this.messagebox = document.getElementById("messagebox");
+
+        this.constructor._instances.push(this);
     }
 
     set fastForwardFactor(value) {
@@ -85,9 +100,12 @@ class Controller {
         else
             this.mainInterval = setInterval(() => this.update(), this.updateInterval);
 
-        this.playbutton.children[0].classList.add("hideme");
-        this.playbutton.children[1].classList.remove("hideme");
-        this.ffbutton.disabled = false;
+        if (this.playbutton) {
+            this.playbutton.children[0].classList.add("hideme");
+            this.playbutton.children[1].classList.remove("hideme");
+        }
+        if (this.ffbutton)
+            this.ffbutton.disabled = false;
     }
 
     onPause() {
@@ -95,9 +113,12 @@ class Controller {
         clearInterval(this.mainInterval);
         this.mainInterval = null;
 
-        this.playbutton.children[0].classList.remove("hideme");
-        this.playbutton.children[1].classList.add("hideme");
-        this.ffbutton.disabled = true;
+        if (this.playbutton) {
+            this.playbutton.children[0].classList.remove("hideme");
+            this.playbutton.children[1].classList.add("hideme");
+        }
+        if (this.ffbutton)
+            this.ffbutton.disabled = true;
         if (this.cancelFFOnPause) {
             this.isFF = false;
             this.offFastForward();
@@ -105,11 +126,13 @@ class Controller {
     }
 
     onFastForward() {
-        this.ffbutton.classList.add("keptPressed");
+        if (this.ffbutton)
+            this.ffbutton.classList.add("keptPressed");
     }
 
     offFastForward() {
-        this.ffbutton.classList.remove("keptPressed");
+        if (this.ffbutton)
+            this.ffbutton.classList.remove("keptPressed");
     }
 
     setMessage(message, pureText) {
