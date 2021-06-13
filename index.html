@@ -43,7 +43,10 @@
 	<script type="text/javascript">
 		let controller;
 		window.addEventListener("load", () => {
-			controller = new JumpController();
+			JumpController.loadStatusGraph()
+				.then(statusGraph => {
+					controller = new JumpController(statusGraph);
+				});
 			/*
 			// Resource loading tests
 			Resource.loadSingle("audio/myrstacken.mp3", LoopableAudio).then(audio => {

@@ -58,6 +58,15 @@ class Resource {
 						reject(response);
 				}).catch(reason => reject(reason));
 			});
+		else if (type === String)
+			promise = new Promise((resolve, reject) => {
+				fetch(path).then(response => {
+					if (response.ok)
+						resolve(response.text());
+					else
+						reject(response);
+				}).catch(reason => reject(reason));
+			});
 		else
 			promise = new Promise((resolve, reject) => {
 				const item = new type();

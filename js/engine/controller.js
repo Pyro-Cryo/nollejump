@@ -21,6 +21,8 @@ class Controller {
         this.timestampLast = null;
         this.isPaused = true;
         this.isFF = false;
+        this.minDelta = 0;
+        this.maxDelta = 100;
         
         this.fastForwardFactor = fastForwardFactor;
         this.cancelFFOnPause = cancelFFOnPause;
@@ -172,15 +174,21 @@ class Controller {
         if (!this._useAnimationFrameForUpdate)
             timestamp = new Date().getTime();
             
-        const delta = timestamp - this.timestampLast;
-        this.timestampLast = timestamp;
+        let delta = timestamp - this.timestampLast;
+        if (delta < this.minDelta)
+            return;
+        else
+            this.timestampLast = timestamp;
+        
+        delta = Math.min(this.maxDelta, delta);
 
-        // Skip first frame and frames where the player has tabbed out a while
-        if (this.timestampLast === null || delta > 1000) {
+        // Skip first frame
+        if (this.timestampLast === null) {
             if (this._useAnimationFrameForUpdate)
                 this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
             return;
         }
+
         
         if (this._useAnimationFrameForUpdate && this.isFF)
             delta *= this._fastForwardFactor;

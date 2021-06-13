@@ -4,9 +4,30 @@ const MIN_ASPECT_RATIO = 1 / 2;
 const WIDTH_PX = 384;
 
 class JumpController extends Controller {
-	constructor() {
+	constructor(statusGraph) {
 		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
+
+		this.statusGraph = statusGraph;
+		console.log(this.statusGraph)
+	}
+
+	static get defaultStatusGraph() {
+		return ["Föhseriet", "Fadderiet", "nØllan"];
+	}
+
+	// Hämtar inte denna med övriga assets pga att den failar om man testar utan att hosta en server lokalt
+	static async loadStatusGraph() {
+		try {
+			return await Resource.load(
+				"https://docs.google.com/spreadsheets/d/e/2PACX-1vSmx5deoelJokU0Q0SmiCdnegZnEnJM8AuhEMq33rT1mk_9I0WidCpnMPYzovkkfReUgd8V8G8NP8VV/pub?gid=512844469&single=true&output=csv",
+				String);
+		} catch (response) {
+			console.log(response);
+			if (response instanceof TypeError && response.message == "Failed to fetch")
+				console.warn("Kunde inte hämta statusgrafen. Prova att starta en server med ex. 'python -m http.server' i nollejump-mappen.");
+			return this.defaultStatusGraph;
+		}
 	}
 
 	startDrawLoop(barHeight, margin) {
