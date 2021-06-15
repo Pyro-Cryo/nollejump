@@ -24,8 +24,8 @@ class JumpPlayer extends Player {
 		);
 		this.speedHorizontal = 0;
 		this.maxSpeedHorizontal = 0.8;
-		this.accelerationHorizontal = 0.005;
-		this.decayHorizontal = 0.012;
+		this.accelerationHorizontal = 0.003;
+		this.decayHorizontal = 0.004;
 
 		this.speedVertical = -0.1;
 		this.accelerationVertical = 0.003;
@@ -75,7 +75,7 @@ class JumpPlayer extends Player {
 				-this.maxSpeedHorizontal);
 		}
 		if (!this.isPressed.get(ActionGoLeft) && !this.isPressed.get(ActionGoRight)) {
-			this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) - this.decayHorizontal * delta);
+			this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) * (1 - this.decayHorizontal * delta));
 		}
 
 		if (this.isPressed.get(ActionShoot)) {

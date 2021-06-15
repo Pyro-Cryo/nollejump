@@ -1,5 +1,7 @@
 const CAMERA_TRACKING_CENTER = 1;
 const CAMERA_TRACKING_INFRAME = 2;
+const CAMERA_TRACKING_NONE = 3;
+
 class Player extends EffectObject {
 	/**
 	 * 
@@ -28,8 +30,7 @@ class Player extends EffectObject {
 			else
 				this.setCameraTracking(cameraTracking);
 		}
-			
-		this._gameArea = null;
+
 	}
 
 	despawn() {
@@ -63,6 +64,10 @@ class Player extends EffectObject {
 					marginLeft: param4
 				};
 				break;
+
+			case CAMERA_TRACKING_NONE:
+				this.cameraTrackingMode = null;
+				this.cameraTrackingParams = null;
 
 			default:
 				throw new Error("Unknown camera tracking mode: " + this.cameraTrackingMode);
@@ -121,10 +126,10 @@ class Player extends EffectObject {
 				this.pressDuration += delta;
 		}
 
-		if (this.cameraTrackingMode && this._gameArea !== null) {
+		if (this.cameraTrackingMode) {
 			switch (this.cameraTrackingMode) {
 				case CAMERA_TRACKING_CENTER:
-					this._gameArea.centerCameraOn(
+					this.centerCameraOn(
 						this.x,
 						this.y,
 						this.cameraTrackingParams.horizontally,
@@ -132,7 +137,7 @@ class Player extends EffectObject {
 					break;
 				
 				case CAMERA_TRACKING_INFRAME:
-					this._gameArea.keepInFrame(
+					this.keepInFrame(
 						this.x,
 						this.y,
 						this.imagecache.width,
@@ -146,8 +151,62 @@ class Player extends EffectObject {
 		}
 	}
 
-	draw(gameArea) {
-		super.draw(gameArea);
-		this._gameArea = gameArea;
+	centerCameraOn(_x, _y, horizontally = true, vertically = true) {
+
+		let offset_x = 0;
+		let offset_y = 0;
+		if (horizontally)
+			offset_x = this.x - controller.gameArea.gridWidth / 2;
+		if (vertically)
+			offset_y = controller.gameArea.gridHeight / 2 - this.y;
+
+		if (offset_x != 0 && offset_y != 0)
+			controller.scrollWorld(offset_x, offset_y);
 	}
+
+	keepInFrame(_x, _y, width = 0, height = null, marginTop = 0, marginRight = null, marginBottom = null, marginLeft = null) {
+		
+		let offset_x = 0;
+		let offset_y = 0;
+
+		if (height === null)
+			height = width;
+		if (marginRight === null)
+			marginRight = marginTop;
+		if (marginBottom === null)
+			marginBottom = marginTop;
+		if (marginLeft === null)
+			marginLeft = marginRight;
+		
+		const xLeft = controller.gameArea.gridToCanvasX(this.x - width / 2);
+		const xRight = controller.gameArea.gridToCanvasX(this.x + width / 2);
+		const yTop = controller.gameArea.gridToCanvasY(this.y - height / 2);
+		const yBottom = controller.gameArea.gridToCanvasY(this.y + height / 2);
+
+		// console.log(xLeft, xRight, yTop, yBottom);
+
+		// Nånting sånt här typ
+
+		// if (xLeft < marginLeft) {
+		// 	offset_x = xLeft;
+		// }
+		// else if (offset_x + controller.gameArea.canvas.width - xRight < marginRight) {
+		// 	offset_x = xRight + marginRight - controller.gameArea.canvas.width;
+		// }
+		if (yTop < marginTop)
+			offset_y =  marginTop - yTop;
+		else if (yBottom < marginBottom)
+			offset_y = yBottom + marginBottom;
+
+		// console.log(yTop, marginTop, offset_y);
+
+
+		if (offset_x != 0 || offset_y != 0) {
+			// console.log(offset_y);
+			controller.scrollWorld(offset_x, offset_y);
+		}
+
+	}
+
+
 }

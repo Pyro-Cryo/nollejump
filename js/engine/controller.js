@@ -28,12 +28,15 @@ class Controller {
         this.cancelFFOnPause = cancelFFOnPause;
         
         this.drawLoop = null;
-        // All objects which receive update calls
-        this.objects = new LinkedList();
         // The id of the next registered object
         this.idCounter = 0;
+        // All objects which receive update calls
+        this.objects = new LinkedList();
         // Objects which are drawn over all others
         this.delayedRenderObjects = [];
+
+        this.scheduledWorldScroll = {x:0, y:0};
+
 
         // Buttons
         this.playbutton = document.getElementById("playButton");
@@ -211,8 +214,32 @@ class Controller {
             this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
     }
 
+    scrollWorld(x, y) {
+
+        this.scheduledWorldScroll.x = x;
+        this.scheduledWorldScroll.y = y;
+
+    }
+
     draw() {
         this.gameArea.clear();
+
+        if (this.scheduledWorldScroll.x !== 0 || this.scheduledWorldScroll.y !== 0){
+            for (const obj of this.objects){
+                if (obj.id !== null){
+                    obj.x -= this.scheduledWorldScroll.x;
+                    obj.y += this.scheduledWorldScroll.y;
+                }
+            }
+            // for (const obj of this.delayedRenderObjects){
+            //     if (obj.id !== null){
+            //         obj.x -= this.scheduledWorldScroll.x;
+            //         obj.y += this.scheduledWorldScroll.y;
+            //     }
+            // }
+            this.scheduledWorldScroll.x = 0;
+            this.scheduledWorldScroll.y = 0;
+        }
         
         for (const obj of this.objects)
             if (obj.id !== null)

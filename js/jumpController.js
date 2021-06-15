@@ -23,7 +23,7 @@ class JumpController extends Controller {
 				"https://docs.google.com/spreadsheets/d/e/2PACX-1vSmx5deoelJokU0Q0SmiCdnegZnEnJM8AuhEMq33rT1mk_9I0WidCpnMPYzovkkfReUgd8V8G8NP8VV/pub?gid=512844469&single=true&output=csv",
 				String);
 		} catch (response) {
-			console.log(response);
+			// console.log(response);
 			if (response instanceof TypeError && response.message == "Failed to fetch")
 				console.warn("Kunde inte hämta statusgrafen. Prova att starta en server med ex. 'python -m http.server' i nollejump-mappen.");
 			return this.defaultStatusGraph;
