@@ -9,21 +9,42 @@ class JumpController extends Controller {
 		this.canvasContainer = document.getElementById("gameboardContainer");
 
 		this.statusGraph = statusGraph;
-		console.log(this.statusGraph)
 	}
 
 	static get defaultStatusGraph() {
-		return ["Föhseriet", "Fadderiet", "nØllan"];
+		return [["Föhseriet", 2], ["Fadderiet", 0], ["nØllan", -2]];
 	}
 
 	// Hämtar inte denna med övriga assets pga att den failar om man testar utan att hosta en server lokalt
 	static async loadStatusGraph() {
 		try {
-			return await Resource.load(
+			const response = await Resource.load(
 				"https://docs.google.com/spreadsheets/d/e/2PACX-1vSmx5deoelJokU0Q0SmiCdnegZnEnJM8AuhEMq33rT1mk_9I0WidCpnMPYzovkkfReUgd8V8G8NP8VV/pub?gid=512844469&single=true&output=csv",
 				String);
+
+			// TODO: gör/använd en ordentlig CSV-parser för det här uppfyller inte alls specen
+			const matches = Array.from(response.matchAll(/^(("[^"]*")+|[^,]*),(("[^"]*")+|[^,]*)$/gm));
+			function trimQuotes(s) {
+				if (s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"')
+					return s.substring(1, s.length - 1);
+				else
+					return s;
+			}
+
+			const statusGraph = matches.map(match => [
+				trimQuotes(match[1]).trim(),
+				trimQuotes(match[3]).trim()
+					.replace(",", ".")
+					.replace("−", "-") // tack google forms
+					* 1
+			]);
+
+			console.log("Fetched status graph:", statusGraph);
+			return statusGraph;
+			
 		} catch (response) {
 			console.log(response);
+			console.log("Using default status graph:", this.defaultStatusGraph);
 			if (response instanceof TypeError && response.message == "Failed to fetch")
 				console.warn("Kunde inte hämta statusgrafen. Prova att starta en server med ex. 'python -m http.server' i nollejump-mappen.");
 			return this.defaultStatusGraph;
