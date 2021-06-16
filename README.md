@@ -15,3 +15,5 @@ Inspirerat av nåt som rimmar på Noodle Jump. Maskoten hoppar på plattformar f
 - Crowdsourcea de olika nivåerna på statusgrafen (dock med moderering), och/eller sorteringen. Se punkten nedan.
 - Vore kul att få till en highscorelista. Går säkert om man får lite hjälp av fdev (kommer dock nog inte funka på Github Pages pga CORS?). Går säkert med mer möda om man använder Googleformulär.
 - Man kanske kan skjuta frukt på fiender? Eller så ger frukt extra powerups / poäng?
+- Plattforms-pathen delar på sig i horisontell led och leder till olika "examen", som fysiker, matematiker och datalog (naturligtvis tar datalog-pathen slut på en något lägre y-status-nivå än fysiker/matematiker, som står högre i rang på grafen). 
+- Kombinera hoppa i y-led med att flyga genom hinder i x-led liknande ett annat känt spel som rimmar på Happy Bird. Kan bli sjukt svårt, men kanske är det TFs hemliga vapen mot att nØllan når för hög status på grafen?
