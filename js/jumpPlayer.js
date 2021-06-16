@@ -61,6 +61,12 @@ class JumpPlayer extends Player {
 		}
 	}
 
+	translate(dx, dy){
+		super.translate(dx, dy);
+		this.lastX += dx;
+		this.lastY += dy;
+	}
+
 	update(delta) {
 		super.update(delta);
 

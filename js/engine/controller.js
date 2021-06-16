@@ -210,6 +210,15 @@ class Controller {
             }
         }
 
+        if (this.scheduledWorldScroll.x !== 0 || this.scheduledWorldScroll.y !== 0){
+            for (const obj of this.objects)
+                if (obj.id !== null)
+                    obj.translate(-this.scheduledWorldScroll.x, this.scheduledWorldScroll.y);
+                
+            this.scheduledWorldScroll.x = 0;
+            this.scheduledWorldScroll.y = 0;
+        }
+
         if (this._useAnimationFrameForUpdate)
             this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
     }
@@ -223,23 +232,6 @@ class Controller {
 
     draw() {
         this.gameArea.clear();
-
-        if (this.scheduledWorldScroll.x !== 0 || this.scheduledWorldScroll.y !== 0){
-            for (const obj of this.objects){
-                if (obj.id !== null){
-                    obj.x -= this.scheduledWorldScroll.x;
-                    obj.y += this.scheduledWorldScroll.y;
-                }
-            }
-            // for (const obj of this.delayedRenderObjects){
-            //     if (obj.id !== null){
-            //         obj.x -= this.scheduledWorldScroll.x;
-            //         obj.y += this.scheduledWorldScroll.y;
-            //     }
-            // }
-            this.scheduledWorldScroll.x = 0;
-            this.scheduledWorldScroll.y = 0;
-        }
         
         for (const obj of this.objects)
             if (obj.id !== null)

@@ -183,26 +183,28 @@ class Player extends EffectObject {
 		const yTop = controller.gameArea.gridToCanvasY(this.y - height / 2);
 		const yBottom = controller.gameArea.gridToCanvasY(this.y + height / 2);
 
-		// console.log(xLeft, xRight, yTop, yBottom);
-
 		// Nånting sånt här typ
 
-		// if (xLeft < marginLeft) {
-		// 	offset_x = xLeft;
-		// }
-		// else if (offset_x + controller.gameArea.canvas.width - xRight < marginRight) {
-		// 	offset_x = xRight + marginRight - controller.gameArea.canvas.width;
-		// }
-		if (yTop < marginTop)
-			offset_y =  marginTop - yTop;
-		else if (yBottom < marginBottom)
-			offset_y = yBottom + marginBottom;
+		// console.log(xLeft, xRight, yTop, yBottom);
 
-		// console.log(yTop, marginTop, offset_y);
+		if (xLeft < marginLeft) {
+			offset_x = xLeft - marginLeft;
+		}
+		else if (xRight > controller.gameArea.width - marginRight) {
+			offset_x = xRight - controller.gameArea.width + marginRight;
+		}
+		if (yTop < marginTop){
+			offset_y =  marginTop - yTop;
+		}
+		else if (yBottom > controller.gameArea.height - marginBottom){
+			// console.log("bottom", this.y, yBottom, controller.gameArea.height, marginBottom);
+			offset_y = -(yBottom - controller.gameArea.height + marginBottom);
+			console.log(yBottom, -(yBottom - controller.gameArea.height + marginBottom));
+		}
 
 
 		if (offset_x != 0 || offset_y != 0) {
-			// console.log(offset_y);
+			// console.log(offset_x, offset_y);
 			controller.scrollWorld(offset_x, offset_y);
 		}
 

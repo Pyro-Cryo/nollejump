@@ -144,6 +144,11 @@ class GameObject extends PrerenderedObject {
 		}
 	}
 
+	translate(dx, dy){
+		this.x += dx;
+		this.y += dy;
+	}
+
 	/**
 	 * Draw the object
 	 * @param {GameArea} gameArea 

@@ -101,6 +101,40 @@ class GameArea {
         this.drawOffsetY = 0;
     }
 
+	centerCameraOn(_x, _y, horizontally = true, vertically = true) {
+        if (horizontally)
+		    this.drawOffsetX = _x - this.gridWidth / 2;
+        if (vertically)
+		    this.drawOffsetY = _y - this.gridHeight / 2;
+	}
+
+	keepInFrame(_x, _y, width = 0, height = null, marginTop = 0, marginRight = null, marginBottom = null, marginLeft = null) {
+        if (height === null)
+            height = width;
+        if (marginRight === null)
+            marginRight = marginTop;
+        if (marginBottom === null)
+            marginBottom = marginTop;
+        if (marginLeft === null)
+            marginLeft = marginRight;
+        
+		const xLeft = this.gridToCanvasX(_x - width / 2);
+        const xRight = this.gridToCanvasX(_x + width / 2);
+		const yTop = this.gridToCanvasY(_y - height / 2);
+        const yBottom = this.gridToCanvasY(_y + height / 2);
+
+		if (xLeft - this.drawOffsetX < marginLeft) {
+			this.drawOffsetX = xLeft - marginLeft;
+        }
+		else if (this.drawOffsetX + this.canvas.width - xRight < marginRight) {
+			this.drawOffsetX = xRight + marginRight - this.canvas.width;
+        }
+		if (yTop - this.drawOffsetY < marginTop)
+			this.drawOffsetY = yTop - marginTop;
+		else if (this.drawOffsetY + this.canvas.height - yBottom < marginBottom)
+			this.drawOffsetY = yBottom + marginBottom - this.canvas.height;
+	}
+
     clear() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
