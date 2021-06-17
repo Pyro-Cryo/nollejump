@@ -186,6 +186,7 @@ class Player extends EffectObject {
 		this._gameArea = gameArea;
 	}
 
+	// TODO: these probably break as well when using different grid origins
 	centerCameraOn(_x, _y, horizontally = true, vertically = true) {
 
 		let offset_x = 0;

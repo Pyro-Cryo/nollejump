@@ -10,10 +10,12 @@ class Controller {
             throw new Error("Multiple controllers exist: " + this._instances.length);
     }
 
-    constructor(canvas, updateInterval = null, gridWidth = null, gridHeight = null, fastForwardFactor = 3, cancelFFOnPause = false) {
+    constructor(canvas, updateInterval = null, gridWidth = null, gridHeight = null,
+            gridOrigin = GRID_ORIGIN_UPPER_LEFT, fastForwardFactor = 3,
+            cancelFFOnPause = false) {
         if (typeof (canvas) === "string")
             canvas = document.getElementById(canvas);
-        this.gameArea = new GameArea(canvas, gridWidth, gridHeight);
+        this.gameArea = new GameArea(canvas, gridWidth, gridHeight, gridOrigin);
         
         this.updateInterval = updateInterval;
         this._useAnimationFrameForUpdate = this.updateInterval === null;

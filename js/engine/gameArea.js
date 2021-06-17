@@ -1,7 +1,15 @@
+const _GRID_ORIGIN_REVERSE_X = 0b01;
+const _GRID_ORIGIN_REVERSE_Y = 0b10;
+const GRID_ORIGIN_UPPER_LEFT = 0;
+const GRID_ORIGIN_LOWER_LEFT = _GRID_ORIGIN_REVERSE_Y;
+const GRID_ORIGIN_UPPER_RIGHT = _GRID_ORIGIN_REVERSE_X;
+const GRID_ORIGIN_LOWER_RIGHT = _GRID_ORIGIN_REVERSE_X | _GRID_ORIGIN_REVERSE_Y;
+
 class GameArea {
-    constructor(canvas, gridWidth, gridHeight) {
+    constructor(canvas, gridWidth, gridHeight, gridOrigin = GRID_ORIGIN_UPPER_LEFT) {
         this.canvas = canvas;
         this.context = this.canvas.getContext("2d");
+        this.gridOrigin = gridOrigin;
 
         if (gridWidth === null && gridHeight === null) {
             this._usesGrid = false;
@@ -17,15 +25,15 @@ class GameArea {
             this._gridWidth = gridWidth;
             this._gridHeight = gridHeight;
 
-            this._unitWidth = this.gridToCanvasX(1) - this.gridToCanvasX(0);
-            this._unitHeight = this.gridToCanvasY(1) - this.gridToCanvasY(0);
+            this._unitWidth = Math.abs(this.gridToCanvasX(1) - this.gridToCanvasX(0));
+            this._unitHeight = Math.abs(this.gridToCanvasY(1) - this.gridToCanvasY(0));
             this._scaleFactor = Math.sqrt((Math.pow(this.unitWidth, 2) + Math.pow(this.unitHeight, 2)) / 2);
         }
         else {
             throw new Error(`Either set both gridWidth and gridHeight to null, or neither: ${gridWidth} x ${gridHeight}`);
         }
 
-        // Draw offset in grid coordinate units
+        // Draw offset in canvas units
         this.drawOffsetX = 0;
         this.drawOffsetY = 0;
     }
@@ -82,18 +90,45 @@ class GameArea {
         return this._gridHeight;
     }
 
+    // TODO: borde dessa räkna med drawOffset? Jag lutar åt ja
     gridToCanvasX(x) {
-        return (x + 0.5) * this.canvas.width / this._gridWidth;
+        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_X)
+            return this.canvas.width * (1 - (x + 0.5) / this._gridWidth);
+        else
+            return this.canvas.width * (x + 0.5) / this._gridWidth;
     }
     gridToCanvasY(y) {
-        return (y + 0.5) * this.canvas.height / this._gridHeight;
+        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_Y)
+            return this.canvas.height * (1 - (y + 0.5) / this._gridHeight);
+        else
+            return this.canvas.height * (y + 0.5) / this._gridHeight;
     }
 
     canvasToGridX(x) {
-        return (x * this._gridWidth / this.canvas.width) - 0.5;
+        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_X)
+            return (1 - x / this.canvas.width) * this._gridWidth - 0.5;
+        else
+            return x / this.canvas.width * this._gridWidth - 0.5;
     }
     canvasToGridY(y) {
-        return (y * this._gridHeight / this.canvas.height) - 0.5;
+        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_Y)
+            return (1 - y / this.canvas.height) * this._gridHeight - 0.5;
+        else
+            return y / this.canvas.height * this._gridHeight - 0.5;
+    }
+
+    get leftEdgeInGrid() {
+        return this.canvasToGridY(this.drawOffsetY);
+    }
+    get rightEdgeInGrid() {
+        return this.canvasToGridY(this.canvas.width - this.drawOffsetY);
+    }
+
+    get topEdgeInGrid() {
+        return this.canvasToGridY(this.drawOffsetY);
+    }
+    get bottomEdgeInGrid() {
+        return this.canvasToGridY(this.canvas.height - this.drawOffsetY);
     }
 
     resetDrawOffset() {
@@ -103,9 +138,9 @@ class GameArea {
 
     centerCameraOn(_x, _y, horizontally = true, vertically = true) {
         if (horizontally)
-            this.drawOffsetX = _x - this.gridWidth / 2;
+            this.drawOffsetX = -this.gridToCanvasX(_x) + this.canvas.width / 2;
         if (vertically)
-            this.drawOffsetY = _y - this.gridHeight / 2;
+            this.drawOffsetY = -this.gridToCanvasY(_y) + this.canvas.height / 2;
     }
 
     keepInFrame(_x, _y, width = 0, height = null, marginTop = 0, marginRight = null, marginBottom = null, marginLeft = null) {
@@ -118,21 +153,19 @@ class GameArea {
         if (marginLeft === null)
             marginLeft = marginRight;
 
-        const xLeft = this.gridToCanvasX(_x - width / 2);
-        const xRight = this.gridToCanvasX(_x + width / 2);
-        const yTop = this.gridToCanvasY(_y - height / 2);
-        const yBottom = this.gridToCanvasY(_y + height / 2);
+        const xLeft = this.gridToCanvasX(_x) - width * this._unitWidth / 2;
+        const xRight = this.gridToCanvasX(_x) + width * this._unitWidth / 2;
+        const yTop = this.gridToCanvasY(_y) - height * this._unitWidth / 2;
+        const yBottom = this.gridToCanvasY(_y) + height * this._unitWidth / 2;
 
-        if (xLeft - this.drawOffsetX < marginLeft) {
-            this.drawOffsetX = xLeft - marginLeft;
-        }
-        else if (this.drawOffsetX + this.canvas.width - xRight < marginRight) {
-            this.drawOffsetX = xRight + marginRight - this.canvas.width;
-        }
-        if (yTop - this.drawOffsetY < marginTop)
-            this.drawOffsetY = yTop - marginTop;
-        else if (this.drawOffsetY + this.canvas.height - yBottom < marginBottom)
-            this.drawOffsetY = yBottom + marginBottom - this.canvas.height;
+        if (xLeft + this.drawOffsetX < marginLeft)
+            this.drawOffsetX = -xLeft + marginLeft;
+        else if (this.canvas.width - (xRight + this.drawOffsetX) < marginRight)
+            this.drawOffsetX = -xRight - marginRight + this.canvas.width;
+        if (yTop + this.drawOffsetY < marginTop)
+            this.drawOffsetY = -yTop + marginTop;
+        else if (this.canvas.height - (yBottom + this.drawOffsetY) < marginBottom)
+            this.drawOffsetY = -yBottom - marginBottom + this.canvas.height;
     }
 
     clear() {
@@ -141,8 +174,8 @@ class GameArea {
 
     // Draws an image centered around (x, y) with the specified angle (in radians) and scale
     draw(image, _x, _y, angle, scale, considerOffset = true) {
-        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
-        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
+        const x = this.gridToCanvasX(_x) + considerOffset * this.drawOffsetX;
+        const y = this.gridToCanvasY(_y) + considerOffset * this.drawOffsetY;
         if (!angle) {
             if (scale == 1)
                 this.context.drawImage(
@@ -177,8 +210,8 @@ class GameArea {
 
     // Draws a subimage from an image, centered around (x, y) with the specified angle (in radians) and scale
     drawSubimage(image, subimageIndex, subimageWidth, _x, _y, angle, scale, considerOffset) {
-        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
-        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
+        const x = this.gridToCanvasX(_x) + considerOffset * this.drawOffsetX;
+        const y = this.gridToCanvasY(_y) + considerOffset * this.drawOffsetY;
         if (!angle) {
             this.context.drawImage(
                 image,
@@ -203,8 +236,8 @@ class GameArea {
     }
 
     disc(_x, _y, radius = 1, color = "#000000", considerOffset = true) {
-        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
-        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
+        const x = this.gridToCanvasX(_x) + considerOffset * this.drawOffsetX;
+        const y = this.gridToCanvasY(_y) + considerOffset * this.drawOffsetY;
         const fillStyle = this.context.fillStyle;
         this.context.fillStyle = color;
         this.context.beginPath();
@@ -218,8 +251,8 @@ class GameArea {
     }
 
     rect(_x, _y, width = 1, height = 1, color = "#000000", considerOffset = true) {
-        const x = this.gridToCanvasX(_x - width / 2 - considerOffset * this.drawOffsetX);
-        const y = this.gridToCanvasY(_y - height / 2 - considerOffset * this.drawOffsetY);
+        const x = this.gridToCanvasX(_x) - width / 2 + considerOffset * this.drawOffsetX;
+        const y = this.gridToCanvasY(_y) - height / 2 + considerOffset * this.drawOffsetY;
         const fillStyle = this.context.fillStyle;
         this.context.fillStyle = color;
         this.context.fillRect(x, y, width * this.unitWidth, height * this.unitHeight);
@@ -227,8 +260,8 @@ class GameArea {
     }
 
     bar(_x, _y, offset, length, width, ratio, fgColor = "#FF0000", bgColor = "#00FF00", considerOffset = true) {
-        const x = this.gridToCanvasX(_x - considerOffset * this.drawOffsetX);
-        const y = this.gridToCanvasY(_y - considerOffset * this.drawOffsetY);
+        const x = this.gridToCanvasX(_x) + considerOffset * this.drawOffsetX;
+        const y = this.gridToCanvasY(_y) + considerOffset * this.drawOffsetY;
         offset *= this.unitHeight;
         length *= this.unitWidth;
         const fillStyle = this.context.fillStyle;
