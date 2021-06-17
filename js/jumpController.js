@@ -7,6 +7,7 @@ class JumpController extends Controller {
 	constructor(statusGraph) {
 		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
+		this.gameArea.gridOrigin = GRID_ORIGIN_LOWER_LEFT;
 
 		this.statusGraph = statusGraph;
 	}
@@ -69,9 +70,9 @@ class JumpController extends Controller {
 		const platWidth = Platform.image.width * Platform.scale;
 		// const platHeight = Platform.image.height * Platform.scale;
 		for (let x = 0; x < this.gameArea.gridWidth; x += platWidth)
-			this.player.addCollidible(new Platform(x + platWidth / 2, this.gameArea.gridHeight - 40));
+			this.player.addCollidible(new Platform(x + platWidth / 2, 40));
 		
-		for (let y = this.gameArea.gridHeight - 40; y > -10000; y -= 200)
+		for (let y = 240; y < 10000; y += 200)
 			this.player.addCollidible(new Platform(
 				Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
 				y));

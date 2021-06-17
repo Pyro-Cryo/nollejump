@@ -16,7 +16,13 @@ class JumpPlayer extends Player {
 				["ArrowRight", ActionGoRight],
 				["Space", ActionShoot]
 			]),
-			[CAMERA_TRACKING_INFRAME, 100, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY],
+			[
+				CAMERA_TRACKING_INFRAME,
+				200, // Margin top
+				Number.NEGATIVE_INFINITY, // Margin right
+				Number.NEGATIVE_INFINITY, // Margin bottom
+				Number.NEGATIVE_INFINITY // Margin left
+			],
 			null,
 			null,
 			null,
@@ -24,11 +30,11 @@ class JumpPlayer extends Player {
 		);
 		this.speedHorizontal = 0;
 		this.maxSpeedHorizontal = 0.8;
-		this.accelerationHorizontal = 0.003;
-		this.decayHorizontal = 0.004;
+		this.accelerationHorizontal = 0.004;
+		this.decayHorizontal = 0.003;
 
-		this.speedVertical = -0.1;
-		this.accelerationVertical = 0.003;
+		this.speedVertical = 0.1;
+		this.accelerationVertical = -0.003;
 		this.jumpSpeed = 1.5;
 
 		this.lastX = x;
@@ -39,7 +45,7 @@ class JumpPlayer extends Player {
 	}
 
 	standardBounce() {
-		this.speedVertical = -this.jumpSpeed;
+		this.speedVertical = this.jumpSpeed;
 	}
 
 	// TODO: implement shooting
@@ -93,7 +99,7 @@ class JumpPlayer extends Player {
 		this.y += this.speedVertical * delta;
 		
 		// Trillar man ner förlorar man
-		if (this.y >= controller.gameArea.drawOffsetY + controller.gameArea.gridHeight + 3 * this.height / controller.gameArea.unitHeight) {
+		if (this.y <= controller.gameArea.drawOffsetY - 3 * this.height / controller.gameArea.unitHeight) {
 			this.despawn();
 			alert("ded");
 		}
