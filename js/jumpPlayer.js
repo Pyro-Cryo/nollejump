@@ -81,7 +81,7 @@ class JumpPlayer extends Player {
 				-this.maxSpeedHorizontal);
 		}
 		if (!this.isPressed.get(ActionGoLeft) && !this.isPressed.get(ActionGoRight)) {
-			this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) * (1 - this.decayHorizontal * delta));
+			this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) - this.decayHorizontal * delta);
 		}
 
 		if (this.isPressed.get(ActionShoot)) {
