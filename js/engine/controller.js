@@ -224,10 +224,8 @@ class Controller {
     }
 
     scrollWorld(x, y) {
-
-        this.scheduledWorldScroll.x = x;
-        this.scheduledWorldScroll.y = y;
-
+        this.scheduledWorldScroll.x += x;
+        this.scheduledWorldScroll.y += y;
     }
 
     draw() {

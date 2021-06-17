@@ -1,6 +1,10 @@
+const CAMERA_TRACKING_NONE = 0;
+// "regular" = keep an offset in gameArea used during drawing
 const CAMERA_TRACKING_CENTER = 1;
 const CAMERA_TRACKING_INFRAME = 2;
-const CAMERA_TRACKING_NONE = 3;
+// KSP = change all objects' coordinates
+const CAMERA_TRACKING_KSP_CENTER = 3;
+const CAMERA_TRACKING_KSP_INFRAME = 4;
 
 class Player extends EffectObject {
 	/**
@@ -31,6 +35,7 @@ class Player extends EffectObject {
 				this.setCameraTracking(cameraTracking);
 		}
 
+		this._gameArea = null;
 	}
 
 	despawn() {
@@ -43,7 +48,13 @@ class Player extends EffectObject {
 		this.cameraTrackingMode = null;
 
 		switch (mode) {
+			case CAMERA_TRACKING_NONE:
+				this.cameraTrackingMode = null;
+				this.cameraTrackingParams = null;
+				break;
+
 			case CAMERA_TRACKING_CENTER:
+			case CAMERA_TRACKING_KSP_CENTER:
 				this.cameraTrackingMode = mode;
 
 				const horizontally = param1 === null ? true : !!param1;
@@ -55,6 +66,7 @@ class Player extends EffectObject {
 				break;
 
 			case CAMERA_TRACKING_INFRAME:
+			case CAMERA_TRACKING_KSP_INFRAME:
 				this.cameraTrackingMode = mode;
 
 				this.cameraTrackingParams = {
@@ -64,10 +76,6 @@ class Player extends EffectObject {
 					marginLeft: param4
 				};
 				break;
-
-			case CAMERA_TRACKING_NONE:
-				this.cameraTrackingMode = null;
-				this.cameraTrackingParams = null;
 
 			default:
 				throw new Error("Unknown camera tracking mode: " + this.cameraTrackingMode);
@@ -129,6 +137,15 @@ class Player extends EffectObject {
 		if (this.cameraTrackingMode) {
 			switch (this.cameraTrackingMode) {
 				case CAMERA_TRACKING_CENTER:
+					if (this._gameArea)
+						this._gameArea.centerCameraOn(
+							this.x,
+							this.y,
+							this.cameraTrackingParams.horizontally,
+							this.cameraTrackingParams.vertically);
+					break;
+
+				case CAMERA_TRACKING_KSP_CENTER:
 					this.centerCameraOn(
 						this.x,
 						this.y,
@@ -137,6 +154,19 @@ class Player extends EffectObject {
 					break;
 				
 				case CAMERA_TRACKING_INFRAME:
+					if (this._gameArea)
+						this._gameArea.keepInFrame(
+							this.x,
+							this.y,
+							this.imagecache.width,
+							this.imagecache.height,
+							this.cameraTrackingParams.marginTop,
+							this.cameraTrackingParams.marginRight,
+							this.cameraTrackingParams.marginBottom,
+							this.cameraTrackingParams.marginLeft);
+						break;
+				
+				case CAMERA_TRACKING_KSP_INFRAME:
 					this.keepInFrame(
 						this.x,
 						this.y,
@@ -151,17 +181,22 @@ class Player extends EffectObject {
 		}
 	}
 
+	draw(gameArea) {
+		super.draw(gameArea);
+		this._gameArea = gameArea;
+	}
+
 	centerCameraOn(_x, _y, horizontally = true, vertically = true) {
 
 		let offset_x = 0;
 		let offset_y = 0;
 		if (horizontally)
-			offset_x = this.x - controller.gameArea.gridWidth / 2;
+			offset_x = this.x - Controller.instance.gameArea.gridWidth / 2;
 		if (vertically)
-			offset_y = controller.gameArea.gridHeight / 2 - this.y;
+			offset_y = Controller.instance.gameArea.gridHeight / 2 - this.y;
 
 		if (offset_x != 0 && offset_y != 0)
-			controller.scrollWorld(offset_x, offset_y);
+			Controller.instance.scrollWorld(offset_x, offset_y);
 	}
 
 	keepInFrame(_x, _y, width = 0, height = null, marginTop = 0, marginRight = null, marginBottom = null, marginLeft = null) {
@@ -178,10 +213,10 @@ class Player extends EffectObject {
 		if (marginLeft === null)
 			marginLeft = marginRight;
 		
-		const xLeft = controller.gameArea.gridToCanvasX(this.x - width / 2);
-		const xRight = controller.gameArea.gridToCanvasX(this.x + width / 2);
-		const yTop = controller.gameArea.gridToCanvasY(this.y - height / 2);
-		const yBottom = controller.gameArea.gridToCanvasY(this.y + height / 2);
+		const xLeft = Controller.instance.gameArea.gridToCanvasX(this.x - width / 2);
+		const xRight = Controller.instance.gameArea.gridToCanvasX(this.x + width / 2);
+		const yTop = Controller.instance.gameArea.gridToCanvasY(this.y - height / 2);
+		const yBottom = Controller.instance.gameArea.gridToCanvasY(this.y + height / 2);
 
 		// Nånting sånt här typ
 
@@ -190,22 +225,22 @@ class Player extends EffectObject {
 		if (xLeft < marginLeft) {
 			offset_x = xLeft - marginLeft;
 		}
-		else if (xRight > controller.gameArea.width - marginRight) {
-			offset_x = xRight - controller.gameArea.width + marginRight;
+		else if (xRight > Controller.instance.gameArea.width - marginRight) {
+			offset_x = xRight - Controller.instance.gameArea.width + marginRight;
 		}
 		if (yTop < marginTop){
 			offset_y =  marginTop - yTop;
 		}
-		else if (yBottom > controller.gameArea.height - marginBottom){
-			// console.log("bottom", this.y, yBottom, controller.gameArea.height, marginBottom);
-			offset_y = -(yBottom - controller.gameArea.height + marginBottom);
-			console.log(yBottom, -(yBottom - controller.gameArea.height + marginBottom));
+		else if (yBottom > Controller.instance.gameArea.height - marginBottom){
+			// console.log("bottom", this.y, yBottom, Controller.instance.gameArea.height, marginBottom);
+			offset_y = -(yBottom - Controller.instance.gameArea.height + marginBottom);
+			console.log(yBottom, -(yBottom - Controller.instance.gameArea.height + marginBottom));
 		}
 
 
 		if (offset_x != 0 || offset_y != 0) {
 			// console.log(offset_x, offset_y);
-			controller.scrollWorld(offset_x, offset_y);
+			Controller.instance.scrollWorld(offset_x, offset_y);
 		}
 
 	}
