@@ -7,6 +7,8 @@ class Platform extends EffectObject {
 	constructor(x, y) {
 		super(x, y);
 		this.despawnMargin = this.constructor.despawnMargin;
+		if (this._imageDirty)
+			this.prerender();
 	}
 
 	/**
@@ -36,6 +38,15 @@ class Platform extends EffectObject {
 	}
 
 	draw(gameArea) {
+		if (this._imageDirty) {
+			const length = 1.41 * this.scale * Math.max(this.image.width, this.image.height);
+			if (!gameArea.isInFrame(this.x, this.y, length, length, true))
+				return;
+		} else {
+			if (!gameArea.isInFrame(this.x, this.y, this.width, this.height, true))
+				return;
+		}
+
 		super.draw(gameArea);
 		// Screen wrapping
 		if (this.x - this.width < controller.gameArea.leftEdgeInGrid) {

@@ -129,7 +129,7 @@ class JumpController extends Controller {
 
 class cheat {
 	static get slowmo() {
-		controller.fastForwardFactor = 0.1;
+		controller.fastForwardFactor = 1 / controller.fastForwardFactor;
 		controller.toggleFastForward();
 	}
 };

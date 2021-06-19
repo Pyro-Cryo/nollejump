@@ -22,6 +22,8 @@ class PrerenderedObject {
 		// this.mirror = false;
 
 		this._imageDirty = true;
+		this.imagecache = null;
+		this.imagecontext = null;
 	}
 
 	set image(value) {

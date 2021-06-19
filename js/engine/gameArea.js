@@ -143,7 +143,7 @@ class GameArea {
         if (vertically)
             this.drawOffsetY = this.gridToCanvasY(_y, false) - this.canvas.height / 2;
     }
-    //fix gridtocanvas & sign flip
+    
     keepInFrame(_x, _y, width = 0, height = null, marginTop = 0, marginRight = null, marginBottom = null, marginLeft = null) {
         if (height === null)
             height = width;
@@ -167,6 +167,29 @@ class GameArea {
             this.drawOffsetY = yTop - marginTop;
         else if (this.canvas.height - (yBottom - this.drawOffsetY) < marginBottom)
             this.drawOffsetY = yBottom - (this.canvas.height - marginBottom);
+    }
+
+    /**
+     * Checks whether any part of a rectangle would be visible when drawn.
+     * @param {Number} _x x position of the center in grid coordinates
+     * @param {Number} _y y position of the center in grid coordinates
+     * @param {Number} width width in grid units
+     * @param {Number} height height in grid units
+     * @param {boolean} widthHeightIsCanvasUnits whether the width and height are given in canvas units
+     */
+    isInFrame(_x, _y, width = 0, height = null, widthHeightIsCanvasUnits = false) {
+        if (height === null)
+            height = width;
+        if (!widthHeightIsCanvasUnits) {
+            width *= this._unitWidth;
+            height *= this._unitHeight;
+        }
+        
+        return (this.gridToCanvasX(_x) + width / 2 >= 0
+            && this.gridToCanvasX(_x) - width / 2 < this.canvas.width
+            && this.gridToCanvasY(_y) + height / 2 >= 0
+            && this.gridToCanvasY(_y) - height / 2 < this.canvas.height 
+        );
     }
 
     clear() {
