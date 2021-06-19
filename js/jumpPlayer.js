@@ -18,7 +18,7 @@ class JumpPlayer extends Player {
 			]),
 			[
 				CAMERA_TRACKING_INFRAME,
-				200, // Margin top
+				100, // Margin top
 				Number.NEGATIVE_INFINITY, // Margin right
 				Number.NEGATIVE_INFINITY, // Margin bottom
 				Number.NEGATIVE_INFINITY // Margin left
@@ -50,6 +50,7 @@ class JumpPlayer extends Player {
 
 	// TODO: implement shooting
 	shoot() {
+		if (this.speedVertical < 0)
 		this.standardBounce();
 	}
 
@@ -57,11 +58,11 @@ class JumpPlayer extends Player {
 		this.collidibles.push(gameObject);
 	}
 
-	// TODO: bör kolla även andra sidan skärmen vid screen wrapping
 	collisionCheck() {
 		for (const obj of this.collidibles.filterIterate(obj => obj.id !== null)) {
-			if (Math.abs(this.x - obj.x) <= (this.width + obj.width) / 2
-					&& Math.abs(this.y - obj.y) <= (this.height + obj.height) / 2) {
+			if ((Math.abs(this.x - obj.x) <= (this.width + obj.width) / 2
+					|| Math.abs(this.x - obj.x) >= controller.gameArea.gridWidth - (this.width + obj.width) / 2
+					) && Math.abs(this.y - obj.y) <= (this.height + obj.height) / 2) {
 				obj.onCollision(this);
 			}
 		}
@@ -99,15 +100,15 @@ class JumpPlayer extends Player {
 		this.y += this.speedVertical * delta;
 		
 		// Trillar man ner förlorar man
-		if (this.y <= controller.gameArea.drawOffsetY - 3 * this.height / controller.gameArea.unitHeight) {
+		if (this.y <= controller.gameArea.bottomEdgeInGrid - 2 * this.height / controller.gameArea.unitHeight) {
 			this.despawn();
 			alert("ded");
 		}
 		
 		// Screen wrapping
-		if (this.x >= controller.gameArea.gridWidth) {
+		if (this.x >= controller.gameArea.rightEdgeInGrid) {
 			this.x -= controller.gameArea.gridWidth;
-		} else if (this.x < 0) {
+		} else if (this.x < controller.gameArea.leftEdgeInGrid) {
 			this.x += controller.gameArea.gridWidth;
 		}
 
@@ -120,11 +121,11 @@ class JumpPlayer extends Player {
 		super.draw(gameArea);
 
 		// Screen wrapping
-		if (this.x - this.width < 0) {
+		if (this.x - this.width < controller.gameArea.leftEdgeInGrid) {
 			this.x += controller.gameArea.gridWidth;
 			super.draw(gameArea);
 			this.x -= controller.gameArea.gridWidth;
-		} else if (this.x + this.width >= controller.gameArea.gridWidth) {
+		} else if (this.x + this.width >= controller.gameArea.rightEdgeInGrid) {
 			this.x -= controller.gameArea.gridWidth;
 			super.draw(gameArea);
 			this.x += controller.gameArea.gridWidth;

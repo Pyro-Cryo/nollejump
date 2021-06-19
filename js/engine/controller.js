@@ -97,14 +97,18 @@ class Controller {
 
     toggleFastForward() {
         if (this.isFF) {
-            clearInterval(this.mainInterval);
-            this.mainInterval = setInterval(() => this.update(), this.updateInterval);
+            if (!this._useAnimationFrameForUpdate) {
+                clearInterval(this.mainInterval);
+                this.mainInterval = setInterval(() => this.update(), this.updateInterval);
+            }
             this.isFF = false;
             this.offFastForward();
         }
         else {
-            clearInterval(this.mainInterval);
-            this.mainInterval = setInterval(() => this.update(), this.updateInterval / this.fastForwardFactor);
+            if (!this._useAnimationFrameForUpdate) {
+                clearInterval(this.mainInterval);
+                this.mainInterval = setInterval(() => this.update(), this.updateInterval / this._fastForwardFactor);
+            }
             this.isFF = true;
             this.onFastForward();
         }
@@ -112,12 +116,10 @@ class Controller {
 
     onPlay() {
         this.isPaused = false;
-        if (this.isFF)
-            this.mainInterval = setInterval(() => this.update(), this.updateInterval / this.fastForwardFactor);
-        else if (this._useAnimationFrameForUpdate)
+        if (this._useAnimationFrameForUpdate)
             this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
         else
-            this.mainInterval = setInterval(() => this.update(), this.updateInterval);
+            this.mainInterval = setInterval(() => this.update(), this.isFF ? this.updateInterval / this._fastForwardFactor : this.updateInterval);
 
         if (this.playbutton) {
             this.playbutton.children[0].classList.add("hideme");
@@ -178,22 +180,26 @@ class Controller {
     update(timestamp) {
         if (!this._useAnimationFrameForUpdate)
             timestamp = new Date().getTime();
-            
-        let delta = timestamp - this.timestampLast;
-        if (delta < this.minDelta)
-            return;
-        else
-            this.timestampLast = timestamp;
-        
-        delta = Math.min(this.maxDelta, delta);
 
         // Skip first frame
         if (this.timestampLast === null) {
             if (this._useAnimationFrameForUpdate)
                 this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
+            this.timestampLast = timestamp;
             return;
         }
 
+        let delta = timestamp - this.timestampLast;
+        
+        if (delta < this.minDelta) {
+            if (this._useAnimationFrameForUpdate)
+                this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
+            return;
+        }
+        else
+            this.timestampLast = timestamp;
+        
+        delta = Math.min(this.maxDelta, delta);
         
         if (this._useAnimationFrameForUpdate && this.isFF)
             delta *= this._fastForwardFactor;

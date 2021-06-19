@@ -126,3 +126,10 @@ class JumpController extends Controller {
 		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");*/
 	}
 }
+
+class cheat {
+	static get slowmo() {
+		controller.fastForwardFactor = 0.1;
+		controller.toggleFastForward();
+	}
+};

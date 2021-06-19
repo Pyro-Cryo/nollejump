@@ -34,4 +34,18 @@ class Platform extends EffectObject {
 		if (this.y < controller.gameArea.bottomEdgeInGrid - this.despawnMargin)
 			this.despawn();
 	}
+
+	draw(gameArea) {
+		super.draw(gameArea);
+		// Screen wrapping
+		if (this.x - this.width < controller.gameArea.leftEdgeInGrid) {
+			this.x += controller.gameArea.gridWidth;
+			super.draw(gameArea);
+			this.x -= controller.gameArea.gridWidth;
+		} else if (this.x + this.width >= controller.gameArea.rightEdgeInGrid) {
+			this.x -= controller.gameArea.gridWidth;
+			super.draw(gameArea);
+			this.x += controller.gameArea.gridWidth;
+		}
+	}
 }
