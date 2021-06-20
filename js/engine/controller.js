@@ -11,7 +11,7 @@ class Controller {
     }
 
     constructor(canvas, updateInterval = null, gridWidth = null, gridHeight = null,
-            gridOrigin = GRID_ORIGIN_UPPER_LEFT, fastForwardFactor = 3,
+            gridOrigin = GameArea.GRID_ORIGIN_UPPER_LEFT, fastForwardFactor = 3,
             cancelFFOnPause = false) {
         if (typeof (canvas) === "string")
             canvas = document.getElementById(canvas);

@@ -1,23 +1,24 @@
-const ActionGoLeft = 1;
-const ActionGoRight = 2;
-const ActionShoot = 3;
 const cornImg = Resource.addAsset("img/corn.png");
 class JumpPlayer extends Player {
 	static get image() { return Resource.getAsset(cornImg); }
+	
+	static ACTION_GO_LEFT = 1;
+	static ACTION_GO_RIGHT = 2;
+	static ACTION_SHOOT = 3;
 
 	constructor(x, y) {
 		super(
 			x,
 			y,
 			new Map([
-				["KeyA", ActionGoLeft],
-				["ArrowLeft", ActionGoLeft],
-				["KeyD", ActionGoRight],
-				["ArrowRight", ActionGoRight],
-				["Space", ActionShoot]
+				["KeyA", JumpPlayer.ACTION_GO_LEFT],
+				["ArrowLeft", JumpPlayer.ACTION_GO_LEFT],
+				["KeyD", JumpPlayer.ACTION_GO_RIGHT],
+				["ArrowRight", JumpPlayer.ACTION_GO_RIGHT],
+				["Space", JumpPlayer.ACTION_SHOOT]
 			]),
 			[
-				CAMERA_TRACKING_INFRAME,
+				Player.CAMERA_TRACKING_INFRAME,
 				100, // Margin top
 				Number.NEGATIVE_INFINITY, // Margin right
 				Number.NEGATIVE_INFINITY, // Margin bottom
@@ -51,7 +52,7 @@ class JumpPlayer extends Player {
 	// TODO: implement shooting
 	shoot() {
 		if (this.speedVertical < 0)
-		this.standardBounce();
+			this.standardBounce();
 	}
 
 	addCollidible(gameObject) {
@@ -77,21 +78,21 @@ class JumpPlayer extends Player {
 	update(delta) {
 		super.update(delta);
 
-		if (this.isPressed.get(ActionGoRight)) {
+		if (this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
 			this.speedHorizontal = Math.min(
 				this.speedHorizontal + this.accelerationHorizontal * delta,
 				this.maxSpeedHorizontal);
 		}
-		if (this.isPressed.get(ActionGoLeft)) {
+		if (this.isPressed.get(JumpPlayer.ACTION_GO_LEFT)) {
 			this.speedHorizontal = Math.max(
 				this.speedHorizontal - this.accelerationHorizontal * delta,
 				-this.maxSpeedHorizontal);
 		}
-		if (!this.isPressed.get(ActionGoLeft) && !this.isPressed.get(ActionGoRight)) {
+		if (!this.isPressed.get(JumpPlayer.ACTION_GO_LEFT) && !this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
 			this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) - this.decayHorizontal * delta);
 		}
 
-		if (this.isPressed.get(ActionShoot)) {
+		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT)) {
 			this.shoot();
 		}
 
@@ -102,7 +103,7 @@ class JumpPlayer extends Player {
 		// Trillar man ner förlorar man
 		if (this.y <= controller.gameArea.bottomEdgeInGrid - 2 * this.height / controller.gameArea.unitHeight) {
 			this.despawn();
-			alert("ded");
+			console.log("ded");
 		}
 		
 		// Screen wrapping

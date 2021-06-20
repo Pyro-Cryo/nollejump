@@ -1,14 +1,14 @@
-const CAMERA_TRACKING_NONE = 0;
-// "regular" = keep an offset in gameArea used during drawing
-const CAMERA_TRACKING_CENTER = 1;
-const CAMERA_TRACKING_INFRAME = 2;
-// KSP = change all objects' coordinates
-const CAMERA_TRACKING_KSP_CENTER = 3;
-const CAMERA_TRACKING_KSP_INFRAME = 4;
-
 class Player extends EffectObject {
+	static CAMERA_TRACKING_NONE = 0;
+	// "regular" = keep an offset in gameArea used during drawing
+	static CAMERA_TRACKING_CENTER = 1;
+	static CAMERA_TRACKING_INFRAME = 2;
+	// KSP = change all objects' coordinates
+	static CAMERA_TRACKING_KSP_CENTER = 3;
+	static CAMERA_TRACKING_KSP_INFRAME = 4;
+	
 	/**
-	 * 
+	 * Create a new player object, with additional support for camera tracking and input management.
 	 * @param {Number} x 
 	 * @param {Number} y 
 	 * @param {Map} keyActionMap
@@ -48,13 +48,13 @@ class Player extends EffectObject {
 		this.cameraTrackingMode = null;
 
 		switch (mode) {
-			case CAMERA_TRACKING_NONE:
+			case Player.CAMERA_TRACKING_NONE:
 				this.cameraTrackingMode = null;
 				this.cameraTrackingParams = null;
 				break;
 
-			case CAMERA_TRACKING_CENTER:
-			case CAMERA_TRACKING_KSP_CENTER:
+			case Player.CAMERA_TRACKING_CENTER:
+			case Player.CAMERA_TRACKING_KSP_CENTER:
 				this.cameraTrackingMode = mode;
 
 				const horizontally = param1 === null ? true : !!param1;
@@ -65,8 +65,8 @@ class Player extends EffectObject {
 				};
 				break;
 
-			case CAMERA_TRACKING_INFRAME:
-			case CAMERA_TRACKING_KSP_INFRAME:
+			case Player.CAMERA_TRACKING_INFRAME:
+			case Player.CAMERA_TRACKING_KSP_INFRAME:
 				this.cameraTrackingMode = mode;
 
 				this.cameraTrackingParams = {
@@ -136,7 +136,7 @@ class Player extends EffectObject {
 
 		if (this.cameraTrackingMode) {
 			switch (this.cameraTrackingMode) {
-				case CAMERA_TRACKING_CENTER:
+				case Player.CAMERA_TRACKING_CENTER:
 					if (this._gameArea)
 						this._gameArea.centerCameraOn(
 							this.x,
@@ -145,7 +145,7 @@ class Player extends EffectObject {
 							this.cameraTrackingParams.vertically);
 					break;
 
-				case CAMERA_TRACKING_KSP_CENTER:
+				case Player.CAMERA_TRACKING_KSP_CENTER:
 					this.centerCameraOn(
 						this.x,
 						this.y,
@@ -153,7 +153,7 @@ class Player extends EffectObject {
 						this.cameraTrackingParams.vertically);
 					break;
 				
-				case CAMERA_TRACKING_INFRAME:
+				case Player.CAMERA_TRACKING_INFRAME:
 					if (this._gameArea)
 						this._gameArea.keepInFrame(
 							this.x,
@@ -166,7 +166,7 @@ class Player extends EffectObject {
 							this.cameraTrackingParams.marginLeft);
 						break;
 				
-				case CAMERA_TRACKING_KSP_INFRAME:
+				case Player.CAMERA_TRACKING_KSP_INFRAME:
 					this.keepInFrame(
 						this.x,
 						this.y,

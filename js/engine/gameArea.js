@@ -1,12 +1,12 @@
-const _GRID_ORIGIN_REVERSE_X = 0b01;
-const _GRID_ORIGIN_REVERSE_Y = 0b10;
-const GRID_ORIGIN_UPPER_LEFT = 0;
-const GRID_ORIGIN_LOWER_LEFT = _GRID_ORIGIN_REVERSE_Y;
-const GRID_ORIGIN_UPPER_RIGHT = _GRID_ORIGIN_REVERSE_X;
-const GRID_ORIGIN_LOWER_RIGHT = _GRID_ORIGIN_REVERSE_X | _GRID_ORIGIN_REVERSE_Y;
-
 class GameArea {
-    constructor(canvas, gridWidth, gridHeight, gridOrigin = GRID_ORIGIN_UPPER_LEFT) {
+    static _GRID_ORIGIN_REVERSE_X = 0b01;
+    static _GRID_ORIGIN_REVERSE_Y = 0b10;
+    static GRID_ORIGIN_UPPER_LEFT = 0;
+    static GRID_ORIGIN_LOWER_LEFT = GameArea._GRID_ORIGIN_REVERSE_Y;
+    static GRID_ORIGIN_UPPER_RIGHT = GameArea._GRID_ORIGIN_REVERSE_X;
+    static GRID_ORIGIN_LOWER_RIGHT = GameArea._GRID_ORIGIN_REVERSE_X | GameArea._GRID_ORIGIN_REVERSE_Y;
+
+    constructor(canvas, gridWidth, gridHeight, gridOrigin = GameArea.GRID_ORIGIN_UPPER_LEFT) {
         this.canvas = canvas;
         this.context = this.canvas.getContext("2d");
         this.gridOrigin = gridOrigin;
@@ -93,26 +93,26 @@ class GameArea {
     // + 0.5 var korrekt för campusdefence när vi ville att saker ritades i mitten av tiles,
     // men generellt rimligare att gridpunkten (0,0) är exakt ett hörn
     gridToCanvasX(x, considerOffset = true) {
-        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_X)
+        if (this.gridOrigin & GameArea._GRID_ORIGIN_REVERSE_X)
             return this.canvas.width * (1 - (x/* + 0.5*/) / this._gridWidth) - considerOffset * this.drawOffsetX;
         else
             return this.canvas.width * (x/* + 0.5*/) / this._gridWidth - considerOffset * this.drawOffsetX;
     }
     gridToCanvasY(y, considerOffset = true) {
-        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_Y)
+        if (this.gridOrigin & GameArea._GRID_ORIGIN_REVERSE_Y)
             return this.canvas.height * (1 - (y/* + 0.5*/) / this._gridHeight) - considerOffset * this.drawOffsetY;
         else
             return this.canvas.height * (y/* + 0.5*/) / this._gridHeight - considerOffset * this.drawOffsetY;
     }
 
     canvasToGridX(x, considerOffset = true) {
-        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_X)
+        if (this.gridOrigin & GameArea._GRID_ORIGIN_REVERSE_X)
             return (1 - (x + considerOffset * this.drawOffsetX) / this.canvas.width) * this._gridWidth/* - 0.5*/;
         else
             return (x + considerOffset * this.drawOffsetX) / this.canvas.width * this._gridWidth/* - 0.5*/;
     }
     canvasToGridY(y, considerOffset = true) {
-        if (this.gridOrigin & _GRID_ORIGIN_REVERSE_Y)
+        if (this.gridOrigin & GameArea._GRID_ORIGIN_REVERSE_Y)
             return (1 - (y + considerOffset * this.drawOffsetY) / this.canvas.height) * this._gridHeight/* - 0.5*/;
         else
             return (y + considerOffset * this.drawOffsetY) / this.canvas.height * this._gridHeight/* - 0.5*/;

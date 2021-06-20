@@ -1,13 +1,12 @@
-// Aspect ratio: width / height
-const MAX_ASPECT_RATIO = 2 / 3;
-const MIN_ASPECT_RATIO = 1 / 2;
-const WIDTH_PX = 384;
-
 class JumpController extends Controller {
+	// Aspect ratio: width / height
+	static MAX_ASPECT_RATIO = 2 / 3;
+	static MIN_ASPECT_RATIO = 1 / 2;
+	static WIDTH_PX = 384;
 	constructor(statusGraph) {
 		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
-		this.gameArea.gridOrigin = GRID_ORIGIN_LOWER_LEFT;
+		this.gameArea.gridOrigin = GameArea.GRID_ORIGIN_LOWER_LEFT;
 
 		this.statusGraph = statusGraph;
 	}
@@ -89,16 +88,16 @@ class JumpController extends Controller {
 		const maxWidthPx = document.documentElement.clientWidth - marginHorizontal * 2;
 
 		// Limit the width to not exceed MAX_ASPECT_RATIO
-		const targetWidthPx = Math.min(maxHeightPx * MAX_ASPECT_RATIO, maxWidthPx);
+		const targetWidthPx = Math.min(maxHeightPx * JumpController.MAX_ASPECT_RATIO, maxWidthPx);
 		// Limit the height to not exceed MIN_ASPECT_RATIO
-		const targetHeightPx = Math.min(targetWidthPx / MIN_ASPECT_RATIO, maxHeightPx);
+		const targetHeightPx = Math.min(targetWidthPx / JumpController.MIN_ASPECT_RATIO, maxHeightPx);
 
 		// Achieve the desired width by scaling the canvas
-		const scale = targetWidthPx / WIDTH_PX;
+		const scale = targetWidthPx / JumpController.WIDTH_PX;
 		// Compute the unscaled height
 		const height_px = Math.round(targetHeightPx / scale);
 		
-		this.gameArea.width = WIDTH_PX;
+		this.gameArea.width = JumpController.WIDTH_PX;
 		this.gameArea.height = height_px;
 		this.gameArea.canvas.style = `transform: scale(${scale});`;
 		
