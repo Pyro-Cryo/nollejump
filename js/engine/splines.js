@@ -60,79 +60,81 @@ class Splines {
         return res;
     }
 
-    /**
-     * Interprets the n closest points as a Bezier curve and interpolates along it.
-     * With smooth=true it will do the same with an offset of 1 and interpolate linearly between the results.
-     * This ensures that the interpolated path is continuous.
-     * @param {Number} t Interpolation variable in the range [0, 1].
-     * @param {Number[][]} path The path to interpolate along.
-     * @param {Number} n The number of points to consider for the curve.
-     * @param {boolean} smooth Whether to ensure a continuous path.
-     * @param {Number} bezierOffset Shift the selection of the n points by this.
-     * @returns {Number[]} The interpolated point.
-     */
+    // /**
+    //  * Interprets the n closest points as a Bezier curve and interpolates along it.
+    //  * With smooth=true it will do the same with an offset of 1 and interpolate linearly between the results.
+    //  * This ensures that the interpolated path is continuous.
+    //  * @param {Number} t Interpolation variable in the range [0, 1].
+    //  * @param {Number[][]} path The path to interpolate along.
+    //  * @param {Number} n The number of points to consider for the curve.
+    //  * @param {boolean} smooth Whether to ensure a continuous path.
+    //  * @param {Number} bezierOffset Shift the selection of the n points by this.
+    //  * @returns {Number[]} The interpolated point.
+    //  */
     // TODO: Currently not equivalent to old implementation (see below)
     // Mainly, will not reach the endpoint and looks more crooked.
-    static interpolateLocalBezier(t, path, n, smooth = true, endpoints = this.ENDPOINT_SAME, bezierOffset = 0) {
-        if (path.length === 1)
-            return path[0];
+    // static interpolateLocalBezier(t, path, n, smooth = true, endpoints = this.ENDPOINT_SAME, bezierOffset = 0) {
+    //     if (path.length === 1)
+    //         return path[0];
 
-        t *= path.length - 1;
-        const bezierStart = Math.round(t - (n / 2)) + bezierOffset;
+    //     t *= path.length - 1;
+    //     const bezierStart = Math.round(t - (n / 2)) + bezierOffset;
         
-        const interpol = (t - Math.max(0, bezierStart)) / n;
-        const sum = new Array(path[0].length).fill(0);
+    //     const interpol = (t - bezierStart) / (n - 1); //(t - Math.max(0, bezierStart)) / n;
+    //     const sum = new Array(path[0].length).fill(0);
 
-        for (let i = 0; i <= n; i++) {
-            let point;
-            if (bezierStart + i >= 0 && bezierStart + i < path.length)
-                point = path[bezierStart + i];
-            else {
-                // Endpoint handling
-                switch (endpoints) {
-                    case this.ENDPOINT_EXTRAPOLATE:
-                        if (bezierStart + i < 0)
-                            point = this.extrapolate(
-                                path[0],
-                                path[1],
-                                true,
-                                -(bezierStart + i));
-                        else
-                            point = this.extrapolate(
-                                path[path.length - 2],
-                                path[path.length - 1],
-                                false,
-                                bezierStart + i - (path.length - 1));
-                        break;
+    //     for (let i = 0; i <= n; i++) {
+    //         let point;
+    //         if (bezierStart + i >= 0 && bezierStart + i < path.length)
+    //             point = path[bezierStart + i];
+    //         else {
+    //             // Endpoint handling
+    //             switch (endpoints) {
+    //                 case this.ENDPOINT_EXTRAPOLATE:
+    //                     if (bezierStart + i < 0)
+    //                         point = this.extrapolate(
+    //                             path[0],
+    //                             path[1],
+    //                             true,
+    //                             -(bezierStart + i));
+    //                     else
+    //                         point = this.extrapolate(
+    //                             path[path.length - 2],
+    //                             path[path.length - 1],
+    //                             false,
+    //                             bezierStart + i - (path.length - 1));
+    //                     break;
 
-                    case this.ENDPOINT_SAME:
-                    default:
-                        point = path[Math.min(path.length - 1, Math.max(0, bezierStart + i))];
-                        break;
-                }
-            }
+    //                 case this.ENDPOINT_SAME:
+    //                 default:
+    //                     point = path[Math.min(path.length - 1, Math.max(0, bezierStart + i))];
+    //                     break;
+    //             }
+    //         }
 
-            // Compute sum
-            const coeff = this.nChooseK(n, i) * Math.pow(interpol, i) * Math.pow(1 - interpol, n - i);
-            for (let dim = 0; dim < sum.length; dim++)
-                sum[dim] += coeff * point[dim];
-        }
+    //         // Compute sum
+    //         const coeff = this.nChooseK(n, i) * Math.pow(interpol, i) * Math.pow(1 - interpol, n - i);
+    //         for (let dim = 0; dim < sum.length; dim++)
+    //             sum[dim] += coeff * point[dim];
+    //     }
 
-        if (smooth) {
-            const otherSum = this.interpolateLocalBezier(t / (path.length - 1), path, n, false, endpoints, bezierOffset - 1);
+    //     if (smooth) {
+    //         const otherSum = this.interpolateLocalBezier(t / (path.length - 1), path, n, false, endpoints, bezierOffset + 1);
 
-            // Interpolate between the first -> second or second -> first
-            // depending on n mod 2
-            if (n % 2 === 0)
-                t += 0.5;
-            const metaInterpol = t - Math.floor(t);
+    //         // Interpolate between the first -> second or second -> first
+    //         // depending on n mod 2
+    //         // if (n % 2 === 0)
+    //         //     t += 0.5;
+    //         // const metaInterpol = t - Math.floor(t);
+    //         const fpart = t - Math.floor(t);
+    //         const metaInterpol = (fpart > 0.5 ? 1 - fpart : fpart) / 0.5;
 
-            for (let dim = 0; dim < sum.length; dim++)
-                sum[dim] = metaInterpol * sum[dim] + (1 - metaInterpol) * otherSum[dim];
-        }
+    //         for (let dim = 0; dim < sum.length; dim++)
+    //             sum[dim] = metaInterpol * sum[dim] + (1 - metaInterpol) * otherSum[dim];
+    //     }
         
-        return sum;
-    }
+    //     return sum;
+    // }
 
     static DERIVATIVE_MIDPOINT = 0;
     static DERIVATIVE_BACKWARD = 1;
@@ -359,38 +361,38 @@ class Splines {
             ),
             path);
 
-        this._plot(
-            this.piecewise(
-                100,
-                t => this.interpolateLocalBezier(t, path, 3, false, this.ENDPOINT_SAME, 0)
-            ),
-            path);
-        this._plot(
-            this.piecewise(
-                100,
-                t => this.interpolateLocalBezier(t, path, 3, false, this.ENDPOINT_SAME, -1)
-            ),
-            path);
-        this._plot(
-            this.piecewise(
-                100,
-                t => this.interpolateLocalBezier(t, path, 3, true, this.ENDPOINT_SAME)
-            ),
-            path);
-        this._plot(
-            this.piecewise(
-                100,
-                t => this._originalInterpolateLocalBezier(t * path.length, path, 3, true)
-            ),
-            path);
+        // this._plot(
+        //     this.piecewise(
+        //         100,
+        //         t => this.interpolateLocalBezier(t, path, 3, false, this.ENDPOINT_SAME, 0)
+        //     ),
+        //     path);
+        // this._plot(
+        //     this.piecewise(
+        //         100,
+        //         t => this.interpolateLocalBezier(t, path, 3, false, this.ENDPOINT_SAME, 1)
+        //     ),
+        //     path);
+        // this._plot(
+        //     this.piecewise(
+        //         100,
+        //         t => this.interpolateLocalBezier(t, path, 3, true, this.ENDPOINT_SAME)
+        //     ),
+        //     path);
+        // this._plot(
+        //     this.piecewise(
+        //         100,
+        //         t => this._originalInterpolateLocalBezier(t * path.length, path, 3, true)
+        //     ),
+        //     path);
 
-        console.log("Local Bezier equivalent to original", JSON.stringify(this.piecewise(
-            100,
-            t => this.interpolateLocalBezier(t, path, 3)
-        )) === JSON.stringify(this.piecewise(
-            100,
-            t => this._originalInterpolateLocalBezier(t * path.length, path, 3, true)
-        )))
+        // console.log("Local Bezier equivalent to original", JSON.stringify(this.piecewise(
+        //     100,
+        //     t => this.interpolateLocalBezier(t, path, 3)
+        // )) === JSON.stringify(this.piecewise(
+        //     100,
+        //     t => this._originalInterpolateLocalBezier(t * path.length, path, 3, true)
+        // )));
     }
 
     static _originalInterpolateLocalBezier(t, path, n, smooth) {
