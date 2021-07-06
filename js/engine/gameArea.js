@@ -201,7 +201,7 @@ class GameArea {
         const x = this.gridToCanvasX(_x, considerOffset);
         const y = this.gridToCanvasY(_y, considerOffset);
         if (!angle) {
-            if (scale == 1)
+            if (scale === 1)
                 this.context.drawImage(
                     image,
                     Math.floor(x - image.width / 2), Math.floor(y - image.height / 2)
@@ -214,9 +214,10 @@ class GameArea {
                 );
         }
         else {
+            this.context.save();
             this.context.translate(Math.floor(x), Math.floor(y));
             this.context.rotate(angle);
-            if (scale == 1)
+            if (scale === 1)
                 this.context.drawImage(
                     image,
                     - Math.floor(image.width / 2), - Math.floor(image.height / 2)
@@ -227,8 +228,7 @@ class GameArea {
                     -Math.floor(image.width * scale / 2), -Math.floor(image.height * scale / 2),
                     Math.floor(image.width * scale), Math.floor(image.height * scale)
                 );
-            this.context.rotate(-angle);
-            this.context.translate(-x, -y);
+            this.context.restore();
         }
     }
 

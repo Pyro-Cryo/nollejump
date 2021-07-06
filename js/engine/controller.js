@@ -36,9 +36,9 @@ class Controller {
         this.objects = new LinkedList();
         // Objects which are drawn over all others
         this.delayedRenderObjects = [];
+        this.clearOnDraw = true;
 
-        this.scheduledWorldScroll = {x:0, y:0};
-
+        this.scheduledWorldScroll = {x: 0, y: 0};
 
         // Buttons
         this.playbutton = document.getElementById("playButton");
@@ -237,7 +237,8 @@ class Controller {
     }
 
     draw() {
-        this.gameArea.clear();
+        if (this.clearOnDraw)
+            this.gameArea.clear();
         
         for (const obj of this.objects)
             if (obj.id !== null)
