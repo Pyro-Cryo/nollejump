@@ -60,3 +60,25 @@ class Platform extends EffectObject {
 		}
 	}
 }
+
+class BasicMovingPlatform extends Platform {
+	constructor(x, y) {
+		super(x, y);
+		new BasicAnimation(this)
+			.set({x: x})
+			.after(1).set({x: x - 100})
+			.after(2).set({x: x + 100})
+			.after(1).loop()
+			.start();
+	}
+
+	update(delta) {
+		super.update(delta);
+
+		if (this.x < controller.gameArea.leftEdgeInGrid) {
+			this.x += controller.gameArea.gridWidth;
+		} else if (this.x >= controller.gameArea.rightEdgeInGrid) {
+			this.x -= controller.gameArea.gridWidth;
+		}
+	}
+}

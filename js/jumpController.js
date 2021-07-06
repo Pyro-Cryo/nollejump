@@ -73,13 +73,16 @@ class JumpController extends Controller {
 		for (let x = 0; x < this.gameArea.gridWidth; x += platWidth)
 			this.player.addCollidible(new Platform(x + platWidth / 2, 40));
 		
-		for (let y = 240; y < 10000; y += 200)
-			this.player.addCollidible(new Platform(
+		for (let y = 240; y < 10000; y += 200) {
+			let platformType = Platform;
+			if (y % 1000 === 440)
+				platformType = BasicMovingPlatform;
+			this.player.addCollidible(new platformType(
 				Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
 				y));
+			}
 
 		this.togglePause();
-
 		this.setMessage(`Loading complete`);
 	}
 
