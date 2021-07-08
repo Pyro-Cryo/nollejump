@@ -36,6 +36,26 @@ class Player extends EffectObject {
 		}
 
 		this._gameArea = null;
+
+		this.deviceTilt = 0;
+		/*this.debugAnimation = new BasicAnimation(this)
+			.set({deviceTilt: 0})
+			.after(1).set({deviceTilt: -1})
+			.after(1).set({deviceTilt: 1})
+			.after(1).loop();
+		this.debugAnimation.start();*/
+
+		window.addEventListener("deviceorientation", e => {
+			if (e.gamma === null)
+				return;
+				
+			/*if (this.debugAnimation) {
+				this.debugAnimation.cancel();
+				this.debugAnimation = null;
+			}*/
+
+			this.deviceTilt = Math.max(-1, Math.min(1, e.gamma / 30));
+		}, true)
 	}
 
 	despawn() {

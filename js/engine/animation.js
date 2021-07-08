@@ -11,6 +11,7 @@ class BasicAnimation {
         this.uninterpolatedProperties = null;
 
         this.interpolation = interpolation;
+        this.objUpdate = null;
     }
 
     get constructionComplete() {
@@ -180,9 +181,17 @@ class BasicAnimation {
 
             this.time = timeNextInLoop;
             if (this.loopOnEnd === false && this.time >= this.totalTime)
-                this.obj.update = this.objUpdate;
+                this.cancel();
 
             this.objUpdate(delta);
         };
+    }
+
+    cancel() {
+        if (this.objUpdate === null)
+            throw new Error("Animation not currently playing");
+
+        this.obj.update = this.objUpdate;
+        this.objUpdate = null;
     }
 }

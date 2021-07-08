@@ -43,6 +43,8 @@ class JumpPlayer extends Player {
 
 		this.collidibles = new LinkedList();
 		controller.registerObject(this, false, true);
+
+		this.useTiltControls = true;
 	}
 
 	standardBounce() {
@@ -79,11 +81,13 @@ class JumpPlayer extends Player {
 		super.update(delta);
 
 		if (this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
+			this.useTiltControls = false;
 			this.speedHorizontal = Math.min(
 				this.speedHorizontal + this.accelerationHorizontal * delta,
 				this.maxSpeedHorizontal);
 		}
 		if (this.isPressed.get(JumpPlayer.ACTION_GO_LEFT)) {
+			this.useTiltControls = false;
 			this.speedHorizontal = Math.max(
 				this.speedHorizontal - this.accelerationHorizontal * delta,
 				-this.maxSpeedHorizontal);
@@ -94,6 +98,10 @@ class JumpPlayer extends Player {
 
 		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT)) {
 			this.shoot();
+		}
+
+		if (this.useTiltControls) {
+			this.speedHorizontal = this.deviceTilt * this.maxSpeedHorizontal;
 		}
 
 		this.speedVertical += this.accelerationVertical * delta;
