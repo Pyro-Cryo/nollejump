@@ -80,6 +80,10 @@ class JumpPlayer extends Player {
 	update(delta) {
 		super.update(delta);
 
+		if (this.useTiltControls) {
+			this.speedHorizontal = this.deviceTilt * this.maxSpeedHorizontal;
+		}
+
 		if (this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
 			this.useTiltControls = false;
 			this.speedHorizontal = Math.min(
@@ -98,10 +102,6 @@ class JumpPlayer extends Player {
 
 		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT)) {
 			this.shoot();
-		}
-
-		if (this.useTiltControls) {
-			this.speedHorizontal = this.deviceTilt * this.maxSpeedHorizontal;
 		}
 
 		this.speedVertical += this.accelerationVertical * delta;

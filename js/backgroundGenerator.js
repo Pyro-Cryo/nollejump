@@ -6,7 +6,7 @@ class BackgroundGenerator {
 			return `rgb(${col.join(",")})`;
 	}
 
-	static renderGraphImg(width, height, n, interpolationFunction, gradients, sizes, transparent = false) {
+	static renderGraphImg(width, height, n, interpolationFunction, gradients, sizes, transparent = false, flipped = true) {
         if (gradients.length !== sizes.length)
             throw new Error(`Mismatch of length between gradients (${gradients.length}) and sizes (${sizes.length})`);
 
@@ -19,9 +19,12 @@ class BackgroundGenerator {
 			canvas.height = height;
 		}
         const ctx = canvas.getContext("2d", {alpha: !transparent});
-        let fillStyle = ctx.fillStyle;
 		ctx.fillStyle = "white";
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
+		if (flipped) {
+			ctx.translate(0, canvas.height);
+			ctx.scale(1, -1);
+		}
 
         for (let spec_ind = 0; spec_ind < sizes.length; spec_ind++) {
             for (let i = 0; i < n; i++) {
@@ -39,7 +42,6 @@ class BackgroundGenerator {
             }
         }
 
-        ctx.fillStyle = fillStyle;
         return canvas;
     }
 
@@ -47,18 +49,25 @@ class BackgroundGenerator {
 		return margin / 2 + Math.random() * (length - margin);
 	}
 
-	static createGraph(distance, width, nPoints, prevPath = null, uniformPoints = false) {
+	static createGraph(width, distance, nPoints, prevPath = null, uniformPoints = false, flipped = true) {
+		let canvas = null;
+		if (width instanceof HTMLCanvasElement) {
+			canvas = width;
+			width = canvas.width;
+			distance = canvas.height;
+		}
+
 		const gradients = [
-				[[0, 0, 0, 0.1]],
-				[[0, 0, 0]],
-				[[30, 30, 20]],
-				[[30, 30, 20]]
+				[[40, 40, 40, 0.1]],
+				//[[40, 40, 40]],
+				[[90, 90, 80]],
+				//[[90, 90, 80]]
 			];
 		const sizes = [
-			18,
 			13,
 			8,
-			3
+			//8,
+			//3
 		];
 		const margin = 1.5 * Math.max(...sizes);
 
@@ -89,12 +98,13 @@ class BackgroundGenerator {
 			path.sort((p1, p2) => p1[1] - p2[1]);
 			
 		const img = this.renderGraphImg(
-			width,
+			canvas || width,
 			distance,
 			Math.round(distance / 2),
 			t => Splines.interpolateHermite(t, path),
 			gradients,
-			sizes);
+			sizes,
+			flipped);
 
 		return [img, path];
 	}
