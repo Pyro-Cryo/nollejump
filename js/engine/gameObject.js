@@ -66,10 +66,14 @@ class PrerenderedObject {
 	}
 
 	get width() {
-		return this.imagecache.width;
+		if (this._imageDirty)
+			this.prerender();
+		return this.imagecache.width / Controller.instance.gameArea.unitWidth;
 	}
 	get height() {
-		return this.imagecache.height;
+		if (this._imageDirty)
+			this.prerender();
+		return this.imagecache.height / Controller.instance.gameArea.unitHeight;
 	}
 
 	/**
@@ -135,6 +139,10 @@ class GameObject extends PrerenderedObject {
 
 		if (register)
 			Controller.instance.registerObject(this);
+	}
+
+	collisionCheckRectangular(other) {
+		return Math.abs(this.x - obj.x) <= (this.width + obj.width) / 2 && Math.abs(this.y - obj.y) <= (this.height + obj.height) / 2;
 	}
 
 	// TODO: gör om timers (även för effektCooldowns och liknande) till att baseras på tidsdeltan istället för antal frames

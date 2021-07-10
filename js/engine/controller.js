@@ -334,6 +334,12 @@ class LinkedList {
         this.count--;
     }
 
+    clear() {
+        this.first = null;
+        this.last = null;
+        this.count = 0;
+    }
+
     *[Symbol.iterator]() {
         for (let current = this.first; current !== null; current = current.next) {
             yield current.obj;

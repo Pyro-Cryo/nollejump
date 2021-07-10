@@ -72,7 +72,8 @@ class Background extends GameObject {
 		this.path.forEach(point => {
 			point[1] -= this.bufferHeight;
 		});
-		this.path = this.path.filter(point => point[1] >= 0);
+		const lowerLimit = Math.min(0, this.path[this.path.length - 1][1] - 3 * this.nodeSpacing);
+		this.path = this.path.filter(point => point[1] >= lowerLimit);
 		return buffer;
 	}
 

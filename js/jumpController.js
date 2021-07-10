@@ -64,9 +64,10 @@ class JumpController extends Controller {
 	onAssetsLoaded() {
 		super.onAssetsLoaded();
 		this.startDrawLoop(64, 16);
-		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, this.gameArea.gridHeight / 2);
+		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 200);
 		this.background = new Background(this.gameArea.gridWidth / 2, 0);
 		this.clearOnDraw = false;
+		this.enemies = [new TF1(this.gameArea.gridWidth / 4, this.gameArea.gridHeight)];
 
 		const platWidth = Platform.image.width * Platform.scale;
 		// const platHeight = Platform.image.height * Platform.scale;

@@ -49,15 +49,7 @@ class Platform extends EffectObject {
 
 		super.draw(gameArea);
 		// Screen wrapping
-		if (this.x - this.width < controller.gameArea.leftEdgeInGrid) {
-			this.x += controller.gameArea.gridWidth;
-			super.draw(gameArea);
-			this.x -= controller.gameArea.gridWidth;
-		} else if (this.x + this.width >= controller.gameArea.rightEdgeInGrid) {
-			this.x -= controller.gameArea.gridWidth;
-			super.draw(gameArea);
-			this.x += controller.gameArea.gridWidth;
-		}
+		drawScreenWrap(gameArea, this, super.draw.bind(this));
 	}
 }
 
@@ -75,10 +67,6 @@ class BasicMovingPlatform extends Platform {
 	update(delta) {
 		super.update(delta);
 
-		if (this.x < controller.gameArea.leftEdgeInGrid) {
-			this.x += controller.gameArea.gridWidth;
-		} else if (this.x >= controller.gameArea.rightEdgeInGrid) {
-			this.x -= controller.gameArea.gridWidth;
-		}
+		screenWrap(this);
 	}
 }

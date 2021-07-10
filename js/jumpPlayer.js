@@ -41,6 +41,13 @@ class JumpPlayer extends Player {
 		this.lastX = x;
 		this.lastY = y;
 
+		this.shootCooldown = 0;
+		this.shootCooldownTime = 40; //ms, rimligare med 400 typ
+		controller.gameArea.canvas.addEventListener("click", e => {
+			this.shoot();
+			e.preventDefault();
+		}, true);
+
 		this.collidibles = new LinkedList();
 		controller.registerObject(this, false, true);
 
@@ -51,10 +58,15 @@ class JumpPlayer extends Player {
 		this.speedVertical = this.jumpSpeed;
 	}
 
-	// TODO: implement shooting
 	shoot() {
-		if (this.speedVertical < 0)
-			this.standardBounce();
+		if (!this.shootCooldown) {
+			new Pellet(
+				this.x,
+				this.y,
+				(Math.random() - 0.5) * 0.6,
+				1.2);
+			this.shootCooldown = this.shootCooldownTime;
+		}
 	}
 
 	addCollidible(gameObject) {
@@ -63,9 +75,7 @@ class JumpPlayer extends Player {
 
 	collisionCheck() {
 		for (const obj of this.collidibles.filterIterate(obj => obj.id !== null)) {
-			if ((Math.abs(this.x - obj.x) <= (this.width + obj.width) / 2
-					|| Math.abs(this.x - obj.x) >= controller.gameArea.gridWidth - (this.width + obj.width) / 2
-					) && Math.abs(this.y - obj.y) <= (this.height + obj.height) / 2) {
+			if (collisionCheckScreenWrap(this, obj)) {
 				obj.onCollision(this);
 			}
 		}
@@ -100,44 +110,32 @@ class JumpPlayer extends Player {
 			this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) - this.decayHorizontal * delta);
 		}
 
-		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT)) {
+		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT))
 			this.shoot();
-		}
 
 		this.speedVertical += this.accelerationVertical * delta;
 		this.x += this.speedHorizontal * delta;
 		this.y += this.speedVertical * delta;
 		
 		// Trillar man ner förlorar man
-		if (this.y <= controller.gameArea.bottomEdgeInGrid - 2 * this.height / controller.gameArea.unitHeight) {
+		if (this.y <= controller.gameArea.bottomEdgeInGrid - 2 * this.height) {
 			this.despawn();
 			console.log("ded");
 		}
 		
-		// Screen wrapping
-		if (this.x >= controller.gameArea.rightEdgeInGrid) {
-			this.x -= controller.gameArea.gridWidth;
-		} else if (this.x < controller.gameArea.leftEdgeInGrid) {
-			this.x += controller.gameArea.gridWidth;
-		}
+		screenWrap(this);
 
 		this.collisionCheck();
 		this.lastX = this.x;
 		this.lastY = this.y;
+
+		this.shootCooldown = Math.max(0, this.shootCooldown - delta);
 	}
 
 	draw(gameArea) {
 		super.draw(gameArea);
 
 		// Screen wrapping
-		if (this.x - this.width < controller.gameArea.leftEdgeInGrid) {
-			this.x += controller.gameArea.gridWidth;
-			super.draw(gameArea);
-			this.x -= controller.gameArea.gridWidth;
-		} else if (this.x + this.width >= controller.gameArea.rightEdgeInGrid) {
-			this.x -= controller.gameArea.gridWidth;
-			super.draw(gameArea);
-			this.x += controller.gameArea.gridWidth;
-		}
+		drawScreenWrap(gameArea, this, super.draw.bind(this));
 	}
 }
