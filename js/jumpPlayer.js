@@ -60,11 +60,12 @@ class JumpPlayer extends Player {
 
 	shoot() {
 		if (!this.shootCooldown) {
+			const t = (this.y - controller.gameArea.bottomEdgeInGrid) / controller.gameArea.gridHeight;
 			new Pellet(
 				this.x,
 				this.y,
 				(Math.random() - 0.5) * 0.6,
-				1.2);
+				1.7 + t * (0.8 - 1.7));
 			this.shootCooldown = this.shootCooldownTime;
 		}
 	}

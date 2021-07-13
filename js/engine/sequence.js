@@ -1,98 +1,31 @@
 /**
  * Basklass för att skapa (spawna) sekvenser av GameObjects.
  */
-class BasicSequence  {
+class BaseSequence  {
 	constructor() {
 		this.iterating = false;
 		this.currentSequence = [];
 		this.totalSequence = [];
-		this._sent = {};
 	}
 
 	/**
-	 * Kolla att objektet är redo för att modifieras
-	 * @param {boolean} shouldBeZero 
+	 * Kolla att objektet är redo för att modifieras.
+	 * @param {boolean} requireNothingQueued Kräv att inget är köat med send().
 	 */
-	_checks(shouldBeZero) {
-		if (shouldBeZero !== undefined && shouldBeZero ^ (this.currentSequence.length === 0)) {
+	_checks(requireNothingQueued) {
+		if (requireNothingQueued !== undefined && requireNothingQueued ^ (this.currentSequence.length === 0)) {
 			console.log(this);
-			throw new Error("Invalid state for that operation");
+			throw new Error("Invalid state for this operation");
 		}
 		if (this.iterating)
 			throw new Error("Cannot modify sequence once iteration has begun");
 	}
 
 	/**
-	 * Sekvensens kvarvarande längd till slutet, i enheter av rum/tids-avstånd
+	 * Sekvensens (kvarvarande, om den börjat iterera) längd till slutet, i enheter av rum/tids-avstånd
 	 */
 	get length() {
 		return this.totalSequence.concat(this.currentSequence).reduce((tot, ins) => ins[0] === "wait" ? tot + ins[1] : tot, 0);
-	}
-
-	// Felsökningsfunktioner
-
-	/**
-	 * Ett objekt som bekriver vilka objekt som skapats hittills
-	 */
-	get sent() {
-		return this._sent;
-	}
-
-	/**
-	 * Ett objekt som beskriver hur många objekt som skapas i sekvensen
-	 */
-	get summary() {
-		if (!this.iterating || !this._summary)
-			this._summary = this.totalSequence.concat(this.currentSequence).reduce((tot, ins) => {
-				if (ins[0] === "spawn") {
-					if (ins[1] instanceof Array)
-						for (let i = 0; i < ins[1].length; i++)
-							tot[ins[1][i].constructor.name] = (tot[ins[1][i].constructor.name] || 0) + 1;
-					else
-						tot[ins[1].constructor.name] = (tot[ins[1].constructor.name] || 0) + 1;
-				}
-
-				return tot;
-			}, {});
-
-		return this._summary;
-	}
-
-	/**
-	 * Ett objekt som beskriver hur många objekt som är kvar att skicka
-	 */
-	get remaining() {
-		let smry = this.summary();
-		if (!this.iterating)
-			return smry;
-		let sent = this.sent();
-		let rem = {};
-
-		for (let t in smry)
-			rem[t] = smry[t] - (sent[t] || 0);
-
-		return rem;
-	}
-
-	/**
-	 * Ett objekt som mappar klassnamn till dess typ, för alla objekt som kommer spawnas av denna sekvens.
-	 */
-	get codebook() {
-		return this.totalSequence.concat(this.currentSequence).reduce((tot, ins) => {
-			if (ins[0] === "spawn") {
-				if (ins[1] instanceof Array)
-				{
-					for (let i = 0; i < ins[1].length; i++)
-						if (!tot[ins[1][i].constructor.name])
-							tot[ins[1][i].constructor.name] = ins[1][i];
-				}
-				else
-					if (!tot[ins[1].constructor.name])
-						tot[ins[1].constructor.name] = ins[1];
-			}
-
-			return tot;
-		}, {});
 	}
 
 	// Byggarfunktioner
@@ -112,14 +45,14 @@ class BasicSequence  {
 
 	/**
 	 * Köa ett visst antal objekt. Följs av immediately(), over() eller spaced().
-	 * @param {Number} number Antalet objekt som ska köas.
 	 * @param {*} type Objektens typ.
+	 * @param {Number} number Antalet objekt som ska köas.
 	 */
-	send(number, type) {
+	spawn(type, number = 1) {
 		this._checks();
 		if (number < 0)
 			throw new Error("Invalid number " + number);
-		this.currentSequence = this.currentSequence.concat(new Array(number).fill(type).flat());
+		this.currentSequence = this.currentSequence.concat(new Array(number).fill(["spawn", type]));
 
 		return this;
 	}
@@ -130,7 +63,7 @@ class BasicSequence  {
 	immediately() {
 		this._checks(false);
 
-		this.totalSequence.push(["spawn", this.currentSequence]);
+		this.totalSequence = this.totalSequence.concat(this.currentSequence);
 		this.currentSequence = [];
 
 		return this;
@@ -159,7 +92,7 @@ class BasicSequence  {
 		for (let i = 0; i < this.currentSequence.length; i++) {
 			if (i !== 0)
 				this.totalSequence.push(["wait", delays[i - 1]]);
-			this.totalSequence.push(["spawn", this.currentSequence[i]]);
+			this.totalSequence.push(this.currentSequence[i]);
 		}
 		this.currentSequence = [];
 
@@ -178,7 +111,7 @@ class BasicSequence  {
 		for (let i = 0; i < this.currentSequence.length; i++) {
 			if (i !== 0)
 				this.totalSequence.push(["wait", interval]);
-			this.totalSequence.push(["spawn", this.currentSequence[i]]);
+			this.totalSequence.push(this.currentSequence[i]);
 		}
 		this.currentSequence = [];
 
@@ -186,13 +119,20 @@ class BasicSequence  {
 	}
 
 	/**
-	 * Anropa en funktion.
-	 * @param {Function} func 
+	 * Ange eller köa funktionsanrop.
+	 * @param {Function} func Funktionen som ska anropas.
+	 * @param {Number} times Antal upprepningar. Om denna sätts till 0 (default) anger det funktionsanropet direkt (motsvarar ungefär call(func, 1).immediately()).
 	 */
-	do(func) {
-		this._checks(true);
-
-		this.totalSequence.push(["call", func]);
+	call(func, times = 0) {
+		if (times < 0)
+			throw new Error("Invalid times " + times);
+		else if (times === 0) {
+			this._checks(true);
+			this.totalSequence.push(["call", func]);
+		} else {
+			this._checks();
+			this.currentSequence = this.currentSequence.concat(new Array(times).fill(["call", func]));
+		}
 
 		return this;
 	}
@@ -200,7 +140,7 @@ class BasicSequence  {
 	// Kombineringsfunktioner
 	/**
 	 * Sammanfläta den här sekvensen med en annan sekvens.
-	 * @param {BasicSequence} other Sekvensen som ska vävas ihop med denna.
+	 * @param {BaseSequence} other Sekvensen som ska vävas ihop med denna.
 	 */
 	interleave(other) {
 		this._checks(true);
@@ -253,7 +193,7 @@ class BasicSequence  {
 
 	/**
 	 * Lägg till en annan sekvens efter denna.
-	 * @param {BasicSequence} sequence Sekvensen som ska följa denna.
+	 * @param {BaseSequence} sequence Sekvensen som ska följa denna.
 	 */
 	append(sequence) {
 		this._checks();
@@ -266,10 +206,18 @@ class BasicSequence  {
 	// Itereringsfunktioner
 	/**
 	 * Spawna ett nytt objekt av en viss typ. Kör konstruktorn utan några argument.
-	 * @param {*} type Typen som ska skapas.
+	 * @param {["spawn", *]} instruction En array med "spawn" först, följt av typen som ska skapas.
 	 */
-	spawn(type) {
-		return new type();
+	doSpawn(instruction) {
+		return new instruction[1]();
+	}
+
+	/**
+	 * Anropa en funktion utan några argument
+	 * @param {["call", *]} instruction En array med "call" först, följt av funktionen som ska anropas.
+	 */
+	doCall(instruction) {
+		return instruction[1]();
 	}
 
 	/**
@@ -295,21 +243,11 @@ class BasicSequence  {
 			let instruction = this.totalSequence[this.index];
 			switch (instruction[0]) {
 				case "call":
-					instruction[1]();
+					this.doCall(instruction);
 					break;
 
 				case "spawn":
-					if (instruction[1] instanceof Array)
-					{
-						instruction[1].forEach(type => this.spawn(type));
-						for (let i = 0; i < instruction[1].length; i++)
-							this.sent[instruction[1][i].name] = (this.sent[instruction[1][i].name] || 0) + 1;
-					}
-					else
-					{
-						this.spawn(instruction[1]);
-						this.sent[instruction[1].name] = (this.sent[instruction[1].name] || 0) + 1;
-					}
+					this.doSpawn(instruction);
 					break;
 				
 				case "wait":
@@ -346,4 +284,182 @@ class BasicSequence  {
 			return { done: false };
 		}
 	}
+
+	/**
+	 * Klona den här sekvensen.
+	 * 
+	 * Ej tillåtet under iterering eftersom wait-instruktioner då har hunnit modifieras.
+	 */
+	clone() {
+		if (this.iterating)
+			throw new Error("Cannot clone sequence after iteration has begun");
+		const sequence = new this.constructor();
+		sequence.currentSequence = this.currentSequence.map(this.cloneInstruction);
+		sequence.totalSequence = this.totalSequence.map(this.cloneInstruction);
+
+		return sequence;
+	}
+
+	/**
+	 * Klona en viss instruktion.
+	 * @param {[string, ...*]} instruction 
+	 */
+	cloneInstruction(instruction) {
+		if (instruction[0] === "wait")
+			return ["wait", instruction[1]];
+		else
+			// Övriga instruktioner bör betraktas som immutable
+			return instruction;
+	}
 }
+
+class ArgableSequence extends BaseSequence {
+	/**
+	 * Köa ett visst antal objekt, med argument till konstruktorn. Följs av immediately(), over() eller spaced().
+	 * 
+	 * Argumenten kan vara antingen en array som populerar parametrarna till konstruktorn, eller en funktion som anropas vid spawnandet och då returnerar en sådan array.
+	 * @param {*} type Objektens typ.
+	 * @param {Number} number Antalet objekt som ska köas.
+	 * @param {Function | Array} args Argumenten till konstruktorn för typen, eller en funktion som returnerar dessa.
+	 */
+	spawn(type, number = 1, args = null) {
+		this._checks();
+		if (number < 0)
+			throw new Error("Invalid number " + number);
+		const instruction = args === null ? ["spawn", type] : ["spawn", type, args];
+		this.currentSequence = this.currentSequence.concat(new Array(number).fill(instruction));
+
+		return this;
+	}
+
+	/**
+	 * Spawna ett nytt objekt av en viss typ, med de angivna argumenten.
+	 * @param {["spawn", *] | ["spawn", *, Array | Function]} instruction En array med "spawn" först, följt av typen som ska skapas, följt av eventuella argument.
+	 */
+	doSpawn(instruction) {
+		if (instruction.length > 2 && instruction[2] !== null) {
+			let args = instruction[2];
+			if (args instanceof Function)
+				args = args();
+			return new instruction[1](...args);
+		} else
+			return new instruction[1]();
+	}
+
+	/**
+	 * Ange eller köa funktionsanrop.
+	 * @param {Function} func Funktionen som ska anropas.
+	 * @param {Number} times Antal upprepningar. Om denna sätts till 0 (default) anger det funktionsanropet direkt (motsvarar ungefär call(func, 1).immediately()).
+	 * @param {Function | Array} args Argumenten till funktionen, eller en funktion som i sig returnerar dessa.
+	 */
+	call(func, times = 0, args = null) {
+		const instruction = args === null ? ["call", func] : ["call", func, args];
+		if (times < 0)
+			throw new Error("Invalid times " + times);
+		else if (times === 0) {
+			this._checks(true);
+			this.totalSequence.push(instruction);
+		} else {
+			this._checks();
+			this.currentSequence = this.currentSequence.concat(new Array(times).fill(instruction));
+		}
+
+		return this;
+	}
+
+	/**
+	 * Anropa en funktion
+	 * @param {["call", *] | ["call", *, Array | Function]} instruction En array med "call" först, följt av funktionen som ska anropas, följt av eventuella argument.
+	 */
+	doCall(instruction) {
+		if (instruction.length > 2 && instruction[2] !== null) {
+			let args = instruction[2];
+			if (args instanceof Function)
+				args = args();
+			return instruction[1](...args);
+		}
+		else
+			return instruction[1]();
+	}
+}
+
+// Dessa kändes inte supernödvändiga så plockade bort dem
+// /**
+//  * Sekvens med extra felsökningsmöjligheter
+//  */
+// class DebuggableSequence extends BaseSequence {
+// 	constructor() {
+// 		super();
+// 		this._sent = {};
+// 	}
+
+// 	// Felsökningsfunktioner
+// 	/**
+// 	 * Ett objekt som bekriver vilka objekt som skapats hittills
+// 	 */
+// 	get sent() {
+// 		return this._sent;
+// 	}
+
+// 	/**
+// 	 * Ett objekt som beskriver hur många objekt som skapas i sekvensen
+// 	 */
+// 	get summary() {
+// 		if (!this.iterating || !this._summary)
+// 			this._summary = this.totalSequence.concat(this.currentSequence).reduce((tot, ins) => {
+// 				if (ins[0] === "spawn")
+// 					tot[ins[1].name] = (tot[ins[1].name] || 0) + 1;
+
+// 				return tot;
+// 			}, {});
+
+// 		return this._summary;
+// 	}
+
+// 	/**
+// 	 * Ett objekt som beskriver hur många objekt som är kvar att skicka
+// 	 */
+// 	get remaining() {
+// 		let smry = this.summary;
+// 		if (!this.iterating)
+// 			return smry;
+// 		let sent = this.sent;
+// 		let rem = {};
+
+// 		for (let t in smry)
+// 			rem[t] = smry[t] - (sent[t] || 0);
+
+// 		return rem;
+// 	}
+
+// 	/**
+// 	 * Ett objekt som mappar klassnamn till dess typ, för alla objekt som kommer spawnas av denna sekvens.
+// 	 */
+// 	get codebook() {
+// 		return this.totalSequence.concat(this.currentSequence).reduce((tot, ins) => {
+// 			if (ins[0] === "spawn" && !tot[ins[1].name])
+// 				tot[ins[1].name] = ins[1];
+
+// 			return tot;
+// 		}, {});
+// 	}
+
+// 	/**
+// 	 * Köa ett visst antal objekt. Följs av immediately(), over() eller spaced().
+// 	 * @param {*} type Objektens typ.
+// 	 * @param {Number} number Antalet objekt som ska köas.
+// 	 */
+// 	spawn(type, number = 1) {
+// 		this._summary = null;
+// 		return super.spawn(type, number);
+// 	}
+
+// 	/**
+// 	 * Spawna ett nytt objekt av en viss typ. Kör konstruktorn utan några argument.
+// 	 * @param {["spawn", *]} instruction En array med "spawn" först, följt av typen som ska skapas.
+// 	 */
+// 	doSpawn(instruction) {
+// 		this._sent[instruction[1].name] = (this._sent[instruction[1].name] || 0) + 1;
+// 		return super.spawn(instruction);
+// 	}
+// }
