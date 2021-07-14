@@ -2,6 +2,7 @@ class Enemy extends GameObject {
     constructor(x, y) {
         super(x, y);
         controller.player.addCollidible(this);
+        controller.enemies.push(this);
     }
 
     /**
@@ -20,6 +21,11 @@ class Enemy extends GameObject {
     onShot(pellet) {
         this.despawn();
         controller.enemies = controller.enemies.filter(obj => obj.id != null)
+    }
+
+    despawn() {
+        super.despawn();
+        controller.enemies = controller.enemies.filter(e => e !== this);
     }
 }
 

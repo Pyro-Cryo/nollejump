@@ -9,6 +9,8 @@ class JumpController extends Controller {
 		this.gameArea.gridOrigin = GameArea.GRID_ORIGIN_LOWER_LEFT;
 
 		this.statusGraph = statusGraph;
+		this.sequence = null;
+		this.sequenceTemplate = null;
 	}
 
 	static get defaultStatusGraph() {
@@ -67,21 +69,48 @@ class JumpController extends Controller {
 		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 200);
 		this.background = new Background(this.gameArea.gridWidth / 2, 0);
 		this.clearOnDraw = false;
-		this.enemies = [new TF1(this.gameArea.gridWidth / 4, this.gameArea.gridHeight)];
+		this.enemies = [];
 
 		const platWidth = Platform.image.width * Platform.scale;
 		// const platHeight = Platform.image.height * Platform.scale;
 		for (let x = 0; x < this.gameArea.gridWidth; x += platWidth)
-			this.player.addCollidible(new Platform(x + platWidth / 2, 40));
-		
-		for (let y = 240; y < 10000; y += 200) {
-			let platformType = Platform;
+			new Platform(x + platWidth / 2, 40);
+
+		for (let y = 240; y < this.gameArea.topEdgeInGrid; y += 100) {
+			let PlatformType = Platform;
 			if (y % 1000 === 440)
-				platformType = BasicMovingPlatform;
-			this.player.addCollidible(new platformType(
+				PlatformType = BasicMovingPlatform;
+			new PlatformType(
 				Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
-				y));
-			}
+				y);
+		}
+
+		const regularSequence = new ArgableSequence()
+			.spawn(Platform, 100, () => [
+				Math.random() * this.gameArea.gridWidth,
+				this.gameArea.topEdgeInGrid + Math.random() * 100
+			]).spaced(150);
+
+		const movingSequence = new ArgableSequence()
+			.spawn(BasicMovingPlatform, 40, () => [
+				Math.random() * this.gameArea.gridWidth,
+				this.gameArea.topEdgeInGrid + Math.random() * 200
+			]).over(regularSequence.length);
+
+		const enemySequence = new ArgableSequence()
+			.spawn(TF1, 10, () => [
+				Math.random() * this.gameArea.gridWidth,
+				this.gameArea.topEdgeInGrid + Math.random() * 200
+			])
+			.over(regularSequence.length);
+		
+		this.sequenceTemplate = regularSequence
+			.interleave(movingSequence)
+			.interleave(enemySequence)
+			.call(() => {
+				this.sequence = this.sequenceTemplate.clone();
+			});
+		this.sequence = this.sequenceTemplate.clone();
 
 		this.togglePause();
 		this.setMessage(`Loading complete`);
@@ -110,11 +139,19 @@ class JumpController extends Controller {
 		this.canvasContainer.style = `height: ${targetHeightPx}px;`;
 	}
 
-	draw() {
+	update(delta) {
+		const edgePosPrev = this.gameArea.topEdgeInGrid;
+		super.update(delta);
+		const posDelta = this.gameArea.topEdgeInGrid - edgePosPrev;
+		if (this.sequence && posDelta > 0)
+			this.sequence.next(posDelta);
+	}
+
+	/*draw() {
 		super.draw();
 		
 		// Debug snowman
-		/*const x = this.gameArea.width / 2;
+		const x = this.gameArea.width / 2;
 		const y = this.gameArea.height - 100;
 		const radius = 50;
 
@@ -128,8 +165,8 @@ class JumpController extends Controller {
 		this.gameArea.rect(x, y - radius * 2 * 1.25, radius * 0.08, radius * 0.4, "orange");
 
 		this.gameArea.rect(x - radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
-		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");*/
-	}
+		this.gameArea.rect(x + radius * 1.65, y - radius * 2 * 0.7, radius * 1.5, radius * 0.08, "black");
+	}*/
 }
 
 class cheat {

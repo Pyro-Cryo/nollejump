@@ -9,6 +9,9 @@ class Platform extends EffectObject {
 		this.despawnMargin = this.constructor.despawnMargin;
 		if (this._imageDirty)
 			this.prerender();
+
+		if (controller.player)
+			controller.player.addCollidible(this);
 	}
 
 	/**

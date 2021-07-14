@@ -269,7 +269,7 @@ class BaseSequence  {
 			this.totalSequence[this.index][1] -= delta;
 			// Om vi väntade längre än nödvändigt på denna wait, dra bort
 			// motsvarande från efterföljande så totalen hålls samma
-			const i = this.index;
+			let i = this.index;
 			while (this.totalSequence[i][1] < 0) {
 				let nextI = i + 1;
 				while (nextI < this.totalSequence.length && this.totalSequence[nextI][0] !== "wait")
