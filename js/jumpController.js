@@ -71,46 +71,52 @@ class JumpController extends Controller {
 		this.clearOnDraw = false;
 		this.enemies = [];
 
-		const platWidth = Platform.image.width * Platform.scale;
-		// const platHeight = Platform.image.height * Platform.scale;
-		for (let x = 0; x < this.gameArea.gridWidth; x += platWidth)
-			new Platform(x + platWidth / 2, 40);
-
-		for (let y = 240; y < this.gameArea.topEdgeInGrid; y += 100) {
-			let PlatformType = Platform;
-			if (y % 1000 === 440)
-				PlatformType = BasicMovingPlatform;
-			new PlatformType(
-				Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
-				y);
-		}
-
 		const regularSequence = new ArgableSequence()
-			.spawn(Platform, 100, () => [
+			.spawn(Platform, 100, y => [
 				Math.random() * this.gameArea.gridWidth,
-				this.gameArea.topEdgeInGrid + Math.random() * 100
+				this.sequenceAnchorY + y + Math.random() * 100
 			]).spaced(150);
 
 		const movingSequence = new ArgableSequence()
-			.spawn(BasicMovingPlatform, 40, () => [
+			.spawn(BasicMovingPlatform, 40, y => [
 				Math.random() * this.gameArea.gridWidth,
-				this.gameArea.topEdgeInGrid + Math.random() * 200
+				this.sequenceAnchorY + y + Math.random() * 200
 			]).over(regularSequence.length);
 
 		const enemySequence = new ArgableSequence()
-			.spawn(TF1, 10, () => [
+			.wait(regularSequence.length / 10)
+			.spawn(TF1, 9, y => [
 				Math.random() * this.gameArea.gridWidth,
-				this.gameArea.topEdgeInGrid + Math.random() * 200
+				this.sequenceAnchorY + y + Math.random() * 200
 			])
-			.over(regularSequence.length);
+			.over(regularSequence.length * 9 / 10);
 		
 		this.sequenceTemplate = regularSequence
 			.interleave(movingSequence)
 			.interleave(enemySequence)
 			.call(() => {
 				this.sequence = this.sequenceTemplate.clone();
+				this.sequenceAnchorY = this.gameArea.topEdgeInGrid;
+				console.log("Restarted sequence");
 			});
 		this.sequence = this.sequenceTemplate.clone();
+		this.sequenceAnchorY = this.gameArea.bottomEdgeInGrid + 80;
+
+		const platWidth = Platform.image.width * Platform.scale;
+		// const platHeight = Platform.image.height * Platform.scale;
+		for (let x = 0; x < this.gameArea.gridWidth; x += platWidth)
+			new Platform(x + platWidth / 2, 40);
+
+		// for (let y = 240; y < this.gameArea.topEdgeInGrid; y += 100) {
+		// 	let PlatformType = Platform;
+		// 	if (y % 1000 === 440)
+		// 		PlatformType = BasicMovingPlatform;
+		// 	new PlatformType(
+		// 		Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
+		// 		y);
+		// }
+		while (!this.sequence.iterating || this.sequence.elapsed < this.gameArea.gridHeight - 80)
+			this.sequence.next(1);
 
 		this.togglePause();
 		this.setMessage(`Loading complete`);
@@ -170,8 +176,28 @@ class JumpController extends Controller {
 }
 
 class cheat {
+	static isDirtyCheater = false;
+	/**
+	 * Kan togglas
+	 */
 	static get slowmo() {
 		controller.fastForwardFactor = 1 / controller.fastForwardFactor;
 		controller.toggleFastForward();
+	}
+
+	static get godmode() {
+		const addCollidible = controller.player.addCollidible.bind(controller.player);
+		controller.player.addCollidible = obj => obj instanceof Enemy ? null : addCollidible(obj);
+		for (const item of controller.player.collidibles.filterIterate(obj => !(obj instanceof Enemy)))
+			;
+	}
+
+	static get jumpshoot() {
+		const shoot = controller.player.shoot.bind(controller.player);
+		controller.player.shoot = () => {
+			shoot();
+			if (controller.player.speedVertical < 0)
+				controller.player.standardBounce();
+		};
 	}
 };

@@ -2,11 +2,9 @@ const platformImg = Resource.addAsset("img/oneliner.png");
 class Platform extends EffectObject {
 	static get image() { return Resource.getAsset(platformImg); }
 	static get scale() { return 0.1; }
-	static get despawnMargin() { return 100; }
 
 	constructor(x, y) {
 		super(x, y);
-		this.despawnMargin = this.constructor.despawnMargin;
 		if (this._imageDirty)
 			this.prerender();
 
@@ -36,8 +34,7 @@ class Platform extends EffectObject {
 	update(delta) {
 		super.update(delta);
 
-		if (this.y < controller.gameArea.bottomEdgeInGrid - this.despawnMargin)
-			this.despawn();
+		despawnIfBelowBottom(this);
 	}
 
 	draw(gameArea) {

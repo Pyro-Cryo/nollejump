@@ -28,8 +28,7 @@ class Pellet extends GameObject {
             }
         }
 
-        if (this.y + this.height < controller.gameArea.bottomEdgeInGrid)
-            this.despawn();
+        despawnIfBelowBottom(this);
     }
 
     draw(gameArea) {

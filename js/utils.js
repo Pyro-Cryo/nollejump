@@ -23,3 +23,8 @@ function collisionCheckScreenWrap(obj, other) {
         || Math.abs(obj.x - other.x) >= controller.gameArea.gridWidth - (obj.width + other.width) / 2)
         && Math.abs(obj.y - other.y) <= (obj.height + other.height) / 2;
 }
+
+function despawnIfBelowBottom(obj, margin = 3) {
+    if (obj.y + obj.height * margin / 2 < controller.gameArea.bottomEdgeInGrid)
+        obj.despawn();
+}

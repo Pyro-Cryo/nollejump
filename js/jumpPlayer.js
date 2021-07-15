@@ -19,7 +19,7 @@ class JumpPlayer extends Player {
 			]),
 			[
 				Player.CAMERA_TRACKING_INFRAME,
-				200, // Margin top
+				160, // Margin top
 				Number.NEGATIVE_INFINITY, // Margin right
 				Number.NEGATIVE_INFINITY, // Margin bottom
 				Number.NEGATIVE_INFINITY // Margin left

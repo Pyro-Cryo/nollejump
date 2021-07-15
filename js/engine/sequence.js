@@ -237,6 +237,7 @@ class BaseSequence  {
 		if (!this.iterating) {
 			this.iterating = true;
 			this.index = 0;
+			this.elapsed = 0;
 		}
 		// Gå igenom alla instruktioner tills vi måste vänta
 		while (this.index < this.totalSequence.length && (this.totalSequence[this.index][0] !== "wait" || this.totalSequence[this.index][1] <= 0)) {
@@ -267,6 +268,7 @@ class BaseSequence  {
 			return { done: true };
 		else {
 			this.totalSequence[this.index][1] -= delta;
+			this.elapsed += delta;
 			// Om vi väntade längre än nödvändigt på denna wait, dra bort
 			// motsvarande från efterföljande så totalen hålls samma
 			let i = this.index;
@@ -340,7 +342,7 @@ class ArgableSequence extends BaseSequence {
 		if (instruction.length > 2 && instruction[2] !== null) {
 			let args = instruction[2];
 			if (args instanceof Function)
-				args = args();
+				args = args(this.elapsed);
 			return new instruction[1](...args);
 		} else
 			return new instruction[1]();
@@ -375,7 +377,7 @@ class ArgableSequence extends BaseSequence {
 		if (instruction.length > 2 && instruction[2] !== null) {
 			let args = instruction[2];
 			if (args instanceof Function)
-				args = args();
+				args = args(this.elapsed);
 			return instruction[1](...args);
 		}
 		else
