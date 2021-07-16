@@ -231,13 +231,18 @@ class BaseSequence  {
 	/**
 	 * Stega framåt i itereringen och utför de operationer som köats.
 	 * @param {Number} delta Steglängd i enheter av rum/tids-avstånd
+	 * @param {Number} step Dela upp deltat i enheter som är som mest så här stora och stega igenom dem. Ser till att .elapsed är mer precis under doCall() och doSpawn(). Sätt till null för step = delta.
 	 */
-	next(delta = 1) {
+	next(delta = 1, step = null) {
 		// Börja iterera första gången next() anropas, och förhindra att sekvensen ändras.
 		if (!this.iterating) {
 			this.iterating = true;
 			this.index = 0;
 			this.elapsed = 0;
+		}
+		while (step !== null && step < delta) {
+			this.next(step);
+			delta -= step;
 		}
 		// Gå igenom alla instruktioner tills vi måste vänta
 		while (this.index < this.totalSequence.length && (this.totalSequence[this.index][0] !== "wait" || this.totalSequence[this.index][1] <= 0)) {

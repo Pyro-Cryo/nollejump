@@ -115,8 +115,7 @@ class JumpController extends Controller {
 		// 		Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
 		// 		y);
 		// }
-		while (!this.sequence.iterating || this.sequence.elapsed < this.gameArea.gridHeight - 80)
-			this.sequence.next(1);
+		this.sequence.next(this.gameArea.gridHeight - 80, 1);
 
 		this.togglePause();
 		this.setMessage(`Loading complete`);
