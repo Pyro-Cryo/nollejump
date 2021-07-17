@@ -41,6 +41,7 @@ class Level {
 
 	tokenPickup(type) {
 		console.log("Plockade upp token: " + type.name);
+		const wasCompleted = this.completed;
 		switch (type) {
 			case Homework:
 				this.homeworkCurrent = Math.min(this.homeworkNeeded, this.homeworkCurrent + 1);
@@ -57,17 +58,19 @@ class Level {
 			default:
 				break;
 		}
+		if (this.completed && !wasCompleted)
+			console.log("Ny nivå börjar efter denna region");
 	}
 
 	/**
 	 * Ankra levelns första yCurrent till en viss position och gör den redo att starta.
 	 * Detta görs automatiskt med `yOnLevelStart = controller.gameArea.topEdgeInGrid` i update() om det inte redan gjorts manuellt.
-	 * @param {number} yOnLevelStart y-nivån nivån ska börja på.
-	 * @param {number} marginToTop Hur långt i förväg saker ska spawnas in. Sätts i update() och warmup() till `controller.gameArea.gridHeight / 2`.
+	 * @param {number} yOnLevelStart y-nivån leveln ska börja på.
+	 * @param {number} prespawnDistance Hur långt i förväg saker ska spawnas in. Sätts i update() och warmup() till `controller.gameArea.gridHeight / 2`.
 	 */
-	init(yOnLevelStart, marginToTop) {
+	init(yOnLevelStart, prespawnDistance) {
 		this.yOnLevelStart = yOnLevelStart;
-		this.yLast = this.yOnLevelStart - marginToTop;
+		this.yLast = this.yOnLevelStart - prespawnDistance;
 		this.currentRegion = this.initial.clone();
 		console.log(`Ny level: ${this.code} - ${this.name}`);
 	}
@@ -140,6 +143,31 @@ class Level {
 
 	static tutorial = null;
 	static levels = new Map();
+	static ctfysLevels = [
+		"DD1301", // Datorintro
+		"SF1673", // Envarre
+		"DD1331", // Gruprog
+		"SI1121", // Termo
+		"SF1672", // Linalg
+		"SK1104", // Klassfys
+		"SF1674", // Flervarre
+		"SG1112", // Mek 1
+		"SF1922", // Sannstat
+		"SK1105", // Expfys
+	];
+	static ctmatLevels = [
+		"DD1301", // Datorintro
+		"DD1331", // Gruprog
+		"SF1673", // Envarre
+		"SA1006", // Ingenjörsfärdigheter
+		"SF1672", // Linalg
+		"SF1918", // Sannstat, OBS annan kurskod
+		"SF1674", // Flervarre
+		"DD1320", // Tildat
+		"SF1550", // Numme
+		"DD1396", // Parallellprogrammering
+		"SG1115", // Partikeldynamik
+	];
 }
 
 /**
@@ -216,12 +244,14 @@ class Region extends ArgableSequence {
 
 	doSpawn(instruction) {
 		// Lägg på ytterligare relevanta argument till argsfunktionen, som i ArgableSequence bara får .elapsed
+		let spawned;
 		if (instruction.length > 2 && instruction[2] instanceof Function) {
 			const args = instruction[2];
-			instruction[2] = elapsed => args(elapsed, this.spawnHistory, this.level);
+			spawned = super.doSpawn([instruction[0], instruction[1], elapsed => args(elapsed, this.spawnHistory, this.level), ...instruction.slice(3)]);
 		}
+		else
+			spawned = super.doSpawn(instruction);
 
-		const spawned = super.doSpawn(instruction);
 		this.spawnHistory.push({
 			object: spawned,
 			xSpawn: spawned.x,
@@ -236,9 +266,9 @@ class Region extends ArgableSequence {
 		// Lägg på ytterligare relevanta argument till argsfunktionen, som i ArgableSequence bara får .elapsed
 		if (instruction.length > 2 && instruction[2] instanceof Function) {
 			const args = instruction[2];
-			instruction[2] = elapsed => args(elapsed, this.spawnHistory, this.level);
-		}
-		return super.doCall(instruction);
+			return super.doCall([instruction[0], instruction[1], elapsed => args(elapsed, this.spawnHistory, this.level), ...instruction.slice(3)]);
+		} else
+			return super.doCall(instruction);
 	}
 
 	clone() {

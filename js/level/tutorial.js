@@ -9,6 +9,8 @@ Level.tutorial = () => {
 		1, // KS-tokens
 		0  // Tenta-tokens
 	);
+	// TODO: gör en faktisk tutorial av detta
+	
 	// Täck botten med plattformar och skapa en liten stege
 	const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
 	const start = level.defineRegion("start")
@@ -49,7 +51,7 @@ Level.tutorial = () => {
 	
 	const tokens = new Region()
 		.wait(regular.length / 5)
-		.spawn(Homework, 2, (elapsed, spawnHistory, level) => {
+		.spawn(KS, 2, (elapsed, spawnHistory, level) => {
 			for (let i = spawnHistory.length - 1; i >= 0; i--) {
 				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
 					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 20];

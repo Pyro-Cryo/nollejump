@@ -10,6 +10,8 @@ class JumpController extends Controller {
 
 		this.statusGraph = statusGraph;
 		this.currentLevel = null;
+		this.ctfys = true;
+		this.levelIndex = 0;
 	}
 
 	static get defaultStatusGraph() {
@@ -104,9 +106,12 @@ class JumpController extends Controller {
 	update(delta) {
 		super.update(delta);
 		if (this.currentLevel.update()) {
-			// TODO: Ladda nästa level (just nu loopar den första bara, om allt funkar)
-			// ...
-			console.warn("Oops detta borde inte hända");
+			// TODO: spara progress osv
+			this.levelIndex++;
+			const y = this.currentLevel.yCurrent;
+			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
+			this.currentLevel = Level.levels.get(code)();
+			this.currentLevel.init(y, this.gameArea.gridHeight / 2);
 		}
 	}
 
