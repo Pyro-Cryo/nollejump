@@ -39,6 +39,26 @@ class Level {
 		return this.homeworkCurrent >= this.homeworkNeeded && this.ksCurrent >= this.ksNeeded && this.tentaCurrent >= this.tentaNeeded;
 	}
 
+	tokenPickup(type) {
+		console.log("Plockade upp token: " + type.name);
+		switch (type) {
+			case Homework:
+				this.homeworkCurrent = Math.min(this.homeworkNeeded, this.homeworkCurrent + 1);
+				break;
+			
+			case KS:
+				this.ksCurrent = Math.min(this.ksNeeded, this.ksCurrent + 1);
+				break;
+
+			case Tenta:
+				this.tentaCurrent = Math.min(this.tentaNeeded, this.tentaCurrent + 1);
+				break;
+
+			default:
+				break;
+		}
+	}
+
 	/**
 	 * Ankra levelns första yCurrent till en viss position och gör den redo att starta.
 	 * Detta görs automatiskt med `yOnLevelStart = controller.gameArea.topEdgeInGrid` i update() om det inte redan gjorts manuellt.
@@ -207,6 +227,8 @@ class Region extends ArgableSequence {
 			xSpawn: spawned.x,
 			ySpawn: spawned.y
 		});
+		if (spawned instanceof Token)
+			spawned.level = this.level;
 		return spawned;
 	}
 

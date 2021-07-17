@@ -47,9 +47,20 @@ Level.tutorial = () => {
 		])
 		.over(regular.length * 9 / 10);
 	
+	const tokens = new Region()
+		.wait(regular.length / 5)
+		.spawn(Homework, 2, (elapsed, spawnHistory, level) => {
+			for (let i = spawnHistory.length - 1; i >= 0; i--) {
+				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
+					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 20];
+			}
+			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent]
+		}).over(regular.length * 4 / 5);
+	
 	const looping = regular
 		.interleave(moving)
-		.interleave(enemies);
+		.interleave(enemies)
+		.interleave(tokens);
 
 	level.initialRegion(start);
 	start.follower(looping);
