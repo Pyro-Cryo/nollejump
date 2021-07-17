@@ -35,7 +35,7 @@ class BaseSequence  {
 	 */
 	wait(delay) {
 		this._checks(true);
-		if (delay < 0)
+		if (!(delay >= 0))
 			throw new Error("Invalid delay " + delay);
 
 		this.totalSequence.push(["wait", delay]);
@@ -76,7 +76,7 @@ class BaseSequence  {
 	 */
 	over(interval, integerize = false) {
 		this._checks(false);
-		if (interval < 0)
+		if (!(interval >= 0))
 			throw new Error("Invalid interval " + interval);
 
 		const nDelays = this.currentSequence.length - 1;
@@ -105,7 +105,7 @@ class BaseSequence  {
 	 */
 	spaced(interval) {
 		this._checks(false);
-		if (interval < 0)
+		if (!(interval >= 0))
 			throw new Error("Invalid interval " + interval);
 
 		for (let i = 0; i < this.currentSequence.length; i++) {
@@ -124,7 +124,7 @@ class BaseSequence  {
 	 * @param {Number} times Antal upprepningar. Om denna sätts till 0 (default) anger det funktionsanropet direkt (motsvarar ungefär call(func, 1).immediately()).
 	 */
 	call(func, times = 0) {
-		if (times < 0)
+		if (!(times >= 0))
 			throw new Error("Invalid times " + times);
 		else if (times === 0) {
 			this._checks(true);
@@ -231,65 +231,57 @@ class BaseSequence  {
 	/**
 	 * Stega framåt i itereringen och utför de operationer som köats.
 	 * @param {Number} delta Steglängd i enheter av rum/tids-avstånd
-	 * @param {Number} step Dela upp deltat i enheter som är som mest så här stora och stega igenom dem. Ser till att .elapsed är mer precis under doCall() och doSpawn(). Sätt till null för step = delta.
 	 */
-	next(delta = 1, step = null) {
+	next(delta = 1) {
 		// Börja iterera första gången next() anropas, och förhindra att sekvensen ändras.
 		if (!this.iterating) {
 			this.iterating = true;
 			this.index = 0;
 			this.elapsed = 0;
 		}
-		while (step !== null && step < delta) {
-			this.next(step);
-			delta -= step;
-		}
-		// Gå igenom alla instruktioner tills vi måste vänta
-		while (this.index < this.totalSequence.length && (this.totalSequence[this.index][0] !== "wait" || this.totalSequence[this.index][1] <= 0)) {
-			let instruction = this.totalSequence[this.index];
-			switch (instruction[0]) {
-				case "call":
-					this.doCall(instruction);
-					break;
+		while (delta !== null) {
+			// Gå igenom alla instruktioner tills vi måste vänta
+			while (this.index < this.totalSequence.length && (this.totalSequence[this.index][0] !== "wait" || this.totalSequence[this.index][1] === 0)) {
+				let instruction = this.totalSequence[this.index];
+				switch (instruction[0]) {
+					case "call":
+						this.doCall(instruction);
+						break;
 
-				case "spawn":
-					this.doSpawn(instruction);
-					break;
-				
-				case "wait":
-					break;
-				
-				default:
-					// Om man ärver från denna klass kan man hantera specialinstruktioner
-					// genom att overrida nonstandardInstruction()
-					this.nonstandardInstruction(instruction);
-					break;
-			}
+					case "spawn":
+						this.doSpawn(instruction);
+						break;
+					
+					case "wait":
+						break;
+					
+					default:
+						// Om man ärver från denna klass kan man hantera specialinstruktioner
+						// genom att overrida nonstandardInstruction()
+						this.nonstandardInstruction(instruction);
+						break;
+				}
 
-			this.index++;
-		}
-
-		if (this.index >= this.totalSequence.length)
-			return { done: true };
-		else {
-			this.totalSequence[this.index][1] -= delta;
-			this.elapsed += delta;
-			// Om vi väntade längre än nödvändigt på denna wait, dra bort
-			// motsvarande från efterföljande så totalen hålls samma
-			let i = this.index;
-			while (this.totalSequence[i][1] < 0) {
-				let nextI = i + 1;
-				while (nextI < this.totalSequence.length && this.totalSequence[nextI][0] !== "wait")
-					nextI++;
-				if (nextI >= this.totalSequence.length)
-					break;
-				this.totalSequence[nextI][1] += this.totalSequence[i][1];
-				i = nextI;
-			}
-			if (this.totalSequence[this.index][1] <= 0)
 				this.index++;
-			return { done: false };
+			}
+			if (this.index < this.totalSequence.length) {
+				// this.index pekar på en wait med mer än 0 kvar
+				this.totalSequence[this.index][1] -= delta;
+
+				if (this.totalSequence[this.index][1] <= 0) {
+					this.elapsed += delta + this.totalSequence[this.index][1];
+					delta = -this.totalSequence[this.index][1];
+					this.totalSequence[this.index][1] = 0;
+					this.index++;
+				} else {
+					this.elapsed += delta;
+					delta = null;
+				}
+			} else
+				return { done: true, remainingDelta: delta };
 		}
+
+		return { done: false };
 	}
 
 	/**

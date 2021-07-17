@@ -9,8 +9,7 @@ class JumpController extends Controller {
 		this.gameArea.gridOrigin = GameArea.GRID_ORIGIN_LOWER_LEFT;
 
 		this.statusGraph = statusGraph;
-		this.sequence = null;
-		this.sequenceTemplate = null;
+		this.currentLevel = null;
 	}
 
 	static get defaultStatusGraph() {
@@ -67,55 +66,13 @@ class JumpController extends Controller {
 		super.onAssetsLoaded();
 		this.startDrawLoop(64, 16);
 		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 200);
+		this.enemies = [];
+		// TODO: Borde kanske också skötas i level
 		this.background = new Background(this.gameArea.gridWidth / 2, 0);
 		this.clearOnDraw = false;
-		this.enemies = [];
-
-		const regularSequence = new ArgableSequence()
-			.spawn(Platform, 100, y => [
-				Math.random() * this.gameArea.gridWidth,
-				this.sequenceAnchorY + y + Math.random() * 100
-			]).spaced(150);
-
-		const movingSequence = new ArgableSequence()
-			.spawn(BasicMovingPlatform, 40, y => [
-				Math.random() * this.gameArea.gridWidth,
-				this.sequenceAnchorY + y + Math.random() * 200
-			]).over(regularSequence.length);
-
-		const enemySequence = new ArgableSequence()
-			.wait(regularSequence.length / 10)
-			.spawn(TF1, 9, y => [
-				Math.random() * this.gameArea.gridWidth,
-				this.sequenceAnchorY + y + Math.random() * 200
-			])
-			.over(regularSequence.length * 9 / 10);
 		
-		this.sequenceTemplate = regularSequence
-			.interleave(movingSequence)
-			.interleave(enemySequence)
-			.call(() => {
-				this.sequence = this.sequenceTemplate.clone();
-				this.sequenceAnchorY = this.gameArea.topEdgeInGrid;
-				console.log("Restarted sequence");
-			});
-		this.sequence = this.sequenceTemplate.clone();
-		this.sequenceAnchorY = this.gameArea.bottomEdgeInGrid + 80;
-
-		const platWidth = Platform.image.width * Platform.scale;
-		// const platHeight = Platform.image.height * Platform.scale;
-		for (let x = 0; x < this.gameArea.gridWidth; x += platWidth)
-			new Platform(x + platWidth / 2, 40);
-
-		// for (let y = 240; y < this.gameArea.topEdgeInGrid; y += 100) {
-		// 	let PlatformType = Platform;
-		// 	if (y % 1000 === 440)
-		// 		PlatformType = BasicMovingPlatform;
-		// 	new PlatformType(
-		// 		Math.random() * (this.gameArea.width - platWidth / 2) + platWidth / 2,
-		// 		y);
-		// }
-		this.sequence.next(this.gameArea.gridHeight - 80, 1);
+		this.currentLevel = Level.tutorial();
+		this.currentLevel.warmup();
 
 		this.togglePause();
 		this.setMessage(`Loading complete`);
@@ -145,11 +102,12 @@ class JumpController extends Controller {
 	}
 
 	update(delta) {
-		const edgePosPrev = this.gameArea.topEdgeInGrid;
 		super.update(delta);
-		const posDelta = this.gameArea.topEdgeInGrid - edgePosPrev;
-		if (this.sequence && posDelta > 0)
-			this.sequence.next(posDelta);
+		if (this.currentLevel.update()) {
+			// TODO: Ladda nästa level (just nu loopar den första bara, om allt funkar)
+			// ...
+			console.warn("Oops detta borde inte hända");
+		}
 	}
 
 	/*draw() {
