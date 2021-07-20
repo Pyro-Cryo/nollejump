@@ -56,8 +56,9 @@ class Level {
 				break;
 
 			default:
-				break;
+				return;
 		}
+		controller.setScores();
 		if (this.completed && !wasCompleted)
 			console.log("Ny nivå börjar efter denna region");
 	}

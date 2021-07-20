@@ -61,11 +61,12 @@ class JumpController extends Controller {
 	}
 
 	onAssetLoadUpdate(progress, total) {
-		this.setMessage(`Loaded ${progress}/${total}`);
+		this.setMessage(`Laddar (${progress}/${total}) ...`);
 	}
 
 	onAssetsLoaded() {
 		super.onAssetsLoaded();
+		this.setMessage(`Laddat klart`);
 		this.startDrawLoop(64, 16);
 		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 200);
 		this.enemies = [];
@@ -75,9 +76,44 @@ class JumpController extends Controller {
 		
 		this.currentLevel = Level.tutorial();
 		this.currentLevel.warmup();
+		this.setLevelMessage();
+		this.setScores();
 
 		this.togglePause();
-		this.setMessage(`Loading complete`);
+	}
+
+	setLevelMessage() {
+		this.setMessage(`${this.currentLevel.code} ${this.currentLevel.name}`);
+	}
+
+	setScores() {
+		const populateImages = !document.getElementById("homeworkToken").src;
+		for (const type of [Homework, KS, Tenta]) {
+			if (populateImages) {
+				const imgElement = document.getElementById(type.name.toLowerCase() + "Token");
+				imgElement.src = type.image.src;
+				imgElement.style = `transform: rotate(${type.angle}rad)`;
+			}
+
+			const scoreElement = document.getElementById(type.name.toLowerCase() + "Score");
+			const current = this.currentLevel[type.name.toLowerCase() + "Current"];
+			const needed = this.currentLevel[type.name.toLowerCase() + "Needed"];
+			if (needed > 0) {
+				if (scoreElement.parentElement.classList.contains("hidden")) {
+					scoreElement.parentElement.classList.remove("hidden");
+				}
+				if (current >= needed)
+					scoreElement.innerText = "\u2713";
+				else
+					scoreElement.innerText = `${current}/${needed}`;
+			} else {
+				if (!scoreElement.parentElement.classList.contains("hidden")) {
+					scoreElement.parentElement.classList.add("hidden");
+				}
+				scoreElement.innerText = "";
+			}
+		}
+
 	}
 
 	setCanvasDimensions(barHeight, marginHorizontal, marginVertical = null) {
@@ -112,6 +148,8 @@ class JumpController extends Controller {
 			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
 			this.currentLevel = Level.levels.get(code)();
 			this.currentLevel.init(y, this.gameArea.gridHeight / 2);
+			this.setLevelMessage();
+			this.setScores();
 		}
 	}
 

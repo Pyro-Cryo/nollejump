@@ -1,7 +1,13 @@
 body {
 	margin: 0;
 	font-family: Nunito, sans-serif;
+	user-select: none;
 }
+
+.hidden {
+	display: none;
+}
+
 #gameboard {
 	border: 1px solid black;
 	transform-origin: top center;
@@ -11,12 +17,33 @@ body {
 }
 #topbar {
 	width: 100%;
-	background-color: lightgreen;
+	background-color: #df3c48;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 }
-#topbar > div {
-	border: 1px solid black;
-	margin: 0 2em;
-}
+	#topbar > div {
+		margin: 0 1em;
+	}
+
+	#menuimg {
+		height: 24px;
+	}
+
+	#scoreContainer {
+		font-size: 0.8em;
+	}
+
+	#scoreContainer div {
+		text-align: right;
+	}
+
+	#scoreContainer img {
+		height: 1em;
+		margin-left: 1ex;
+	}
+
+	#scoreContainer span {
+		min-width: 3.5ex;
+		display: inline-block;
+	}
