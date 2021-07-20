@@ -14,6 +14,7 @@ class Background extends GameObject {
 			8,
 			3
 		];
+		this.dark = false;
 
 		const numBuffers = Math.ceil(Math.min((JumpController.WIDTH_PX / JumpController.MAX_ASPECT_RATIO) / this.bufferHeight, 2)) + 1;
 
@@ -107,7 +108,10 @@ class Background extends GameObject {
 			this.bufferHeight,
 			interpolation,
 			this.gradients,
-			this.sizes
+			this.sizes,
+			false,
+			true,
+			this.dark ? [12, 3, 4] : "white"
 		);
 		if (index === this.buffers.length)
 			this.buffers.push(buffer);
@@ -126,7 +130,7 @@ class Background extends GameObject {
 			return `rgb(${col.join(",")})`;
 	}
 
-	static renderGraphImg(width, height, n, interpolationFunction, gradients, sizes, transparent = false, flipped = true) {
+	static renderGraphImg(width, height, n, interpolationFunction, gradients, sizes, transparent = false, flipped = true, bgcolor = "white") {
         if (gradients.length !== sizes.length)
             throw new Error(`Mismatch of length between gradients (${gradients.length}) and sizes (${sizes.length})`);
 
@@ -140,7 +144,7 @@ class Background extends GameObject {
 		}
 		const ctx = canvas.getContext("2d", {alpha: !transparent});
 		ctx.save();
-		ctx.fillStyle = "white";
+		ctx.fillStyle = typeof bgcolor === "string" ? bgcolor : this.toColor(bgcolor);
 		ctx.fillRect(0, 0, canvas.width, canvas.height);
 		if (flipped) {
 			ctx.translate(0, canvas.height);
