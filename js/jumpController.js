@@ -80,6 +80,14 @@ class JumpController extends Controller {
 		this.setScores();
 
 		this.togglePause();
+		document.getElementById("pausemenuButton").addEventListener("click", e => {
+			this.togglePause();
+			e.preventDefault();
+		}, true);
+		document.getElementById("resumeButton").addEventListener("click", e => {
+			this.togglePause();
+			e.preventDefault();
+		}, true);
 	}
 
 	setLevelMessage() {
@@ -137,6 +145,16 @@ class JumpController extends Controller {
 		this.gameArea.canvas.style = `transform: scale(${scale});`;
 		
 		this.canvasContainer.style = `height: ${targetHeightPx}px;`;
+	}
+
+	onPlay() {
+		super.onPlay();
+		document.getElementById("pausemenu").classList.add("hidden");
+	}
+
+	onPause() {
+		super.onPause();
+		document.getElementById("pausemenu").classList.remove("hidden");
 	}
 
 	update(delta) {
@@ -199,5 +217,10 @@ class cheat {
 			if (controller.player.speedVertical < 0)
 				controller.player.standardBounce();
 		};
+	}
+
+	static get darkmode() {
+		document.body.classList.add("dark");
+		controller.background.dark = true;
 	}
 };

@@ -3,9 +3,12 @@ body {
 	font-family: Nunito, sans-serif;
 	user-select: none;
 }
+body.dark {
+	background-color: rgb(12, 3, 4);
+}
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 #gameboard {
@@ -26,10 +29,6 @@ body {
 		margin: 0 1em;
 	}
 
-	#menuimg {
-		height: 24px;
-	}
-
 	#scoreContainer {
 		font-size: 0.8em;
 	}
@@ -46,4 +45,53 @@ body {
 	#scoreContainer span {
 		min-width: 3.5ex;
 		display: inline-block;
+	}
+
+#pausemenuButton {
+	border-radius: 10px;
+	padding: 5px;
+	margin-left: -5px;
+}
+
+	#pausemenuButton:hover {
+		background-color: #dfb5b8;
+	}
+	#pausemenuButton:active {
+		color: #df3c48;
+	}
+
+#pausemenu {
+	background-color: rgba(12, 3, 4, 0.8);
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	color: white;
+}
+
+	#pausemenu > div {
+		width: 80%;
+		margin: 0.5em 0;
+	}
+
+#resumeButton {
+	text-align: center;
+	font-size: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: fit-content !important;
+	padding: 5px 5px 5px 15px;
+	border-radius: 10px;
+}
+	#resumeButton:hover {
+		background-color: #df3c48;
+	}
+	#resumeButton:active {
+		color: #dfb5b8;
 	}

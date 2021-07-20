@@ -116,6 +116,7 @@ class Controller {
 
     onPlay() {
         this.isPaused = false;
+        this.timestampLast = null;
         if (this._useAnimationFrameForUpdate)
             this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
         else

@@ -5,13 +5,16 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta name="description" content="Game of the Year 2021">
-	<!--<meta name="keywords" content="Campus, Fysik, Teknisk Fysik, Fysiksektionen, KTH">
-	<meta name="author" content="Pyro & Cryo">-->
+	<meta name="keywords" content="Fysik, Teknisk Fysik, Fysiksektionen, Mottagning, 2021, Fruktig, Fadderiet, Nollejump, KTH">
+	<meta name="author" content="Pyro & Cryo">
 	<meta name="theme-color" content="#df3c48">
-
-	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" href="style.css">
 	<link rel="icon" type="image/png" href="img/fadderietslogga.png" />
+	
+	<!-- Font och ikoner -->
+	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
+	<!-- Sök ikoner på https://fonts.google.com/icons -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="style.css">
 
 	<!-- Kelvin -->
 	<script type="text/javascript" src="js/engine/audio.js"></script>
@@ -47,9 +50,10 @@
 	<script type="text/javascript" src="js/jumpController.js"></script>
 </head>
 <body>
+	<!-- Inforutan i toppen -->
 	<div id="topbar" style="height: 64px;">
 		<div>
-			<img id="menuimg" src="img/menu.png" />
+			<span id="pausemenuButton" style="font-size: 32px;" class="material-icons">&#xe034;</span>
 		</div>
 		<div id="messageBox">
 			Laddar ...
@@ -60,8 +64,21 @@
 			<div><span id="tentaScore"></span><img class="scoretoken" id="tentaToken"></div>
 		</div>
 	</div>
+	<!-- Spelområdet -->
 	<div id="gameboardContainer">
 		<canvas id="gameboard" style="transform: scale(1);"></canvas>
+	</div>
+	<!-- Pausmeny -->
+	<div id="pausemenu" class="hidden">
+		<div>
+			Hej! Det är jag som är pausmenyn. Klicka på knappen här nedanför för att fortsätta spela.
+		</div>
+		<div>
+			Här kan vi stoppa en massa rolig information som hur många föhsare man tomatat eller ens highscore eller nåt.
+		</div>
+		<div id="resumeButton">
+			Fortsätt <span style="font-size: 48px;" class="material-icons">&#xe037;</span>
+		</div>
 	</div>
 	<script type="text/javascript">
 		let controller;
@@ -70,21 +87,6 @@
 				.then(statusGraph => {
 					controller = new JumpController(statusGraph);
 				});
-			/*
-			// Resource loading tests
-			Resource.loadSingle("audio/myrstacken.mp3", LoopableAudio).then(audio => {
-				document.getElementById("scoreContainer").addEventListener("click", () => audio.play());
-			});
-			Resource.load(
-				["img/aftonbladet.png", "img/beta.png", "img/boom.png"],
-				Image,
-				(progress, total) => {
-					const time = new Date().toJSON();
-					console.log(`${time}: ${progress} of ${total} items loaded`);
-				}).then(
-					items => console.log(items)
-				);
-			*/
 		});
 	</script>
 </body>
