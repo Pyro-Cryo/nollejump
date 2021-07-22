@@ -24,7 +24,8 @@ class Controller {
         this.isPaused = true;
         this.isFF = false;
         this.minDelta = 0;
-        this.maxDelta = 100;
+        this.maxDelta = 1000 / 24; // about 42 ms
+        this.abandonFrameDeltaThreshold = this.maxDelta * 2;
         
         this.fastForwardFactor = fastForwardFactor;
         this.cancelFFOnPause = cancelFFOnPause;
@@ -197,9 +198,15 @@ class Controller {
                 this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
             return;
         }
-        else
-            this.timestampLast = timestamp;
-        
+        this.timestampLast = timestamp;
+
+        // Prevent single frames with too large delta,
+        // which otherwise cause collision detection / physics issues etc.
+        if (delta > this.abandonFrameDeltaThreshold) {
+            if (this._useAnimationFrameForUpdate)
+                this.mainInterval = window.requestAnimationFrame(this.update.bind(this));
+            return;
+        }
         delta = Math.min(this.maxDelta, delta);
         
         if (this._useAnimationFrameForUpdate && this.isFF)
