@@ -96,6 +96,7 @@ class JumpController extends Controller {
 
 	setScores() {
 		const populateImages = !document.getElementById("homeworkToken").src;
+		let nScores = 0;
 		for (const type of [Homework, KS, Tenta]) {
 			if (populateImages) {
 				const imgElement = document.getElementById(type.name.toLowerCase() + "Token");
@@ -114,6 +115,7 @@ class JumpController extends Controller {
 					scoreElement.innerText = "\u2713";
 				else
 					scoreElement.innerText = `${current}/${needed}`;
+				nScores++;
 			} else {
 				if (!scoreElement.parentElement.classList.contains("hidden")) {
 					scoreElement.parentElement.classList.add("hidden");
@@ -122,6 +124,14 @@ class JumpController extends Controller {
 			}
 		}
 
+		// Se till att det är en rimlig textstorlek
+		const scoreContainer = document.getElementById("scoreContainer");
+		for (const n of [1, 2, 3]) {
+			if (n !== nScores && scoreContainer.classList.contains("scores" + n))
+				scoreContainer.classList.remove("scores" + n);
+		}
+		if (!scoreContainer.classList.contains("scores" + nScores))
+			scoreContainer.classList.add("scores" + nScores);
 	}
 
 	setCanvasDimensions(barHeight, marginHorizontal, marginVertical = null) {

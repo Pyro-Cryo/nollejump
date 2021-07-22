@@ -29,8 +29,16 @@ body.dark {
 		margin: 0 1em;
 	}
 
-	#scoreContainer {
-		font-size: 0.8em;
+	#scoreContainer.scores1 {
+		font-size: 18px;
+	}
+
+	#scoreContainer.scores2 {
+		font-size: 16px;
+	}
+
+	#scoreContainer.scores3 {
+		font-size: 12px;
 	}
 
 	#scoreContainer div {
