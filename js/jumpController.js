@@ -86,6 +86,23 @@ class JumpController extends Controller {
 			document.getElementById("deathmenu").classList.add("hidden");
 			e.preventDefault();
 		}, true);
+		const restartButtons = document.getElementsByClassName("restartButton");
+		for (let i = 0; i < restartButtons.length; i++)
+			restartButtons.item(i).addEventListener("click", e => {
+				if (window.confirm("Är du säker på att du vill börja om från alla första början?")) {
+					this.clearState();
+					this.loadState(); // Laddar defaultstate
+					this.objects.clear();
+					this.gameArea.resetDrawOffset();
+					this.spawnPlayer();
+					this.startLevel();
+					if (this.isPaused) // Pausmenyn är uppe
+						this.togglePause();
+					else // Deathmenyn är uppe
+						document.getElementById("deathmenu").classList.add("hidden");
+				}
+				e.preventDefault();
+			}, true);
 	}
 
 	setLevelMessage() {
@@ -207,7 +224,6 @@ class JumpController extends Controller {
 	}
 
 	playerDied() {
-		console.log("aj då");
 		this.nDeaths++;
 		this.saveState();
 		document.getElementById("deathmenu").classList.remove("hidden");
