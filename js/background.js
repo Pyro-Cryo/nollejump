@@ -2,7 +2,7 @@ class Background extends GameObject {
 	constructor(x, y) {
 		super(x, y, null, 0, 1, false);
 
-		this.parallax = 0.3;
+		this.parallax = 0.2;
 		this.bufferHeight = JumpController.WIDTH_PX;
 		this.nodeSpacing = JumpController.WIDTH_PX;
 		this.nodeMargin = 0.1 * JumpController.WIDTH_PX;

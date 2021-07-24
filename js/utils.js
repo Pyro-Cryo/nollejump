@@ -1,3 +1,4 @@
+"use strict";
 function screenWrap(obj) {
     if (obj.x >= controller.gameArea.rightEdgeInGrid) {
         obj.x -= controller.gameArea.gridWidth;

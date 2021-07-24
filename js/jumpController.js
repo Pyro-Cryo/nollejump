@@ -27,12 +27,12 @@ class JumpController extends Controller {
 
 			// TODO: gör/använd en ordentlig CSV-parser för det här uppfyller inte alls specen
 			const matches = Array.from(response.matchAll(/^(("[^"]*")+|[^,]*),(("[^"]*")+|[^,]*)$/gm));
-			function trimQuotes(s) {
+			const trimQuotes = function (s) {
 				if (s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"')
 					return s.substring(1, s.length - 1);
 				else
 					return s;
-			}
+			};
 
 			const statusGraph = matches.map(match => [
 				trimQuotes(match[1]).trim(),
@@ -80,10 +80,6 @@ class JumpController extends Controller {
 		this.setScores();
 
 		this.togglePause();
-		document.getElementById("pausemenuButton").addEventListener("click", e => {
-			this.togglePause();
-			e.preventDefault();
-		}, true);
 		document.getElementById("resumeButton").addEventListener("click", e => {
 			this.togglePause();
 			e.preventDefault();
@@ -204,7 +200,6 @@ class JumpController extends Controller {
 }
 
 class cheat {
-	static isDirtyCheater = false;
 	/**
 	 * Kan togglas
 	 */

@@ -55,16 +55,16 @@ body.dark {
 		display: inline-block;
 	}
 
-#pausemenuButton {
+#playButton {
 	border-radius: 10px;
-	padding: 5px;
-	margin-left: -5px;
+	padding: 5px 5px 2px;
+	line-height: 1em;
 }
 
-	#pausemenuButton:hover {
+	#playButton:hover {
 		background-color: #dfb5b8;
 	}
-	#pausemenuButton:active {
+	#playButton:active {
 		color: #df3c48;
 	}
 

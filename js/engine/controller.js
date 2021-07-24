@@ -124,8 +124,8 @@ class Controller {
             this.mainInterval = setInterval(() => this.update(), this.isFF ? this.updateInterval / this._fastForwardFactor : this.updateInterval);
 
         if (this.playbutton) {
-            this.playbutton.children[0].classList.add("hideme");
-            this.playbutton.children[1].classList.remove("hideme");
+            this.playbutton.children[0].classList.add("hidden");
+            this.playbutton.children[1].classList.remove("hidden");
         }
         if (this.ffbutton)
             this.ffbutton.disabled = false;
@@ -140,8 +140,8 @@ class Controller {
         this.mainInterval = null;
 
         if (this.playbutton) {
-            this.playbutton.children[0].classList.remove("hideme");
-            this.playbutton.children[1].classList.add("hideme");
+            this.playbutton.children[0].classList.remove("hidden");
+            this.playbutton.children[1].classList.add("hidden");
         }
         if (this.ffbutton)
             this.ffbutton.disabled = true;
