@@ -26,34 +26,41 @@ body.dark {
 	justify-content: space-between;
 }
 	#topbar > div {
-		margin: 0 1em;
+		margin-right: 1em;
+	}
+	#topbar > div:first-child {
+		margin-left: 1em;
 	}
 
-	#scoreContainer.scores1 {
-		font-size: 18px;
+	#scoreContainer {
+		min-width: 7ex;
 	}
 
-	#scoreContainer.scores2 {
-		font-size: 16px;
-	}
+		#scoreContainer.scores1 {
+			font-size: 18px;
+		}
 
-	#scoreContainer.scores3 {
-		font-size: 12px;
-	}
+		#scoreContainer.scores2 {
+			font-size: 16px;
+		}
 
-	#scoreContainer div {
-		text-align: right;
-	}
+		#scoreContainer.scores3 {
+			font-size: 12px;
+		}
 
-	#scoreContainer img {
-		height: 1em;
-		margin-left: 1ex;
-	}
+		#scoreContainer div {
+			text-align: right;
+		}
 
-	#scoreContainer span {
-		min-width: 3.5ex;
-		display: inline-block;
-	}
+		#scoreContainer img {
+			height: 1em;
+			margin-left: 1ex;
+		}
+
+		#scoreContainer span {
+			min-width: 3.5ex;
+			display: inline-block;
+		}
 
 #playButton {
 	border-radius: 10px;
