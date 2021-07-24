@@ -143,6 +143,7 @@ class Level {
 	}
 
 	static tutorial = null;
+	static choice = null;
 	static levels = new Map();
 	static ctfysLevels = [
 		"DD1301", // Datorintro

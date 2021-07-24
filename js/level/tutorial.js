@@ -20,7 +20,7 @@ Level.tutorial = () => {
 			level.yCurrent
 		]).spaced(200);
 	
-	// placerholder, lite godtyckliga loopande plattformar
+	// placeholder, lite godtyckliga loopande plattformar
 	const regular = level.defineRegion("looping")
 		.spawn(Platform, 100, (elapsed, spawnHistory, level) => [
 			Math.random() * controller.gameArea.gridWidth,
@@ -70,6 +70,53 @@ Level.tutorial = () => {
 	level.initialRegion(start);
 	start.follower(looping);
 	looping.follower(looping);
+
+	return level;
+};
+
+Level.choice = () => {
+	const level = new Level(
+		{
+			"code": "antagning.se",
+			"name": "Val av utbildning",
+			"hp": 0
+		},
+		0, // Homework-tokens
+		0, // KS-tokens
+		0  // Tenta-tokens
+	);
+
+	const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
+	const initialWait = 10;
+	const n = 50;
+	const ctfys = level.defineRegion()
+		.call(() => {
+			controller.screenWrap = false;
+			console.log("no screen wrap");
+		})
+		.spawn(CTFYSRight, 1, [
+			controller.gameArea.gridWidth / 2,
+			controller.gameArea.gridHeight * 2 / 3
+		]).immediately()
+		.wait(initialWait)
+		.spawn(Platform, n, (elapsed, spawnHistory, level) => [
+			controller.gameArea.gridWidth + platWidth * Math.floor((spawnHistory.length - 1) / 2),
+			initialWait
+		]).immediately();
+
+	const ctmat = new Region()
+		.spawn(CTMATLeft, 1, [
+			controller.gameArea.gridWidth / 2,
+			controller.gameArea.gridHeight * 1 / 3
+		]).immediately()
+		.wait(initialWait)
+		.spawn(Platform, n, (elapsed, spawnHistory, level) => [
+			-platWidth * Math.floor((spawnHistory.length - 1) / 2),
+			initialWait
+		]).immediately(platWidth);
+
+	ctfys.interleave(ctmat).wait(controller.gameArea.gridHeight * 2);
+	level.initialRegion(ctfys);
 
 	return level;
 };

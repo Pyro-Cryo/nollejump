@@ -34,7 +34,10 @@ class Platform extends EffectObject {
 	update(delta) {
 		super.update(delta);
 
-		despawnIfBelowBottom(this);
+		// Inte intuitivt uppenbart varför vi avstår om man inte screenwrappar
+		// men tanken är att man ska kunna hoppa tillbaka
+		if (controller.screenWrap)
+			despawnIfBelowBottom(this);
 	}
 
 	draw(gameArea) {
@@ -48,8 +51,8 @@ class Platform extends EffectObject {
 		}
 
 		super.draw(gameArea);
-		// Screen wrapping
-		drawScreenWrap(gameArea, this, super.draw.bind(this));
+		if (controller.screenWrap)
+			drawScreenWrap(gameArea, this, super.draw.bind(this));
 	}
 }
 
@@ -66,7 +69,7 @@ class BasicMovingPlatform extends Platform {
 
 	update(delta) {
 		super.update(delta);
-
-		screenWrap(this);
+		if (controller.screenWrap)
+			screenWrap(this);
 	}
 }

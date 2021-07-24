@@ -12,6 +12,23 @@ class JumpController extends Controller {
 		this.statusGraph = statusGraph;
 		this.currentLevel = null;
 		this.stateProperties = ["ctfys", "levelIndex", "nDeaths"];
+		this._screenWrap = true;
+	}
+
+	set screenWrap(value) {
+		this._screenWrap = value;
+		if (value) {
+			this.player.setCameraTracking(...JumpPlayer.SCREENWRAP_TRACKING);
+			this.clearOnDraw = false;
+		}
+		else {
+			this.clearOnDraw = true;
+			this.player.setCameraTracking(...JumpPlayer.NON_SCREENWRAP_TRACKING);
+		}
+	}
+
+	get screenWrap() {
+		return this._screenWrap;
 	}
 
 	static get defaultStatusGraph() {
@@ -84,6 +101,7 @@ class JumpController extends Controller {
 		// Respawnknappen ("försök igen") på du dog-sidan
 		document.getElementById("respawnButton").addEventListener("click", e => {
 			this.objects.clear();
+			this.delayedRenderObjects = [];
 			this.gameArea.resetDrawOffset();
 			this.spawnPlayer();
 			this.startLevel();
@@ -98,6 +116,7 @@ class JumpController extends Controller {
 					this.clearState();
 					this.loadState(); // Laddar defaultstate
 					this.objects.clear();
+					this.delayedRenderObjects = [];
 					this.gameArea.resetDrawOffset();
 					this.spawnPlayer();
 					this.startLevel();
@@ -242,12 +261,19 @@ class JumpController extends Controller {
 	}
 
 	startLevel(y = null) {
-		if (this.levelIndex === 0)
-			this.currentLevel = Level.tutorial();
-		else {
-			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
-			this.currentLevel = Level.levels.get(code)();
+		switch (this.levelIndex) {
+			case 0:
+				this.currentLevel = Level.choice();
+				break;
+			case 1:
+				this.currentLevel = Level.tutorial();
+				break;
+			default:
+				const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 2];
+				this.currentLevel = Level.levels.get(code)();
+				break;
 		}
+		
 		if (y === null) {
 			this.currentLevel.warmup();
 			// TODO: Borde kanske också skötas i level
@@ -266,6 +292,23 @@ class JumpController extends Controller {
 			this.levelIndex++;
 			this.saveState();
 			this.startLevel(this.currentLevel.yCurrent);
+		}
+
+		if (this.levelIndex === 0 && Math.abs(this.player.x - this.gameArea.gridWidth / 2) > this.gameArea.gridWidth * 5) {
+			console.log("Here we go");
+			this.levelIndex = 1;
+			this.ctfys = this.player.x > 0;
+			this.screenWrap = true;
+			for (const obj of this.objects) {
+				if (obj instanceof Platform && (obj.x < 0 || obj.x > this.gameArea.gridWidth))
+					obj.despawn();
+				else if (obj instanceof CTFYSRight || obj instanceof CTMATLeft)
+					obj.despawn();
+			}
+			this.gameArea.resetDrawOffset();
+			this.player.x = this.gameArea.gridWidth / 2;
+			this.saveState();
+			this.startLevel();
 		}
 	}
 

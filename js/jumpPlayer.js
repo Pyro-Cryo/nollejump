@@ -5,6 +5,20 @@ class JumpPlayer extends Player {
 	static ACTION_GO_LEFT = 1;
 	static ACTION_GO_RIGHT = 2;
 	static ACTION_SHOOT = 3;
+	static SCREENWRAP_TRACKING = [
+		Player.CAMERA_TRACKING_INFRAME,
+		160, // Margin top
+		Number.NEGATIVE_INFINITY, // Margin right
+		Number.NEGATIVE_INFINITY, // Margin bottom
+		Number.NEGATIVE_INFINITY // Margin left
+	];
+	static NON_SCREENWRAP_TRACKING = [
+		Player.CAMERA_TRACKING_INFRAME,
+		384 / 4, // Margin top = JumpController.WIDTH_PX / 4
+		384 / 4, // Margin right
+		384 / 4, // Margin bottom
+		384 / 4, // Margin left
+	];
 
 	constructor(x, y) {
 		super(
@@ -17,13 +31,7 @@ class JumpPlayer extends Player {
 				["ArrowRight", JumpPlayer.ACTION_GO_RIGHT],
 				["Space", JumpPlayer.ACTION_SHOOT]
 			]),
-			[
-				Player.CAMERA_TRACKING_INFRAME,
-				160, // Margin top
-				Number.NEGATIVE_INFINITY, // Margin right
-				Number.NEGATIVE_INFINITY, // Margin bottom
-				Number.NEGATIVE_INFINITY // Margin left
-			],
+			controller.screenWrap ? JumpPlayer.SCREENWRAP_TRACKING : JumpPlayer.NON_SCREENWRAP_TRACKING,
 			null,
 			null,
 			null,
@@ -78,7 +86,7 @@ class JumpPlayer extends Player {
 
 	collisionCheck() {
 		for (const obj of this.collidibles.filterIterate(obj => obj.id !== null)) {
-			if (collisionCheckScreenWrap(this, obj)) {
+			if (controller.screenWrap ? collisionCheckScreenWrap(this, obj) : this.collisionCheckRectangular(obj)) {
 				obj.onCollision(this);
 			}
 		}
@@ -121,12 +129,12 @@ class JumpPlayer extends Player {
 
 		
 		// Trillar man ner förlorar man
-		if (this.y <= controller.gameArea.bottomEdgeInGrid - 2 * this.height) {
+		if (this.y <= (controller.screenWrap ? controller.gameArea.bottomEdgeInGrid : 0) - 2 * this.height) {
 			controller.playerDied();
 			this.despawn();
 		}
-		
-		screenWrap(this);
+		if (controller.screenWrap)
+			screenWrap(this);
 
 		this.collisionCheck();
 		this.lastX = this.x;
@@ -138,8 +146,8 @@ class JumpPlayer extends Player {
 	draw(gameArea) {
 		super.draw(gameArea);
 
-		// Screen wrapping
-		drawScreenWrap(gameArea, this, super.draw.bind(this));
+		if (controller.screenWrap)
+			drawScreenWrap(gameArea, this, super.draw.bind(this));
 	}
 }
 

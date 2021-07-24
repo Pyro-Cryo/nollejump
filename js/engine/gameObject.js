@@ -144,7 +144,7 @@ class GameObject extends PrerenderedObject {
 	}
 
 	collisionCheckRectangular(other) {
-		return Math.abs(this.x - obj.x) <= (this.width + obj.width) / 2 && Math.abs(this.y - obj.y) <= (this.height + obj.height) / 2;
+		return Math.abs(this.x - other.x) <= (this.width + other.width) / 2 && Math.abs(this.y - other.y) <= (this.height + other.height) / 2;
 	}
 
 	// TODO: gör om timers (även för effektCooldowns och liknande) till att baseras på tidsdeltan istället för antal frames
