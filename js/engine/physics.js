@@ -6,8 +6,6 @@ class Physics {
 		this.object = object;
 		this.mass = 0;
 		this.e = 1;
-		this.m_mod = [];
-		this.e_mod = [];
 
 		this.decay_speed = true;
 		this.decay_next = true;
@@ -16,20 +14,13 @@ class Physics {
 		this.gx = 0;
 		this.gy = -9.82;
 
-		this.gx_mod = [];
-		this.gy_mod = [];
-
 		this.linear_decay_y = 0;
 		this.linear_decay_x = 0;
 		this.proportional_decay_y = 0;
 		this.proportional_decay_x = 0;
 
-
 		this.vx = 0;
 		this.vy = 0;
-
-		this.vx_mod = [];
-		this.vy_mod = [];
 
 		this.previous_vx = 0;
 		this.previous_vy = 0;
@@ -37,129 +28,8 @@ class Physics {
 		this.max_vx = Number.POSITIVE_INFINITY;
 		this.max_vy = Number.POSITIVE_INFINITY;
 
-		this.max_vx_mod = [];
-		this.max_vy_mod = [];
-
 	}
 
-/*
-	/// <ugh>
-	modify_mass(key, value) {
-		this._m_mod[key] = value;
-	}
-	unset_mass_mod(key) {
-		if (this._m_mod[key] !== undefined)
-			this._m_mod = this._m_mod.splice(key,1);
-	}
-	modify_e(key, value) {
-		this._e_mod[key] = value;
-	}
-	unset_e_mod(key) {
-		if (this._e_mod[key] !== undefined)
-			this._e_mod = this._e_mod.splice(key,1);
-	}
-	modify_gx(key, value) {
-		this._gx_mod[key] = value;
-	}
-	unset_gx_mod(key) {
-		if (this._gx_mod[key] !== undefined)
-			this._gx_mod = this._gx_mod.splice(key,1);
-	}
-	modify_gy(key, value) {
-		this._gy_mod[key] = value;
-	}
-	unset_gy_mod(key) {
-		if (this._gy_mod[key] !== undefined)
-			this._gy_mod = this._gy_mod.splice(key,1);
-	}
-	modify_vx(key, value) {
-		this._vx_mod[key] = value;
-	}
-	unset_vx_mod(key) {
-		if (this._vx_mod[key] !== undefined)
-			this._vx_mod = this._vx_mod.splice(key,1);
-	}
-	modify_vy(key, value) {
-		this._vy_mod[key] = value;
-	}
-	unset_vy_mod(key) {
-		if (this._vy_mod[key] !== undefined)
-			this._vy_mod = this._vy_mod.splice(key,1);
-	}
-	modify_max_vx(key, value) {
-		this._max_vx_mod[key] = value;
-	}
-	unset_max_vx_mod(key) {
-		if (this._max_vx_mod[key] !== undefined)
-			this._max_vx_mod = this._gx_mod.splice(key,1);
-	}
-	modify_max_vy(key, value) {
-		this._max_vy_mod[key] = value;
-	}
-	unset_max_vy_mod(key) {
-		if (this._max_vy_mod[key] !== undefined)
-			this._max_vy_mod = this._max_vy_mod.splice(key,1);
-	}
-
-
-	get mass() {
-		let m = this._m;
-		for (var i = this._m_mod.length - 1; i >= 0; i--) {
-			m *= this._m_mod[i];
-		}
-		return m;
-	}
-	get e() {
-		let v = this._e;
-		for (var i = this._e_mod.length - 1; i >= 0; i--) {
-			v *= this._e_mod[i];
-		}
-		return v;
-	}
-	get gx() {
-		let v = this._gx;
-		for (var i = this._gx_mod.length - 1; i >= 0; i--) {
-			v *= this._gx_mod[i];
-		}
-		return v;
-	}
-	get gy() {
-		let v = this._gy;
-		for (var i = this._gy_mod.length - 1; i >= 0; i--) {
-			v *= this._gy_mod[i];
-		}
-		return v;
-	}
-	get vx() {
-		let v = this._vx;
-		for (var i = this._vx_mod.length - 1; i >= 0; i--) {
-			v *= this._vx_mod[i];
-		}
-		return v;
-	}
-	get vy() {
-		let v = this._vy;
-		for (var i = this._vy_mod.length - 1; i >= 0; i--) {
-			v *= this._vy_mod[i];
-		}
-		return v;
-	}
-	get max_vx() {
-		let v = this.max_vx;
-		for (var i = this.max_vx_mod.length - 1; i >= 0; i--) {
-			v *= this.max_vx_mod[i];
-		}
-		return v;
-	}
-	get max_vy() {
-		let v = this._max_vy;
-		for (var i = this._max_vy_mod.length - 1; i >= 0; i--) {
-			v *= this._max_vy_mod[i];
-		}
-		return v;
-	}
-	/// </ugh>
-	*/
 
 	accellerate(dx, dy, dt) {
 

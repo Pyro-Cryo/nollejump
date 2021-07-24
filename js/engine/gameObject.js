@@ -231,7 +231,7 @@ class BaseEffect extends PrerenderedObject {
 		this.image = this.constructor.image;
 		this.scale = this.constructor.scale;
 
-		this.cooldown = cooldown;
+		this.cooldown = this.constructor.cooldown;
 		this.cdtime = this.cooldown;
 		this.timesinitialized = 0;
 

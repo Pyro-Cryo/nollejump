@@ -182,8 +182,6 @@ class PlayerPhysics extends Physics {
 		this.vx = this.bounce_speed * Math.sin(a);
 		this.vy = this.bounce_speed * Math.cos(a);
 
-		console.log(a, this.vx, this.vy);
-
 	}
 
 }
