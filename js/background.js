@@ -1,4 +1,5 @@
 class Background extends GameObject {
+	static dark = false;
 	constructor(x, y) {
 		super(x, y, null, 0, 1, false);
 
@@ -7,16 +8,16 @@ class Background extends GameObject {
 		this.nodeSpacing = JumpController.WIDTH_PX;
 		this.nodeMargin = 0.1 * JumpController.WIDTH_PX;
 		this.gradients = [
-			// [[40, 40, 40, 0.1]],
+			[[40, 40, 40, 0.1]],
 			[[140, 140, 120]],
 		];
 		this.sizes = [
-			//8,
+			6,
 			5,
 		];
-		this.dark = false;
+		this.dark = Background.dark;
 
-		const numBuffers = Math.ceil(Math.min((JumpController.WIDTH_PX / JumpController.MAX_ASPECT_RATIO) / this.bufferHeight, 2)) + 1;
+		const numBuffers = Math.ceil(Math.min(JumpController.HEIGHT_PX / this.bufferHeight, 2)) + 1;
 
 		this.path = []; // Also filled out by createGraph() below
 		for (let nodeY = -2 * this.nodeSpacing; nodeY <= 2 * this.nodeSpacing; nodeY += this.nodeSpacing) {

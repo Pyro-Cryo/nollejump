@@ -1,12 +1,12 @@
 class JumpController extends Controller {
-	// Aspect ratio: width / height
-	static MAX_ASPECT_RATIO = 2 / 3;
-	static MIN_ASPECT_RATIO = 1 / 2;
 	static WIDTH_PX = 384;
+	static HEIGHT_PX = JumpController.WIDTH_PX * 15 / 9;
 	static STORAGE_PREFIX = "nollejump_";
 	constructor(statusGraph) {
 		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
+		this.gameArea.width = JumpController.WIDTH_PX;
+		this.gameArea.height = JumpController.HEIGHT_PX;
 		this.gameArea.gridOrigin = GameArea.GRID_ORIGIN_LOWER_LEFT;
 
 		this.statusGraph = statusGraph;
@@ -55,8 +55,10 @@ class JumpController extends Controller {
 	}
 
 	startDrawLoop(barHeight, margin) {
-		this.setCanvasDimensions(barHeight, margin);
-		window.addEventListener("resize", () => this.setCanvasDimensions(barHeight, margin));
+		// Usch fy skriv aldrig sån här kod igen
+		this.setCanvasDimensions(barHeight, margin, margin / 2); // Första tar bort scrollbar
+		this.setCanvasDimensions(barHeight, margin, margin / 2); // Andra sätter rätt värden
+		window.addEventListener("resize", () => this.setCanvasDimensions(barHeight, margin, margin / 2));
 		super.startDrawLoop();
 	}
 
@@ -152,24 +154,21 @@ class JumpController extends Controller {
 	setCanvasDimensions(barHeight, marginHorizontal, marginVertical = null) {
 		if (marginVertical === null)
 			marginVertical = marginHorizontal;
-		const maxHeightPx = document.documentElement.clientHeight - barHeight - marginVertical * 2;
 		const maxWidthPx = document.documentElement.clientWidth - marginHorizontal * 2;
+		const maxHeightPx = document.documentElement.clientHeight - barHeight - marginVertical * 2;
+		const wScale = maxWidthPx / JumpController.WIDTH_PX;
+		const hScale = maxHeightPx / JumpController.HEIGHT_PX;
+		const scale = Math.min(wScale, hScale);
 
-		// Limit the width to not exceed MAX_ASPECT_RATIO
-		const targetWidthPx = Math.min(maxHeightPx * JumpController.MAX_ASPECT_RATIO, maxWidthPx);
-		// Limit the height to not exceed MIN_ASPECT_RATIO
-		const targetHeightPx = Math.min(targetWidthPx / JumpController.MIN_ASPECT_RATIO, maxHeightPx);
-
-		// Achieve the desired width by scaling the canvas
-		const scale = targetWidthPx / JumpController.WIDTH_PX;
-		// Compute the unscaled height
-		const height_px = Math.round(targetHeightPx / scale);
-		
-		this.gameArea.width = JumpController.WIDTH_PX;
-		this.gameArea.height = height_px;
-		this.gameArea.canvas.style = `transform: scale(${scale});`;
-		
-		this.canvasContainer.style = `height: ${targetHeightPx}px;`;
+		// Varifrån kommer de magiska siffrorna? Det du!
+		if (maxWidthPx < JumpController.WIDTH_PX - 30) {
+			const leftpad = marginHorizontal + Math.max(maxWidthPx - 300, 0) / 2;
+			this.gameArea.canvas.style = `transform: scale(${scale}); position: absolute; left: ${leftpad}px; transform-origin: left top;`;
+			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px; position: relative;`;
+		} else {
+			this.gameArea.canvas.style = `transform: scale(${scale});`;
+			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px;`;
+		}
 	}
 
 	loadState() {
@@ -317,5 +316,6 @@ class cheat {
 	static get darkmode() {
 		document.body.classList.add("dark");
 		controller.background.dark = true;
+		Background.dark = true;
 	}
 };

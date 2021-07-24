@@ -13,10 +13,11 @@ body.dark {
 
 #gameboard {
 	border: 1px solid black;
-	transform-origin: top center;
+	transform-origin: center top;
 }
 #gameboardContainer {
 	text-align: center;
+	width: 100%;
 }
 #topbar {
 	width: 100%;
