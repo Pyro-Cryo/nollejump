@@ -254,7 +254,7 @@ class BaseEffect extends PrerenderedObject {
 	}
 
 	draw(object, gameArea, index) {
-		let defaultoffset = this.constructor.imgOffset();
+		let defaultoffset = this.constructor.imgOffset;
 
 		let x = object.x + (defaultoffset[0] === null ? 0.5 - 0.3 * index : defaultoffset[0]);		
 		let y = object.y + (defaultoffset[1] === null ? -0.5 : defaultoffset[1]);
