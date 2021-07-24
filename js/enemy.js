@@ -10,12 +10,7 @@ class Enemy extends GameObject {
      * @param {JumpPlayer} player 
      */
     onCollision(player) {
-        player.collidibles.clear();
-        new BasicAnimation(player)
-            .set({angle: 0})
-            .after(0.5).set({angle: Math.random() < 0.5 ? 2 * Math.PI : -2 * Math.PI})
-            .loop().start();
-        console.log("death by föhs");
+        player.damage();
     }
     
     onShot(pellet) {

@@ -54,6 +54,7 @@ class JumpPlayer extends Player {
 		controller.registerObject(this, false, true);
 
 		this.useTiltControls = true;
+		this.lives = 1;
 	}
 
 	standardBounce() {
@@ -82,6 +83,20 @@ class JumpPlayer extends Player {
 				obj.onCollision(this);
 			}
 		}
+	}
+
+	damage() {
+		if (this.lives !== -1 && --this.lives == 0)
+			this.die();
+
+	}
+
+	die() {
+		this.collidibles.clear();
+		new BasicAnimation(this)
+			.set({angle: 0})
+			.after(0.5).set({angle: Math.random() < 0.5 ? 2 * Math.PI : -2 * Math.PI})
+			.loop().start();
 	}
 
 	translate(dx, dy){
@@ -157,7 +172,7 @@ class PlayerPhysics extends Physics {
 		this.proportional_decay_x = 0.55;
 
 		this.max_vx = 250;
-		this.max_vy = 500;
+		this.max_vy = 400;
 
 	}
 
@@ -165,8 +180,8 @@ class PlayerPhysics extends Physics {
 		super.bounceSurface(angle);
 
 		let a = Math.atan2(this.vx, this.vy);
-		this.vx = this.bounce_speed * Math.sin(a);
-		this.vy = this.bounce_speed * Math.cos(a);
+		// this.vx = this.bounce_speed * Math.sin(a);
+		this.vy = this.bounce_speed; // * Math.cos(a);
 
 	}
 

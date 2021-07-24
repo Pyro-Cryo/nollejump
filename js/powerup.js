@@ -27,6 +27,26 @@ class PowerupToken extends GameObject {
 }
 
 
+class Immortal extends PowerUp {
+
+	static get cooldown() { return 5000; }
+
+	init(player) {
+		super.init(player);
+		if (player.lives !== -1){
+			this.lives = player.lives;
+	 		player.lives = -1;
+		}
+	}
+
+	remove(player) {
+		if (player.lives == -1)
+			player.lives = this.lives;
+		super.remove(player);
+	}
+}
+
+
 const aubimg = Resource.addAsset("img/fruit/aubergine.png");
 class JumpBoost extends PowerUp {
 
@@ -34,15 +54,15 @@ class JumpBoost extends PowerUp {
 	static get scale() { return 0.2; }
 	static get cooldown() { return 5000; }
 
-	init(object) {
-		super.init(object);
- 		this.prev = Object.assign({}, object.physics);
- 		object.physics.bounce_speed *= 1.5;
+	init(player) {
+		super.init(player);
+ 		this.prev = Object.assign({}, player.physics);
+ 		player.physics.bounce_speed *= 1.5;
 	}
 
-	remove(object) {
-		object.physics.bounce_speed = this.prev.bounce_speed;
-		super.remove(object);
+	remove(player) {
+		player.physics.bounce_speed = this.prev.bounce_speed;
+		super.remove(player);
 	}
 }
 
@@ -57,21 +77,25 @@ class Rocket extends PowerUp {
 	static get scale() { return 0.1; }
 	static get cooldown() { return 2200; }
 
-	init(object) {
-		super.init(object);
- 		this.prev = Object.assign({}, object.physics);
- 		object.physics.gy = 0;
- 		object.physics.vy = 0;
+	init(player) {
+		super.init(player);
+
+		player.addEffect(new Immortal());
+
+ 		this.prev = Object.assign({}, player.physics);
+ 		player.physics.gy = 0;
+ 		if(player.physics.vy < 0)
+ 			player.physics.vy = 0;
 	}
 
-	update(object, delta) {
-		object.physics.accellerate(0, 20, delta);
-		super.update(object, delta);
+	update(player, delta) {
+		player.physics.accellerate(0, 20, delta);
+		super.update(player, delta);
 	}
 
-	remove(object) {
-		object.physics.gy = this.prev.gy;
-		super.remove(object);
+	remove(player) {
+		player.physics.gy = this.prev.gy;
+		super.remove(player);
 	}
 }
 
