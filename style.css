@@ -75,7 +75,7 @@ body.dark {
 		color: #df3c48;
 	}
 
-#pausemenu {
+.pausemenu {
 	background-color: rgba(12, 3, 4, 0.8);
 	position: fixed;
 	top: 0;
@@ -89,12 +89,12 @@ body.dark {
 	color: white;
 }
 
-	#pausemenu > div {
+	.pausemenu > div {
 		width: 80%;
 		margin: 0.5em 0;
 	}
 
-#resumeButton {
+.resumeButton {
 	text-align: center;
 	font-size: 24px;
 	display: flex;
@@ -104,9 +104,14 @@ body.dark {
 	padding: 5px 5px 5px 15px;
 	border-radius: 10px;
 }
-	#resumeButton:hover {
+	.resumeButton:hover {
 		background-color: #df3c48;
 	}
-	#resumeButton:active {
+	.resumeButton:active {
 		color: #dfb5b8;
+	}
+
+	.resumeButton > span {
+		margin-left: 0.5ex;
+		padding-right: 0.4ex;
 	}

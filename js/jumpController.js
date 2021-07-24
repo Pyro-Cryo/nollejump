@@ -66,28 +66,24 @@ class JumpController extends Controller {
 
 	onAssetsLoaded() {
 		super.onAssetsLoaded();
+		this.clearOnDraw = false;
 		this.setMessage(`Laddat klart`);
 		this.startDrawLoop(64, 16);
 		this.loadState();
-		this.enemies = [];
 		this.spawnPlayer();
-		// TODO: Borde kanske också skötas i level
-		this.background = new Background(this.gameArea.gridWidth / 2, 0);
-		this.clearOnDraw = false;
-		
-		if (this.levelIndex === 0)
-			this.currentLevel = Level.tutorial();
-		else {
-			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
-			this.currentLevel = Level.levels.get(code)();
-		}
-		this.currentLevel.warmup();
-		this.setLevelMessage();
-		this.setScores();
-
+		this.startLevel();
 		this.togglePause();
+		
 		document.getElementById("resumeButton").addEventListener("click", e => {
 			this.togglePause();
+			e.preventDefault();
+		}, true);
+		document.getElementById("respawnButton").addEventListener("click", e => {
+			this.objects.clear();
+			this.gameArea.resetDrawOffset();
+			this.spawnPlayer();
+			this.startLevel();
+			document.getElementById("deathmenu").classList.add("hidden");
 			e.preventDefault();
 		}, true);
 	}
@@ -161,7 +157,7 @@ class JumpController extends Controller {
 
 	loadState() {
 		const defaultState = {
-			// TODO: uppdatera med att man ska kunna välja spår
+			// TODO: ctfys kanske null innan man valt spår eller nåt
 			ctfys: true,
 			levelIndex: 0,
 			nDeaths: 0,
@@ -189,8 +185,13 @@ class JumpController extends Controller {
 		console.log("Saved state", JSON.stringify(data));
 	}
 
+	clearState() {
+		window.localStorage.removeItem(JumpController.STORAGE_PREFIX + "state");
+	}
+
 	spawnPlayer() {
 		// Täck botten med plattformar så man inte instadör
+		this.enemies = [];
 		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 100);
 		const platWidth = Platform.image.width * Platform.scale / this.gameArea.unitWidth;
 		const startingPlatforms = new Region()
@@ -209,6 +210,7 @@ class JumpController extends Controller {
 		console.log("aj då");
 		this.nDeaths++;
 		this.saveState();
+		document.getElementById("deathmenu").classList.remove("hidden");
 	}
 
 	onPlay() {
@@ -221,17 +223,31 @@ class JumpController extends Controller {
 		document.getElementById("pausemenu").classList.remove("hidden");
 	}
 
+	startLevel(y = null) {
+		if (this.levelIndex === 0)
+			this.currentLevel = Level.tutorial();
+		else {
+			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
+			this.currentLevel = Level.levels.get(code)();
+		}
+		if (y === null) {
+			this.currentLevel.warmup();
+			// TODO: Borde kanske också skötas i level
+			this.background = new Background(this.gameArea.gridWidth / 2, 0);
+		}
+		else
+			this.currentLevel.init(y, this.gameArea.gridHeight / 2);
+		this.setLevelMessage();
+		this.setScores();
+	}
+
 	update(delta) {
 		super.update(delta);
+		// level.update() returnerar true när den tar slut
 		if (this.currentLevel.update()) {
 			this.levelIndex++;
 			this.saveState();
-			const y = this.currentLevel.yCurrent;
-			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
-			this.currentLevel = Level.levels.get(code)();
-			this.currentLevel.init(y, this.gameArea.gridHeight / 2);
-			this.setLevelMessage();
-			this.setScores();
+			this.startLevel(this.currentLevel.yCurrent);
 		}
 	}
 
