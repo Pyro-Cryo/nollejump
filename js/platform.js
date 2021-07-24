@@ -18,7 +18,7 @@ class Platform extends EffectObject {
 	 */
 	onCollision(player) {
 		// If the player was above us and is going down
-		if (player.speedVertical < 0 && player.lastY - player.height / 2 >= this.y + this.height / 2)
+		if (player.physics.vy < 0 && player.lastY - player.height / 2 >= this.y + this.height / 2)
 			this.onPlayerBounce(player);
 		else
 			this.onPlayerPass(player);

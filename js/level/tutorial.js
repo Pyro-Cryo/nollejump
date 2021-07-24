@@ -50,11 +50,22 @@ Level.tutorial = () => {
 			}
 			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent]
 		}).over(regular.length * 4 / 5);
+
+	const powerups = new Region()
+		.wait(1)
+		.spawn(JumpBoostToken, 1, (elapsed, spawnHistory, level) => {
+			for (let i = spawnHistory.length - 1; i >= 0; i--) {
+				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
+					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
+			}
+			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent]
+		}).immediately();
 	
 	const looping = regular
 		.interleave(moving)
 		.interleave(enemies)
-		.interleave(tokens);
+		.interleave(tokens)
+		.interleave(powerups);
 
 	level.initialRegion(start);
 	start.follower(looping);
