@@ -4,12 +4,16 @@ class Background extends GameObject {
 		super(x, y, null, 0, 1, false);
 
 		this.parallax = 0.2;
+		this.ticksPerBuffer = 10;
+		this.tickThickness = 2;
+		this.tickLength = 20;
+		this.tickColor = [140, 140, 135];
 		this.bufferHeight = JumpController.WIDTH_PX;
 		this.nodeSpacing = JumpController.WIDTH_PX;
 		this.nodeMargin = 0.1 * JumpController.WIDTH_PX;
 		this.gradients = [
 			[[40, 40, 40, 0.1]],
-			[[140, 140, 120]],
+			[[140, 140, 135]],
 		];
 		this.sizes = [
 			6,
@@ -112,7 +116,13 @@ class Background extends GameObject {
 			this.sizes,
 			false,
 			true,
-			this.dark ? [12, 3, 4] : "white"
+			this.dark ? [12, 3, 4] : "white",
+			{
+				perBuffer: this.ticksPerBuffer,
+				thickness: this.tickThickness,
+				color: this.tickColor,
+				length: this.tickLength,
+			},
 		);
 		if (index === this.buffers.length)
 			this.buffers.push(buffer);
@@ -131,7 +141,7 @@ class Background extends GameObject {
 			return `rgb(${col.join(",")})`;
 	}
 
-	static renderGraphImg(width, height, n, interpolationFunction, gradients, sizes, transparent = false, flipped = true, bgcolor = "white") {
+	static renderGraphImg(width, height, n, interpolationFunction, gradients, sizes, transparent = false, flipped = true, bgcolor = "white", ticks = null) {
         if (gradients.length !== sizes.length)
             throw new Error(`Mismatch of length between gradients (${gradients.length}) and sizes (${sizes.length})`);
 
@@ -168,6 +178,23 @@ class Background extends GameObject {
             }
 		}
 
+		if (ticks) {
+			ctx.fillStyle = this.toColor(ticks.color);
+			for (let i = 0; i < ticks.perBuffer; i++) {
+				const y = Math.round((i + 0.5) * canvas.height / ticks.perBuffer);
+				const imageData = ctx.getImageData(0, canvas.height - y, canvas.width, 1).data;
+				let x = 0;
+				let done = false;
+				while (!done && ++x < canvas.width) {
+					for (let channel = 0; channel < 3; channel++) {
+						if (imageData[x * 4 + channel] !== imageData[(x - 1) * 4 + channel])
+							done = true;
+					}
+				}
+				x += Math.max(...sizes) / 2;
+				ctx.fillRect(x - ticks.length / 2, y - ticks.thickness / 2, ticks.length, ticks.thickness);
+			}
+		}
 		ctx.restore();
 
         return canvas;

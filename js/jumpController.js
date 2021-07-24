@@ -76,10 +76,12 @@ class JumpController extends Controller {
 		this.startLevel();
 		this.togglePause();
 		
+		// Resumeknappen på paussidan
 		document.getElementById("resumeButton").addEventListener("click", e => {
 			this.togglePause();
 			e.preventDefault();
 		}, true);
+		// Respawnknappen ("försök igen") på du dog-sidan
 		document.getElementById("respawnButton").addEventListener("click", e => {
 			this.objects.clear();
 			this.gameArea.resetDrawOffset();
@@ -88,6 +90,7 @@ class JumpController extends Controller {
 			document.getElementById("deathmenu").classList.add("hidden");
 			e.preventDefault();
 		}, true);
+		// Restartknappar finns på både paus- och dogsidan
 		const restartButtons = document.getElementsByClassName("restartButton");
 		for (let i = 0; i < restartButtons.length; i++)
 			restartButtons.item(i).addEventListener("click", e => {
