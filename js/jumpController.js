@@ -308,7 +308,7 @@ class cheat {
 		const shoot = controller.player.shoot.bind(controller.player);
 		controller.player.shoot = () => {
 			shoot();
-			if (controller.player.speedVertical < 0)
+			if (controller.player.physics.vy < 0)
 				controller.player.standardBounce();
 		};
 	}

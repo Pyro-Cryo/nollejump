@@ -149,29 +149,15 @@ class PlayerPhysics extends Physics {
 	constructor(player) {
 		super(player);
 
-		// this._e = 1.5;
-		this.bounce_speed = 100;
+		this.bounce_speed = 120;
 
-		this.decay_speed = true;
-		this.decay_next = true;
+		this.gy = -18;
 
-		this.gy = -16;
-		this.gx = 0;
+		this.linear_decay_x = 0.7;
+		this.proportional_decay_x = 0.55;
 
-		this.linear_decay_y = 0;
-		this.linear_decay_x = 0.8;
-		this.proportional_decay_y = 0;
-		this.proportional_decay_x = 0.5;
-
-
-		this.vx = 0;
-		this.vy = 0; // initial speed
-
-		this.previous_vx = 0;
-		this.previous_vy = 0;
-
-		this.max_vx = 300;
-		this.max_vy = 300;
+		this.max_vx = 250;
+		this.max_vy = 500;
 
 	}
 
