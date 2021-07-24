@@ -13,10 +13,11 @@ body.dark {
 
 #gameboard {
 	border: 1px solid black;
-	transform-origin: top center;
+	transform-origin: center top;
 }
 #gameboardContainer {
 	text-align: center;
+	width: 100%;
 }
 #topbar {
 	width: 100%;
@@ -26,49 +27,56 @@ body.dark {
 	justify-content: space-between;
 }
 	#topbar > div {
-		margin: 0 1em;
+		margin-right: 1em;
+	}
+	#topbar > div:first-child {
+		margin-left: 1em;
 	}
 
-	#scoreContainer.scores1 {
-		font-size: 18px;
+	#scoreContainer {
+		min-width: 7ex;
 	}
 
-	#scoreContainer.scores2 {
-		font-size: 16px;
-	}
+		#scoreContainer.scores1 {
+			font-size: 18px;
+		}
 
-	#scoreContainer.scores3 {
-		font-size: 12px;
-	}
+		#scoreContainer.scores2 {
+			font-size: 16px;
+		}
 
-	#scoreContainer div {
-		text-align: right;
-	}
+		#scoreContainer.scores3 {
+			font-size: 12px;
+		}
 
-	#scoreContainer img {
-		height: 1em;
-		margin-left: 1ex;
-	}
+		#scoreContainer div {
+			text-align: right;
+		}
 
-	#scoreContainer span {
-		min-width: 3.5ex;
-		display: inline-block;
-	}
+		#scoreContainer img {
+			height: 1em;
+			margin-left: 1ex;
+		}
 
-#pausemenuButton {
+		#scoreContainer span {
+			min-width: 3.5ex;
+			display: inline-block;
+		}
+
+#playButton {
 	border-radius: 10px;
-	padding: 5px;
-	margin-left: -5px;
+	padding: 5px 5px 2px;
+	line-height: 1em;
 }
 
-	#pausemenuButton:hover {
+	#playButton:hover {
 		background-color: #dfb5b8;
 	}
-	#pausemenuButton:active {
+	#playButton:active {
 		color: #df3c48;
 	}
 
-#pausemenu {
+.pausemenu {
 	background-color: rgba(12, 3, 4, 0.8);
 	position: fixed;
 	top: 0;
@@ -82,12 +90,12 @@ body.dark {
 	color: white;
 }
 
-	#pausemenu > div {
+	.pausemenu > div {
 		width: 80%;
 		margin: 0.5em 0;
 	}
 
-#resumeButton {
+.resumeButton {
 	text-align: center;
 	font-size: 24px;
 	display: flex;
@@ -97,9 +105,14 @@ body.dark {
 	padding: 5px 5px 5px 15px;
 	border-radius: 10px;
 }
-	#resumeButton:hover {
+	.resumeButton:hover {
 		background-color: #df3c48;
 	}
-	#resumeButton:active {
+	.resumeButton:active {
 		color: #dfb5b8;
+	}
+
+	.resumeButton > span {
+		margin-left: 0.5ex;
+		padding-right: 0.4ex;
 	}

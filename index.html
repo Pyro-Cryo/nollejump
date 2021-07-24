@@ -53,8 +53,11 @@
 <body>
 	<!-- Inforutan i toppen -->
 	<div id="topbar" style="height: 64px;">
-		<div>
-			<span id="pausemenuButton" style="font-size: 32px;" class="material-icons">&#xe034;</span>
+		<div id="playButton">
+			<!-- Play -->
+			<span style="font-size: 32px;" class="material-icons hidden">&#xe037;</span>
+			<!-- Pause -->
+			<span style="font-size: 32px;" class="material-icons">&#xe034;</span>
 		</div>
 		<div id="messageBox">
 			Laddar ...
@@ -70,15 +73,32 @@
 		<canvas id="gameboard" style="transform: scale(1);"></canvas>
 	</div>
 	<!-- Pausmeny -->
-	<div id="pausemenu" class="hidden">
+	<div id="pausemenu" class="pausemenu hidden">
 		<div>
 			Hej! Det är jag som är pausmenyn. Klicka på knappen här nedanför för att fortsätta spela.
 		</div>
 		<div>
 			Här kan vi stoppa en massa rolig information som hur många föhsare man tomatat eller ens highscore eller nåt.
 		</div>
-		<div id="resumeButton">
-			Fortsätt <span style="font-size: 48px;" class="material-icons">&#xe037;</span>
+		<div id="resumeButton" class="resumeButton">
+			Fortsätt <span style="font-size: 32px;" class="material-icons">&#xe037;</span>
+		</div>
+		<div class="resumeButton restartButton">
+			Börja om <span style="font-size: 32px;" class="material-icons">&#xe042;</span>
+		</div>
+	</div>
+	<div id="deathmenu" class="pausemenu hidden">
+		<div>
+			Du dog
+		</div>
+		<div>
+			Lol sämst
+		</div>
+		<div id="respawnButton" class="resumeButton">
+			Försök igen <span style="font-size: 32px;" class="material-icons">&#xe045;</span>
+		</div>
+		<div class="resumeButton restartButton">
+			Börja om <span style="font-size: 32px;" class="material-icons">&#xe042;</span>
 		</div>
 	</div>
 	<script type="text/javascript">

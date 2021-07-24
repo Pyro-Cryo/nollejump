@@ -122,8 +122,8 @@ class JumpPlayer extends Player {
 		
 		// Trillar man ner förlorar man
 		if (this.y <= controller.gameArea.bottomEdgeInGrid - 2 * this.height) {
+			controller.playerDied();
 			this.despawn();
-			console.log("ded");
 		}
 		
 		screenWrap(this);

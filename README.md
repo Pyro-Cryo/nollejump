@@ -17,3 +17,11 @@ Inspirerat av nåt som rimmar på Noodle Jump. Maskoten hoppar på plattformar f
 - Man kanske kan skjuta frukt på fiender? Eller så ger frukt extra powerups / poäng?
 - Plattforms-pathen delar på sig i horisontell led och leder till olika "examen", som fysiker, matematiker och datalog (naturligtvis tar datalog-pathen slut på en något lägre y-status-nivå än fysiker/matematiker, som står högre i rang på grafen). 
 - Kombinera hoppa i y-led med att flyga genom hinder i x-led liknande ett annat känt spel som rimmar på Happy Bird. Kan bli sjukt svårt, men kanske är det TFs hemliga vapen mot att nØllan når för hög status på grafen?
+
+### Bra idéer på plattformar / andra gameplayelement
+- Plattform som trillar ner när man hoppar på den
+- Termokurs med ishalka, man fortsätter glida runt i ett visst område
+- Diskret plattform som teleporteras små avstånd (motsvarar en moving platform)
+- Vektorfält som bara vänder accelerationen åt något visst håll
+- Magnetiska plattformar som attraheras / repelleras av spelaren
+- DVD-plattform som rör sig i screenspace och studsar på kanterna

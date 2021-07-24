@@ -1,17 +1,17 @@
 class JumpController extends Controller {
-	// Aspect ratio: width / height
-	static MAX_ASPECT_RATIO = 2 / 3;
-	static MIN_ASPECT_RATIO = 1 / 2;
 	static WIDTH_PX = 384;
+	static HEIGHT_PX = JumpController.WIDTH_PX * 15 / 9;
+	static STORAGE_PREFIX = "nollejump_";
 	constructor(statusGraph) {
 		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
+		this.gameArea.width = JumpController.WIDTH_PX;
+		this.gameArea.height = JumpController.HEIGHT_PX;
 		this.gameArea.gridOrigin = GameArea.GRID_ORIGIN_LOWER_LEFT;
 
 		this.statusGraph = statusGraph;
 		this.currentLevel = null;
-		this.ctfys = true;
-		this.levelIndex = 0;
+		this.stateProperties = ["ctfys", "levelIndex", "nDeaths"];
 	}
 
 	static get defaultStatusGraph() {
@@ -27,12 +27,12 @@ class JumpController extends Controller {
 
 			// TODO: gör/använd en ordentlig CSV-parser för det här uppfyller inte alls specen
 			const matches = Array.from(response.matchAll(/^(("[^"]*")+|[^,]*),(("[^"]*")+|[^,]*)$/gm));
-			function trimQuotes(s) {
+			const trimQuotes = function (s) {
 				if (s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"')
 					return s.substring(1, s.length - 1);
 				else
 					return s;
-			}
+			};
 
 			const statusGraph = matches.map(match => [
 				trimQuotes(match[1]).trim(),
@@ -55,8 +55,10 @@ class JumpController extends Controller {
 	}
 
 	startDrawLoop(barHeight, margin) {
-		this.setCanvasDimensions(barHeight, margin);
-		window.addEventListener("resize", () => this.setCanvasDimensions(barHeight, margin));
+		// Usch fy skriv aldrig sån här kod igen
+		this.setCanvasDimensions(barHeight, margin, margin / 2); // Första tar bort scrollbar
+		this.setCanvasDimensions(barHeight, margin, margin / 2); // Andra sätter rätt värden
+		window.addEventListener("resize", () => this.setCanvasDimensions(barHeight, margin, margin / 2));
 		super.startDrawLoop();
 	}
 
@@ -66,28 +68,43 @@ class JumpController extends Controller {
 
 	onAssetsLoaded() {
 		super.onAssetsLoaded();
+		this.clearOnDraw = false;
 		this.setMessage(`Laddat klart`);
 		this.startDrawLoop(64, 16);
-		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 200);
-		this.enemies = [];
-		// TODO: Borde kanske också skötas i level
-		this.background = new Background(this.gameArea.gridWidth / 2, 0);
-		this.clearOnDraw = false;
-		
-		this.currentLevel = Level.tutorial();
-		this.currentLevel.warmup();
-		this.setLevelMessage();
-		this.setScores();
-
+		this.loadState();
+		this.spawnPlayer();
+		this.startLevel();
 		this.togglePause();
-		document.getElementById("pausemenuButton").addEventListener("click", e => {
-			this.togglePause();
-			e.preventDefault();
-		}, true);
+		
 		document.getElementById("resumeButton").addEventListener("click", e => {
 			this.togglePause();
 			e.preventDefault();
 		}, true);
+		document.getElementById("respawnButton").addEventListener("click", e => {
+			this.objects.clear();
+			this.gameArea.resetDrawOffset();
+			this.spawnPlayer();
+			this.startLevel();
+			document.getElementById("deathmenu").classList.add("hidden");
+			e.preventDefault();
+		}, true);
+		const restartButtons = document.getElementsByClassName("restartButton");
+		for (let i = 0; i < restartButtons.length; i++)
+			restartButtons.item(i).addEventListener("click", e => {
+				if (window.confirm("Är du säker på att du vill börja om från alla första början?")) {
+					this.clearState();
+					this.loadState(); // Laddar defaultstate
+					this.objects.clear();
+					this.gameArea.resetDrawOffset();
+					this.spawnPlayer();
+					this.startLevel();
+					if (this.isPaused) // Pausmenyn är uppe
+						this.togglePause();
+					else // Deathmenyn är uppe
+						document.getElementById("deathmenu").classList.add("hidden");
+				}
+				e.preventDefault();
+			}, true);
 	}
 
 	setLevelMessage() {
@@ -137,24 +154,78 @@ class JumpController extends Controller {
 	setCanvasDimensions(barHeight, marginHorizontal, marginVertical = null) {
 		if (marginVertical === null)
 			marginVertical = marginHorizontal;
-		const maxHeightPx = document.documentElement.clientHeight - barHeight - marginVertical * 2;
 		const maxWidthPx = document.documentElement.clientWidth - marginHorizontal * 2;
+		const maxHeightPx = document.documentElement.clientHeight - barHeight - marginVertical * 2;
+		const wScale = maxWidthPx / JumpController.WIDTH_PX;
+		const hScale = maxHeightPx / JumpController.HEIGHT_PX;
+		const scale = Math.min(wScale, hScale);
 
-		// Limit the width to not exceed MAX_ASPECT_RATIO
-		const targetWidthPx = Math.min(maxHeightPx * JumpController.MAX_ASPECT_RATIO, maxWidthPx);
-		// Limit the height to not exceed MIN_ASPECT_RATIO
-		const targetHeightPx = Math.min(targetWidthPx / JumpController.MIN_ASPECT_RATIO, maxHeightPx);
+		// Varifrån kommer de magiska siffrorna? Det du!
+		if (maxWidthPx < JumpController.WIDTH_PX - 30) {
+			const leftpad = marginHorizontal + Math.max(maxWidthPx - 300, 0) / 2;
+			this.gameArea.canvas.style = `transform: scale(${scale}); position: absolute; left: ${leftpad}px; transform-origin: left top;`;
+			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px; position: relative;`;
+		} else {
+			this.gameArea.canvas.style = `transform: scale(${scale});`;
+			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px;`;
+		}
+	}
 
-		// Achieve the desired width by scaling the canvas
-		const scale = targetWidthPx / JumpController.WIDTH_PX;
-		// Compute the unscaled height
-		const height_px = Math.round(targetHeightPx / scale);
+	loadState() {
+		const defaultState = {
+			// TODO: ctfys kanske null innan man valt spår eller nåt
+			ctfys: true,
+			levelIndex: 0,
+			nDeaths: 0,
+		};
+		let data = window.localStorage.getItem(JumpController.STORAGE_PREFIX + "state");
+		if (data)
+			data = JSON.parse(data);
+		else
+			data = defaultState;
 		
-		this.gameArea.width = JumpController.WIDTH_PX;
-		this.gameArea.height = height_px;
-		this.gameArea.canvas.style = `transform: scale(${scale});`;
-		
-		this.canvasContainer.style = `height: ${targetHeightPx}px;`;
+		for (const prop of this.stateProperties) {
+			if (!data.hasOwnProperty(prop))
+				console.warn(`Property ${prop} missing in saved state`);
+			this[prop] = data[prop];
+		}
+		console.log("Loaded state", JSON.stringify(data));
+	}
+
+	saveState() {
+		const data = {};
+		for (const prop of this.stateProperties)
+			data[prop] = this[prop];
+
+		window.localStorage.setItem(JumpController.STORAGE_PREFIX + "state", JSON.stringify(data));
+		console.log("Saved state", JSON.stringify(data));
+	}
+
+	clearState() {
+		window.localStorage.removeItem(JumpController.STORAGE_PREFIX + "state");
+	}
+
+	spawnPlayer() {
+		// Täck botten med plattformar så man inte instadör
+		this.enemies = [];
+		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 100);
+		const platWidth = Platform.image.width * Platform.scale / this.gameArea.unitWidth;
+		const startingPlatforms = new Region()
+			.spawn(
+				Platform,
+				Math.ceil(controller.gameArea.gridWidth / platWidth),
+				(elapsed, spawnHistory, level) => [
+					spawnHistory.length * platWidth,
+					10
+				])
+			.immediately();
+		startingPlatforms.next();
+	}
+
+	playerDied() {
+		this.nDeaths++;
+		this.saveState();
+		document.getElementById("deathmenu").classList.remove("hidden");
 	}
 
 	onPlay() {
@@ -167,17 +238,31 @@ class JumpController extends Controller {
 		document.getElementById("pausemenu").classList.remove("hidden");
 	}
 
-	update(delta) {
-		super.update(delta);
-		if (this.currentLevel.update()) {
-			// TODO: spara progress osv
-			this.levelIndex++;
-			const y = this.currentLevel.yCurrent;
+	startLevel(y = null) {
+		if (this.levelIndex === 0)
+			this.currentLevel = Level.tutorial();
+		else {
 			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
 			this.currentLevel = Level.levels.get(code)();
+		}
+		if (y === null) {
+			this.currentLevel.warmup();
+			// TODO: Borde kanske också skötas i level
+			this.background = new Background(this.gameArea.gridWidth / 2, 0);
+		}
+		else
 			this.currentLevel.init(y, this.gameArea.gridHeight / 2);
-			this.setLevelMessage();
-			this.setScores();
+		this.setLevelMessage();
+		this.setScores();
+	}
+
+	update(delta) {
+		super.update(delta);
+		// level.update() returnerar true när den tar slut
+		if (this.currentLevel.update()) {
+			this.levelIndex++;
+			this.saveState();
+			this.startLevel(this.currentLevel.yCurrent);
 		}
 	}
 
@@ -204,7 +289,6 @@ class JumpController extends Controller {
 }
 
 class cheat {
-	static isDirtyCheater = false;
 	/**
 	 * Kan togglas
 	 */
@@ -232,5 +316,6 @@ class cheat {
 	static get darkmode() {
 		document.body.classList.add("dark");
 		controller.background.dark = true;
+		Background.dark = true;
 	}
 };
