@@ -29,14 +29,16 @@ class JumpPlayer extends Player {
 			null,
 			false
 		);
-		this.speedHorizontal = 0;
-		this.maxSpeedHorizontal = 0.8;
-		this.accelerationHorizontal = 0.004;
-		this.decayHorizontal = 0.003;
+		// this.speedHorizontal = 0;
+		// this.maxSpeedHorizontal = 0.8;
+		this.accelerationHorizontal = 40;
+		// this.decayHorizontal = 0.003;
 
-		this.speedVertical = 0.1;
-		this.accelerationVertical = -0.003;
-		this.jumpSpeed = 1.5;
+		// this.speedVertical = 0.1;
+		// this.accelerationVertical = -0.003;
+		// this.jumpSpeed = 1.5;
+
+		this.physics = new PlayerPhysics(this);
 
 		this.lastX = x;
 		this.lastY = y;
@@ -55,7 +57,7 @@ class JumpPlayer extends Player {
 	}
 
 	standardBounce() {
-		this.speedVertical = this.jumpSpeed;
+		this.physics.bounceSurface(0);
 	}
 
 	shoot() {
@@ -92,31 +94,31 @@ class JumpPlayer extends Player {
 		super.update(delta);
 
 		if (this.useTiltControls) {
-			this.speedHorizontal = this.deviceTilt * this.maxSpeedHorizontal;
+			// this.speedHorizontal = this.deviceTilt * this.maxSpeedHorizontal;
+			this.physics.setSpeed(this.deviceTilt * this.physics.max_vx, this.physics.vy);
 		}
 
 		if (this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
 			this.useTiltControls = false;
-			this.speedHorizontal = Math.min(
-				this.speedHorizontal + this.accelerationHorizontal * delta,
-				this.maxSpeedHorizontal);
+			this.physics.accellerate(this.accelerationHorizontal, 0, delta);
+			// this.speedHorizontal = Math.min(
+			// 	this.speedHorizontal + this.accelerationHorizontal * delta,
+			// 	this.maxSpeedHorizontal);
 		}
 		if (this.isPressed.get(JumpPlayer.ACTION_GO_LEFT)) {
 			this.useTiltControls = false;
-			this.speedHorizontal = Math.max(
-				this.speedHorizontal - this.accelerationHorizontal * delta,
-				-this.maxSpeedHorizontal);
+			this.physics.accellerate(-this.accelerationHorizontal, 0, delta);
+			// this.speedHorizontal = Math.max(
+			// 	this.speedHorizontal - this.accelerationHorizontal * delta,
+			// 	-this.maxSpeedHorizontal);
 		}
-		if (!this.isPressed.get(JumpPlayer.ACTION_GO_LEFT) && !this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
-			this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) - this.decayHorizontal * delta);
-		}
+		// if (!this.isPressed.get(JumpPlayer.ACTION_GO_LEFT) && !this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
+		// 	this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) - this.decayHorizontal * delta);
+		// }
 
 		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT))
 			this.shoot();
 
-		this.speedVertical += this.accelerationVertical * delta;
-		this.x += this.speedHorizontal * delta;
-		this.y += this.speedVertical * delta;
 		
 		// Trillar man ner förlorar man
 		if (this.y <= controller.gameArea.bottomEdgeInGrid - 2 * this.height) {
@@ -139,4 +141,49 @@ class JumpPlayer extends Player {
 		// Screen wrapping
 		drawScreenWrap(gameArea, this, super.draw.bind(this));
 	}
+}
+
+
+class PlayerPhysics extends Physics {
+
+	constructor(player) {
+		super(player);
+
+		// this._e = 1.5;
+		this.bounce_speed = 100;
+
+		this.decay_speed = true;
+		this.decay_next = true;
+
+		this.gy = -16;
+		this.gx = 0;
+
+		this.linear_decay_y = 0;
+		this.linear_decay_x = 0.8;
+		this.proportional_decay_y = 0;
+		this.proportional_decay_x = 0.5;
+
+
+		this.vx = 0;
+		this.vy = 0; // initial speed
+
+		this.previous_vx = 0;
+		this.previous_vy = 0;
+
+		this.max_vx = 300;
+		this.max_vy = 300;
+
+	}
+
+	bounceSurface(angle) {
+		super.bounceSurface(angle);
+
+		let a = Math.atan2(this.vx, this.vy);
+		this.vx = this.bounce_speed * Math.sin(a);
+		this.vy = this.bounce_speed * Math.cos(a);
+
+		console.log(a, this.vx, this.vy);
+
+	}
+
 }

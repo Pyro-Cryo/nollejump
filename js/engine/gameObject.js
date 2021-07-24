@@ -135,6 +135,8 @@ class GameObject extends PrerenderedObject {
 		this.y = y;
 		this.id = null;
 
+		this.physics = new PhysicsNull(this);
+
 		this.despawnTimer = -1;
 
 		if (register)
@@ -152,6 +154,7 @@ class GameObject extends PrerenderedObject {
 				this.despawn();
 			}
 		}
+		this.physics.move(delta);
 	}
 
 	translate(dx, dy){
@@ -182,7 +185,7 @@ class EffectObject extends GameObject {
 	update(delta) {
 		// Apply status effects
 		this.effects.forEach(function (obj) {
-			obj.update(this);
+			obj.update(this, delta);
 		}.bind(this));
 
 		super.update(delta);
@@ -218,8 +221,11 @@ class BaseEffect extends PrerenderedObject {
 	static get maxInvocations() { return 10; }
 	static get image() { return null; }
 	static get scale() { return 1; }
+	// px offset från parent object för att rita img. null för default värde.
+	static get imgOffset() { return [null, null]; }
+	static get cooldown() { return 1000; }
 
-	constructor(cooldown) {
+	constructor() {
 		super(null, 1, 0);
 
 		this.image = this.constructor.image;
@@ -236,9 +242,10 @@ class BaseEffect extends PrerenderedObject {
 		this.timesinitialized++;
 	}
 
-	update(object) {
-		if (this.cdtime-- <= 0) {
-			this.cdtime = this.cooldown;
+	update(object, delta) {
+		this.cdtime -= delta;
+		if (this.cdtime <= 0) {
+			this.cdtime += this.cooldown;
 			this.apply(object);
 
 			if (++this.invocations >= this.constructor.maxInvocations)
@@ -247,8 +254,10 @@ class BaseEffect extends PrerenderedObject {
 	}
 
 	draw(object, gameArea, index) {
-		let x = object.x + 0.5 - 0.3 * index;
-		let y = object.y - 0.5;
+		let defaultoffset = this.constructor.imgOffset();
+
+		let x = object.x + (defaultoffset[0] === null ? 0.5 - 0.3 * index : defaultoffset[0]);		
+		let y = object.y + (defaultoffset[1] === null ? -0.5 : defaultoffset[1]);
 
 		super.draw(gameArea, x, y);
 		return index + 1;
