@@ -11,19 +11,11 @@ Level.tutorial = () => {
 	);
 	// TODO: gör en faktisk tutorial av detta
 	
-	// Täck botten med plattformar och skapa en liten stege
+	// Skapa en liten stege
 	const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
 	const start = level.defineRegion("start")
-		.wait(10)
-		.spawn(
-			Platform,
-			Math.ceil(controller.gameArea.gridWidth / platWidth),
-			(elapsed, spawnHistory, level) => [
-				spawnHistory.length * platWidth,
-				level.yCurrent
-			]).immediately()
-		.wait(200)
-		.spawn(Platform, 4, (elapsed, spawnHistory, level) => [
+		.wait(210)
+		.spawn(Platform, 5, (elapsed, spawnHistory, level) => [
 			platWidth * 2,
 			level.yCurrent
 		]).spaced(200);

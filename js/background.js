@@ -7,12 +7,12 @@ class Background extends GameObject {
 		this.nodeSpacing = JumpController.WIDTH_PX;
 		this.nodeMargin = 0.1 * JumpController.WIDTH_PX;
 		this.gradients = [
-			[[40, 40, 40, 0.1]],
-			[[140, 140, 120]]
+			// [[40, 40, 40, 0.1]],
+			[[140, 140, 120]],
 		];
 		this.sizes = [
-			8,
-			3
+			//8,
+			5,
 		];
 		this.dark = false;
 

@@ -3,6 +3,7 @@ class JumpController extends Controller {
 	static MAX_ASPECT_RATIO = 2 / 3;
 	static MIN_ASPECT_RATIO = 1 / 2;
 	static WIDTH_PX = 384;
+	static STORAGE_PREFIX = "nollejump_";
 	constructor(statusGraph) {
 		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");
@@ -10,8 +11,7 @@ class JumpController extends Controller {
 
 		this.statusGraph = statusGraph;
 		this.currentLevel = null;
-		this.ctfys = true;
-		this.levelIndex = 0;
+		this.stateProperties = ["ctfys", "levelIndex", "nDeaths"];
 	}
 
 	static get defaultStatusGraph() {
@@ -68,13 +68,19 @@ class JumpController extends Controller {
 		super.onAssetsLoaded();
 		this.setMessage(`Laddat klart`);
 		this.startDrawLoop(64, 16);
-		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 200);
+		this.loadState();
 		this.enemies = [];
+		this.spawnPlayer();
 		// TODO: Borde kanske också skötas i level
 		this.background = new Background(this.gameArea.gridWidth / 2, 0);
 		this.clearOnDraw = false;
 		
-		this.currentLevel = Level.tutorial();
+		if (this.levelIndex === 0)
+			this.currentLevel = Level.tutorial();
+		else {
+			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
+			this.currentLevel = Level.levels.get(code)();
+		}
 		this.currentLevel.warmup();
 		this.setLevelMessage();
 		this.setScores();
@@ -153,6 +159,58 @@ class JumpController extends Controller {
 		this.canvasContainer.style = `height: ${targetHeightPx}px;`;
 	}
 
+	loadState() {
+		const defaultState = {
+			// TODO: uppdatera med att man ska kunna välja spår
+			ctfys: true,
+			levelIndex: 0,
+			nDeaths: 0,
+		};
+		let data = window.localStorage.getItem(JumpController.STORAGE_PREFIX + "state");
+		if (data)
+			data = JSON.parse(data);
+		else
+			data = defaultState;
+		
+		for (const prop of this.stateProperties) {
+			if (!data.hasOwnProperty(prop))
+				console.warn(`Property ${prop} missing in saved state`);
+			this[prop] = data[prop];
+		}
+		console.log("Loaded state", JSON.stringify(data));
+	}
+
+	saveState() {
+		const data = {};
+		for (const prop of this.stateProperties)
+			data[prop] = this[prop];
+
+		window.localStorage.setItem(JumpController.STORAGE_PREFIX + "state", JSON.stringify(data));
+		console.log("Saved state", JSON.stringify(data));
+	}
+
+	spawnPlayer() {
+		// Täck botten med plattformar så man inte instadör
+		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 100);
+		const platWidth = Platform.image.width * Platform.scale / this.gameArea.unitWidth;
+		const startingPlatforms = new Region()
+			.spawn(
+				Platform,
+				Math.ceil(controller.gameArea.gridWidth / platWidth),
+				(elapsed, spawnHistory, level) => [
+					spawnHistory.length * platWidth,
+					10
+				])
+			.immediately();
+		startingPlatforms.next();
+	}
+
+	playerDied() {
+		console.log("aj då");
+		this.nDeaths++;
+		this.saveState();
+	}
+
 	onPlay() {
 		super.onPlay();
 		document.getElementById("pausemenu").classList.add("hidden");
@@ -166,8 +224,8 @@ class JumpController extends Controller {
 	update(delta) {
 		super.update(delta);
 		if (this.currentLevel.update()) {
-			// TODO: spara progress osv
 			this.levelIndex++;
+			this.saveState();
 			const y = this.currentLevel.yCurrent;
 			const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
 			this.currentLevel = Level.levels.get(code)();
