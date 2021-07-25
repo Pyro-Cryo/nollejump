@@ -4,8 +4,9 @@ class Physics {
 	constructor(object) {
 
 		this.object = object;
+
 		this.mass = 0;
-		this.e = 1;
+		this.e = 1;	// studstal
 
 		this.decay_speed = true;
 		this.decay_next = true;
@@ -31,7 +32,7 @@ class Physics {
 	}
 
 
-	accellerate(dx, dy, dt) {
+	accelerate(dx, dy, dt) {
 
 		this.vx += dx*(dt/100);
 		this.vy += dy*(dt/100);
@@ -41,7 +42,7 @@ class Physics {
 
 	applyForce(dx, dy, dt) {
 
-		this.accellerate(dx/this.mass, dy/this.mass, dt);
+		this.accelerate(dx/this.mass, dy/this.mass, dt);
 
 	}
 
@@ -65,6 +66,16 @@ class Physics {
 	bounceObject(object) {
 
 		throw Exception("Not yet implemented. DIY");
+
+	}
+
+	/**
+	 * Beräkna och applicera gravitationen som påverkar det här objektet varje frame.
+	 * @param{dt} tidsdelta
+	 */
+	gravity(dt) {
+
+		this.accelerate(this.gx, this.gy, dt);
 
 	}
 
@@ -94,7 +105,7 @@ class Physics {
 	update(dt) {
 
 		// Gravitation
-		this.accellerate(this.gx, this.gy, dt);
+		this.gravity(dt);
 
 
 		// Om vi har hastighets-decay, applicera den
@@ -104,7 +115,6 @@ class Physics {
 		
 			this.vy /= Math.exp((dt/100) * this.proportional_decay_y);
 			this.vy = Math.sign(this.vy) * Math.max(0, Math.abs(this.vy) - this.linear_decay_y * (dt/100));
-
 		}
 
 
@@ -152,6 +162,8 @@ class PhysicsNull extends Physics {
 		this.max_vx = 0;
 		this.max_vy = 0;
 	}
+
+	gravity(dt) {}
 
 	update(dt) {
 		this.vy = 0;

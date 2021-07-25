@@ -5,7 +5,7 @@ class Platform extends EffectObject {
 
 	constructor(x, y) {
 		super(x, y);
-		if (this._imageDirty)
+		if (this._imageDirty)	// Behövs verkligen det här?
 			this.prerender();
 
 		if (controller.player)
@@ -72,4 +72,17 @@ class BasicMovingPlatform extends Platform {
 		if (controller.screenWrap)
 			screenWrap(this);
 	}
+}
+
+class FakePlatform extends Platform {
+
+	static get scale() { return 0.12; }
+
+	onCollision(player) {
+		if (player.physics.vy < 0 && player.lastY - player.height / 2 >= this.y + this.height / 2){
+			this.physics = new PlayerPhysics(this);
+		}
+		this.onPlayerPass(player);
+	}
+
 }

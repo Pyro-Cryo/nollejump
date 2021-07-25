@@ -89,7 +89,7 @@ class Rocket extends PowerUp {
 	}
 
 	update(player, delta) {
-		player.physics.accellerate(0, 20, delta);
+		player.physics.accelerate(0, 20, delta);
 		super.update(player, delta);
 	}
 

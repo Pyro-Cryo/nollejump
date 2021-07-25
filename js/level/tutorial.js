@@ -33,6 +33,12 @@ Level.tutorial = () => {
 			level.yCurrent + Math.random() * 200
 		]).over(regular.length);
 
+	const fake = new Region()
+	.spawn(FakePlatform, 40, (elapsed, spawnHistory, level) => [
+			Math.random() * controller.gameArea.gridWidth,
+			level.yCurrent + Math.random() * 200
+		]).over(regular.length);
+
 	const enemies = new Region()
 		.wait(regular.length / 10)
 		.spawn(TF1, 9, (elapsed, spawnHistory, level) => [
@@ -74,6 +80,7 @@ Level.tutorial = () => {
 	
 	const looping = regular
 		.interleave(moving)
+		.interleave(fake)
 		.interleave(enemies)
 		.interleave(tokens)
 		.interleave(powerups);

@@ -37,15 +37,8 @@ class JumpPlayer extends Player {
 			null,
 			false
 		);
-		// this.speedHorizontal = 0;
-		// this.maxSpeedHorizontal = 0.8;
+
 		this.accelerationHorizontal = 40;
-		// this.decayHorizontal = 0.003;
-
-		// this.speedVertical = 0.1;
-		// this.accelerationVertical = -0.003;
-		// this.jumpSpeed = 1.5;
-
 		this.physics = new PlayerPhysics(this);
 
 		this.lastX = x;
@@ -117,27 +110,17 @@ class JumpPlayer extends Player {
 		super.update(delta);
 
 		if (this.useTiltControls) {
-			// this.speedHorizontal = this.deviceTilt * this.maxSpeedHorizontal;
 			this.physics.setSpeed(this.deviceTilt * this.physics.max_vx, this.physics.vy);
 		}
 
 		if (this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
 			this.useTiltControls = false;
-			this.physics.accellerate(this.accelerationHorizontal, 0, delta);
-			// this.speedHorizontal = Math.min(
-			// 	this.speedHorizontal + this.accelerationHorizontal * delta,
-			// 	this.maxSpeedHorizontal);
+			this.physics.accelerate(this.accelerationHorizontal, 0, delta);
 		}
 		if (this.isPressed.get(JumpPlayer.ACTION_GO_LEFT)) {
 			this.useTiltControls = false;
-			this.physics.accellerate(-this.accelerationHorizontal, 0, delta);
-			// this.speedHorizontal = Math.max(
-			// 	this.speedHorizontal - this.accelerationHorizontal * delta,
-			// 	-this.maxSpeedHorizontal);
+			this.physics.accelerate(-this.accelerationHorizontal, 0, delta);
 		}
-		// if (!this.isPressed.get(JumpPlayer.ACTION_GO_LEFT) && !this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
-		// 	this.speedHorizontal = Math.sign(this.speedHorizontal) * Math.max(0, Math.abs(this.speedHorizontal) - this.decayHorizontal * delta);
-		// }
 
 		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT))
 			this.shoot();
@@ -172,15 +155,15 @@ class PlayerPhysics extends Physics {
 	constructor(player) {
 		super(player);
 
-		this.bounce_speed = 120;
+		this.bounce_speed = 125;
 
 		this.gy = -18;
 
 		this.linear_decay_x = 0.7;
 		this.proportional_decay_x = 0.55;
 
-		this.max_vx = 250;
-		this.max_vy = 400;
+		this.max_vx = 100;
+		this.max_vy = 300;
 
 	}
 

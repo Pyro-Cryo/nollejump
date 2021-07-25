@@ -135,7 +135,7 @@ class GameObject extends PrerenderedObject {
 		this.y = y;
 		this.id = null;
 
-		this.physics = new PhysicsNull(this);
+		this.physics = new PhysicsNull(this);	// Alla gameobjects har ett physics object, men default är ingen fysik.
 
 		this.despawnTimer = -1;
 
