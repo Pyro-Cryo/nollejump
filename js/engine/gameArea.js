@@ -132,9 +132,11 @@ class GameArea {
         return this.canvasToGridY(this.canvas.height);
     }
 
-    resetDrawOffset() {
-        this.drawOffsetX = 0;
-        this.drawOffsetY = 0;
+    resetDrawOffset(x = true, y = true) {
+        if (x)
+            this.drawOffsetX = 0;
+        if (y)
+            this.drawOffsetY = 0;
     }
 
     centerCameraOn(_x, _y, horizontally = true, vertically = true) {

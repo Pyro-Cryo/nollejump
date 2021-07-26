@@ -7,17 +7,17 @@ class JumpPlayer extends Player {
 	static ACTION_SHOOT = 3;
 	static SCREENWRAP_TRACKING = [
 		Player.CAMERA_TRACKING_INFRAME,
-		160, // Margin top
+		400, // Margin top
 		Number.NEGATIVE_INFINITY, // Margin right
 		Number.NEGATIVE_INFINITY, // Margin bottom
 		Number.NEGATIVE_INFINITY // Margin left
 	];
 	static NON_SCREENWRAP_TRACKING = [
 		Player.CAMERA_TRACKING_INFRAME,
-		384 / 4, // Margin top = JumpController.WIDTH_PX / 4
-		384 / 4, // Margin right
-		384 / 4, // Margin bottom
-		384 / 4, // Margin left
+		100, // Margin top = JumpController.WIDTH_PX / 4
+		100, // Margin right
+		100, // Margin bottom
+		100, // Margin left
 	];
 
 	constructor(x, y) {
@@ -52,6 +52,7 @@ class JumpPlayer extends Player {
 		}, true);
 
 		this.collidibles = new LinkedList();
+		this.isDying = false;
 		controller.registerObject(this, false, true);
 
 		this.useTiltControls = true;
@@ -65,11 +66,11 @@ class JumpPlayer extends Player {
 	shoot() {
 		if (!this.shootCooldown) {
 			const t = (this.y - controller.gameArea.bottomEdgeInGrid) / controller.gameArea.gridHeight;
-			new Pellet(
-				this.x,
-				this.y,
-				(Math.random() - 0.5) * 0.6,
-				1.7 + t * (0.8 - 1.7));
+			let xSpeed = (Math.random() - 0.5) * 0.6;
+			let ySpeed = 1.7 + t * (0.8 - 1.7);
+			if (this.angle)
+				[xSpeed, ySpeed] = [xSpeed * Math.cos(this.angle) + ySpeed * Math.sin(this.angle), -xSpeed * Math.sin(this.angle) + ySpeed * Math.cos(this.angle)];
+			new Pellet(this.x, this.y, xSpeed, ySpeed);
 			this.shootCooldown = this.shootCooldownTime;
 		}
 	}
@@ -79,6 +80,8 @@ class JumpPlayer extends Player {
 	}
 
 	collisionCheck() {
+		if (this.isDying)
+			return;
 		for (const obj of this.collidibles.filterIterate(obj => obj.id !== null)) {
 			if (controller.screenWrap ? collisionCheckScreenWrap(this, obj) : this.collisionCheckRectangular(obj)) {
 				obj.onCollision(this);
@@ -93,7 +96,7 @@ class JumpPlayer extends Player {
 	}
 
 	die() {
-		this.collidibles.clear();
+		this.isDying = true;
 		new BasicAnimation(this)
 			.set({angle: 0})
 			.after(0.5).set({angle: Math.random() < 0.5 ? 2 * Math.PI : -2 * Math.PI})

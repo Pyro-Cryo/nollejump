@@ -1,5 +1,5 @@
 class JumpController extends Controller {
-	static WIDTH_PX = 384;
+	static WIDTH_PX = 576;
 	static HEIGHT_PX = JumpController.WIDTH_PX * 15 / 9;
 	static STORAGE_PREFIX = "nollejump_";
 	constructor(statusGraph) {
@@ -130,7 +130,10 @@ class JumpController extends Controller {
 	}
 
 	setLevelMessage() {
-		this.setMessage(`${this.currentLevel.code} ${this.currentLevel.name}`);
+		if (this.levelIndex === 0)
+			this.setMessage(`${this.currentLevel.code}: ${this.currentLevel.name}`);
+		else
+			this.setMessage(`${this.currentLevel.code} ${this.currentLevel.name}`);
 	}
 
 	setScores() {
@@ -295,7 +298,6 @@ class JumpController extends Controller {
 		}
 
 		if (this.levelIndex === 0 && Math.abs(this.player.x - this.gameArea.gridWidth / 2) > this.gameArea.gridWidth * 5) {
-			console.log("Here we go");
 			this.levelIndex = 1;
 			this.ctfys = this.player.x > 0;
 			this.screenWrap = true;
@@ -305,8 +307,8 @@ class JumpController extends Controller {
 				else if (obj instanceof CTFYSRight || obj instanceof CTMATLeft)
 					obj.despawn();
 			}
-			this.gameArea.resetDrawOffset();
-			this.player.x = this.gameArea.gridWidth / 2;
+			this.player.x -= this.gameArea.leftEdgeInGrid;
+			this.gameArea.resetDrawOffset(true, false);
 			this.saveState();
 			this.startLevel();
 		}

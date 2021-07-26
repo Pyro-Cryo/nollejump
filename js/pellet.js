@@ -29,11 +29,13 @@ class Pellet extends GameObject {
         }
 
         despawnIfBelowBottom(this);
+        if (controller.screenWrap)
+            screenWrap(this);
     }
 
     draw(gameArea) {
         super.draw(gameArea);
-
-        drawScreenWrap(gameArea, this, super.draw.bind(this));
+        if (controller.screenWrap)
+            drawScreenWrap(gameArea, this, super.draw.bind(this));
     }
 }
