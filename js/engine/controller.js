@@ -161,7 +161,7 @@ class Controller {
             this.ffbutton.classList.remove("keptPressed");
     }
 
-    setMessage(message, pureText) {
+    setMessage(message, pureText = true) {
         if (this.messageBox) {
             if (pureText)
                 this.messageBox.innerText = message;

@@ -47,15 +47,16 @@ class JumpPlayer extends Player {
 		this.shootCooldown = 0;
 		this.shootCooldownTime = 40; //ms, rimligare med 400 typ
 		controller.gameArea.canvas.addEventListener("click", e => {
-			this.shoot();
-			e.preventDefault();
+			if (this.deviceTiltAvailable) {
+				this.shoot();
+				e.preventDefault();
+			}
 		}, true);
 
 		this.collidibles = new LinkedList();
 		this.isDying = false;
 		controller.registerObject(this, false, true);
 
-		this.useTiltControls = true;
 		this.lives = 1;
 	}
 
@@ -112,21 +113,19 @@ class JumpPlayer extends Player {
 	update(delta) {
 		super.update(delta);
 
-		if (this.useTiltControls) {
+		if (this.deviceTiltAvailable)
 			this.physics.setSpeed(this.deviceTilt * this.physics.max_vx, this.physics.vy);
-		}
+		else {
+			if (this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
+				this.physics.accelerate(this.accelerationHorizontal, 0, delta);
+			}
+			if (this.isPressed.get(JumpPlayer.ACTION_GO_LEFT)) {
+				this.physics.accelerate(-this.accelerationHorizontal, 0, delta);
+			}
 
-		if (this.isPressed.get(JumpPlayer.ACTION_GO_RIGHT)) {
-			this.useTiltControls = false;
-			this.physics.accelerate(this.accelerationHorizontal, 0, delta);
+			if (this.isPressed.get(JumpPlayer.ACTION_SHOOT))
+				this.shoot();
 		}
-		if (this.isPressed.get(JumpPlayer.ACTION_GO_LEFT)) {
-			this.useTiltControls = false;
-			this.physics.accelerate(-this.accelerationHorizontal, 0, delta);
-		}
-
-		if (this.isPressed.get(JumpPlayer.ACTION_SHOOT))
-			this.shoot();
 
 		
 		// Trillar man ner förlorar man
@@ -173,7 +172,7 @@ class PlayerPhysics extends Physics {
 	bounceSurface(angle) {
 		super.bounceSurface(angle);
 
-		let a = Math.atan2(this.vx, this.vy);
+		// let a = Math.atan2(this.vx, this.vy);
 		// this.vx = this.bounce_speed * Math.sin(a);
 		this.vy = this.bounce_speed; // * Math.cos(a);
 

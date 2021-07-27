@@ -8,6 +8,7 @@ class GameArea {
 
     constructor(canvas, gridWidth, gridHeight, gridOrigin = GameArea.GRID_ORIGIN_UPPER_LEFT) {
         this.canvas = canvas;
+        /** @type {CanvasRenderingContext2D} */
         this.context = this.canvas.getContext("2d");
         this.gridOrigin = gridOrigin;
 
@@ -296,5 +297,31 @@ class GameArea {
         this.context.fillStyle = fgColor;
         this.context.fillRect(x - length / 2, y + offset, length * ratio, width);
         this.context.fillStyle = fillStyle;
+    }
+
+    /**
+     * Draw some text
+     * @param {number} _x Horizontal position in grid coords
+     * @param {number} _y Vertical position in grid coords
+     * @param {string} str The text to draw
+     * @param {number | string} font Either a font size or a whole CSS font specification.
+     * @param {string} color The color to draw the text in
+     * @param {string} alignment Text alignment (`"center"`, `"left"`, or `"right"`)
+     * @param {string} baseline Baseline of the text when drawn, see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline
+     * @param {boolean} considerOffset `true` if camera offset should be used, `false` if offsets should be taken as zero
+     */
+    text(_x, _y, str, font = "16px sans", color = "black", alignment = "center", baseline = null, considerOffset = true) {
+        const x = this.gridToCanvasX(_x, considerOffset);
+        const y = this.gridToCanvasY(_y, considerOffset);
+        this.context.save();
+        if (typeof font === "number")
+            font = font + "px sans";
+        this.context.font = font;
+        this.context.fillStyle = color;
+        this.context.textAlign = alignment;
+        if (baseline)
+            this.context.textBaseline = baseline;
+        this.context.fillText(str, x, y);
+        this.context.restore();
     }
 }

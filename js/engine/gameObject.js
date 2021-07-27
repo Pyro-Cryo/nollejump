@@ -147,12 +147,11 @@ class GameObject extends PrerenderedObject {
 		return Math.abs(this.x - other.x) <= (this.width + other.width) / 2 && Math.abs(this.y - other.y) <= (this.height + other.height) / 2;
 	}
 
-	// TODO: gör om timers (även för effektCooldowns och liknande) till att baseras på tidsdeltan istället för antal frames
 	update(delta) {
 		if (this.despawnTimer >= 0) {
-			if (--this.despawnTimer <= 0) {
+			this.despawnTimer -= delta;
+			if (this.despawnTimer <= 0)
 				this.despawn();
-			}
 		}
 		this.physics.move(delta);
 	}
