@@ -68,11 +68,15 @@ class PrerenderedObject {
 	get width() {
 		if (this._imageDirty)
 			this.prerender();
+		if (this.imagecache === null)
+			return null;
 		return this.imagecache.width / Controller.instance.gameArea.unitWidth;
 	}
 	get height() {
 		if (this._imageDirty)
 			this.prerender();
+		if (this.imagecache === null)
+			return null;
 		return this.imagecache.height / Controller.instance.gameArea.unitHeight;
 	}
 
@@ -99,6 +103,10 @@ class PrerenderedObject {
 		if (this.image === null || (this.image instanceof Image && !this.image.complete)) {
 			this.imagecache = null;
 			console.warn("Trying to prerender null or non-loaded object");
+			return;
+		} else if (!this.image.width || !this.image.height) {
+			this.imagecache = null;
+			console.warn(`Trying to prerender ${this.image.width} x ${this.image.height} image`);
 			return;
 		}
 		if (!this.imagecache)

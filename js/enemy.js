@@ -25,7 +25,17 @@ class Enemy extends GameObject {
 }
 
 const tfImg = Resource.addAsset("img/tf.png");
-class TF1 extends Enemy {
+class TFPassive extends Enemy {
     static get image() { return Resource.getAsset(tfImg); }
+    static get scale() { return 0.25; }
+}
+const ofImg = Resource.addAsset("img/of.png");
+class OFPassive extends Enemy {
+    static get image() { return Resource.getAsset(ofImg); }
+    static get scale() { return 0.25; }
+}
+const sfImg = Resource.addAsset("img/sf.png");
+class SFPassive extends Enemy {
+    static get image() { return Resource.getAsset(sfImg); }
     static get scale() { return 0.25; }
 }

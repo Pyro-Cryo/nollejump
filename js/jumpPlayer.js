@@ -68,7 +68,7 @@ class JumpPlayer extends Player {
 		if (!this.shootCooldown) {
 			const t = (this.y - controller.gameArea.bottomEdgeInGrid) / controller.gameArea.gridHeight;
 			let xSpeed = (Math.random() - 0.5) * 0.6;
-			let ySpeed = 1.7 + t * (0.8 - 1.7);
+			let ySpeed = 2 + t * (1.2 - 2);
 			if (this.angle)
 				[xSpeed, ySpeed] = [xSpeed * Math.cos(this.angle) + ySpeed * Math.sin(this.angle), -xSpeed * Math.sin(this.angle) + ySpeed * Math.cos(this.angle)];
 			new Pellet(this.x, this.y, xSpeed, ySpeed);

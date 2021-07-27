@@ -38,7 +38,7 @@ class Player extends EffectObject {
 		this._gameArea = null;
 
 		this.deviceTilt = 0;
-		this.deviceTiltAvailable = true;
+		this.deviceTiltAvailable = null;
 		/*this.debugAnimation = new BasicAnimation(this)
 			.set({deviceTilt: 0})
 			.after(1).set({deviceTilt: -1})
@@ -47,21 +47,21 @@ class Player extends EffectObject {
 		this.debugAnimation.start();*/
 
 		window.addEventListener("deviceorientation", e => {
-			if (e.gamma === null) {
-				this.deviceTiltAvailable = false;
+			this.deviceTiltAvailable = e.gamma !== null;
+			if (!this.deviceTiltAvailable) {
 				// const msg = Controller.instance.messageBox.innerText;
 				// Controller.instance.setMessage("Device tilt unavailable");
 				// setTimeout(() => Controller.instance.setMessage(msg), 2000);
 				return;
 			}
-				
+
 			/*if (this.debugAnimation) {
 				this.debugAnimation.cancel();
 				this.debugAnimation = null;
 			}*/
 
 			this.deviceTilt = Math.max(-1, Math.min(1, e.gamma / 30));
-		}, true)
+		}, true);
 	}
 
 	despawn() {

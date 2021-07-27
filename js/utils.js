@@ -26,6 +26,6 @@ function collisionCheckScreenWrap(obj, other) {
 }
 
 function despawnIfBelowBottom(obj, margin = 3) {
-    if (obj.y + obj.height * margin / 2 < controller.gameArea.bottomEdgeInGrid)
+    if (obj.y + (obj.height || 0) * margin / 2 < controller.gameArea.bottomEdgeInGrid)
         obj.despawn();
 }
