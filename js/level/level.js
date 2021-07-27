@@ -143,7 +143,7 @@ class Level {
 	}
 
 	static tutorial = null;
-	static choice = null;
+	// static choice = null;
 	static levels = new Map();
 	static ctfysLevels = [
 		"DD1301", // Datorintro
@@ -159,8 +159,8 @@ class Level {
 	];
 	static ctmatLevels = [
 		"DD1301", // Datorintro
-		"DD1331", // Gruprog
 		"SF1673", // Envarre
+		"DD1331", // Gruprog
 		"SA1006", // Ingenjörsfärdigheter
 		"SF1672", // Linalg
 		"SF1918", // Sannstat, OBS annan kurskod

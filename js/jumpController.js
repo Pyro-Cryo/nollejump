@@ -91,8 +91,14 @@ class JumpController extends Controller {
 		this.loadState();
 		this.spawnPlayer();
 		this.startLevel();
-		this.togglePause();
-		
+		this.setupElements();
+		if (this.ctfys === null)
+			document.getElementById("choicemenu").classList.remove("hidden");
+		else
+			this.togglePause();
+	}
+
+	setupElements() {
 		// Resumeknappen på paussidan
 		document.getElementById("resumeButton").addEventListener("click", e => {
 			this.togglePause();
@@ -120,13 +126,38 @@ class JumpController extends Controller {
 					this.gameArea.resetDrawOffset();
 					this.spawnPlayer();
 					this.startLevel();
-					if (this.isPaused) // Pausmenyn är uppe
-						this.togglePause();
-					else // Deathmenyn är uppe
+					if (!this.isPaused) { // Dödsmenyn är uppe
 						document.getElementById("deathmenu").classList.add("hidden");
+						super.onPause(); // Pausa utan att öppna pausmenyn
+					} else // Pausmenyn är uppe
+						document.getElementById("pausemenu").classList.add("hidden");
+					document.getElementById("choicemenu").classList.remove("hidden");
 				}
 				e.preventDefault();
 			}, true);
+		// CTFYS-knappen
+		document.getElementById("ctfysButton").addEventListener("click", e => {
+			this.ctfys = true;
+			this.saveState();
+			this.togglePause();
+			document.getElementById("choicemenu").classList.add("hidden");
+			e.preventDefault();
+		}, true);
+		// CTMAT-knappen
+		document.getElementById("ctmatButton").addEventListener("click", e => {
+			this.ctfys = false;
+			this.saveState();
+			this.togglePause();
+			document.getElementById("choicemenu").classList.add("hidden");
+			e.preventDefault();
+		}, true);
+
+		// Token-ikonerna i topbaren
+		for (const type of [Homework, KS, Tenta]) {
+			const imgElement = document.getElementById(type.name.toLowerCase() + "Token");
+			imgElement.src = type.image.src;
+			imgElement.style = `transform: rotate(${type.angle}rad)`;
+		}
 	}
 
 	setLevelMessage() {
@@ -137,15 +168,8 @@ class JumpController extends Controller {
 	}
 
 	setScores() {
-		const populateImages = !document.getElementById("homeworkToken").src;
 		let nScores = 0;
 		for (const type of [Homework, KS, Tenta]) {
-			if (populateImages) {
-				const imgElement = document.getElementById(type.name.toLowerCase() + "Token");
-				imgElement.src = type.image.src;
-				imgElement.style = `transform: rotate(${type.angle}rad)`;
-			}
-
 			const scoreElement = document.getElementById(type.name.toLowerCase() + "Score");
 			const current = this.currentLevel[type.name.toLowerCase() + "Current"];
 			const needed = this.currentLevel[type.name.toLowerCase() + "Needed"];
@@ -198,8 +222,7 @@ class JumpController extends Controller {
 
 	loadState() {
 		const defaultState = {
-			// TODO: ctfys kanske null innan man valt spår eller nåt
-			ctfys: true,
+			ctfys: null,
 			levelIndex: 0,
 			nDeaths: 0,
 		};
@@ -266,13 +289,10 @@ class JumpController extends Controller {
 	startLevel(y = null) {
 		switch (this.levelIndex) {
 			case 0:
-				this.currentLevel = Level.choice();
-				break;
-			case 1:
 				this.currentLevel = Level.tutorial();
 				break;
 			default:
-				const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 2];
+				const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
 				this.currentLevel = Level.levels.get(code)();
 				break;
 		}
@@ -297,21 +317,21 @@ class JumpController extends Controller {
 			this.startLevel(this.currentLevel.yCurrent);
 		}
 
-		if (this.levelIndex === 0 && Math.abs(this.player.x - this.gameArea.gridWidth / 2) > this.gameArea.gridWidth * 5) {
-			this.levelIndex = 1;
-			this.ctfys = this.player.x > 0;
-			this.screenWrap = true;
-			for (const obj of this.objects) {
-				if (obj instanceof Platform && (obj.x < 0 || obj.x > this.gameArea.gridWidth))
-					obj.despawn();
-				else if (obj instanceof CTFYSRight || obj instanceof CTMATLeft)
-					obj.despawn();
-			}
-			this.player.x -= this.gameArea.leftEdgeInGrid;
-			this.gameArea.resetDrawOffset(true, false);
-			this.saveState();
-			this.startLevel();
-		}
+		// if (this.levelIndex === 0 && Math.abs(this.player.x - this.gameArea.gridWidth / 2) > this.gameArea.gridWidth * 5) {
+		// 	this.levelIndex = 1;
+		// 	this.ctfys = this.player.x > 0;
+		// 	this.screenWrap = true;
+		// 	for (const obj of this.objects) {
+		// 		if (obj instanceof Platform && (obj.x < 0 || obj.x > this.gameArea.gridWidth))
+		// 			obj.despawn();
+		// 		else if (obj instanceof CTFYSRight || obj instanceof CTMATLeft)
+		// 			obj.despawn();
+		// 	}
+		// 	this.player.x -= this.gameArea.leftEdgeInGrid;
+		// 	this.gameArea.resetDrawOffset(true, false);
+		// 	this.saveState();
+		// 	this.startLevel();
+		// }
 	}
 
 	/*draw() {

@@ -196,7 +196,7 @@ Level.tutorial = () => {
 	return level;
 };
 
-Level.choice = () => {
+/*Level.choice = () => {
 	const level = new Level(
 		{
 			"code": "antagning.se",
@@ -241,4 +241,4 @@ Level.choice = () => {
 	level.initialRegion(ctfys);
 
 	return level;
-};
+};*/

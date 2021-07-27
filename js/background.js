@@ -51,9 +51,8 @@ class Background extends GameObject {
 		this.y -= (1 - this.parallax) * (controller.gameArea.drawOffsetY - this.offsetPrev);
 		this.offsetPrev = controller.gameArea.drawOffsetY;
 
-		// TODO: ta bort, fullösning medan denna typ av programval används
-		if (!controller.screenWrap)
-			this.x = controller.gameArea.leftEdgeInGrid + controller.gameArea.gridWidth / 2;
+		// if (!controller.screenWrap)
+		// 	this.x = controller.gameArea.leftEdgeInGrid + controller.gameArea.gridWidth / 2;
 		
 		if (!this.isRendering && !controller.gameArea.isInFrame(
 				this.x,
