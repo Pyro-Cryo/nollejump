@@ -159,6 +159,24 @@ class JumpController extends Controller {
 			imgElement.src = type.image.src;
 			imgElement.style = `transform: rotate(${type.angle}rad)`;
 		}
+
+		document.body.addEventListener("keydown", e => {
+			if (e.code === "Escape") {
+				if (!this.isPaused) {
+					let noneOpen = true;
+					const pauseMenus = document.getElementsByClassName("pausemenu");
+					for (let i = 0; i < pauseMenus.length; i++)
+						noneOpen &= pauseMenus.item(i).classList.contains("hidden");
+					if (noneOpen) {
+						document.getElementById("playButton").click();
+						e.preventDefault();
+					}
+				} else if (!document.getElementById("pausemenu").classList.contains("hidden")) {
+					document.getElementById("resumeButton").click();
+					e.preventDefault();
+				}
+			}
+		}, true);
 	}
 
 	setLevelMessage() {
@@ -257,7 +275,7 @@ class JumpController extends Controller {
 				console.warn(`Property ${prop} missing in saved state`);
 			this[prop] = data[prop];
 		}
-		console.log("Loaded state", data);
+		// console.log("Loaded state", data);
 	}
 
 	saveState() {
@@ -266,7 +284,7 @@ class JumpController extends Controller {
 			data[prop] = this[prop];
 
 		window.localStorage.setItem(JumpController.STORAGE_PREFIX + "state", JSON.stringify(data));
-		console.log("Saved state", data);
+		// console.log("Saved state", data);
 	}
 
 	clearState() {
