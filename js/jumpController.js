@@ -257,7 +257,7 @@ class JumpController extends Controller {
 				console.warn(`Property ${prop} missing in saved state`);
 			this[prop] = data[prop];
 		}
-		console.log("Loaded state", JSON.stringify(data));
+		console.log("Loaded state", data);
 	}
 
 	saveState() {
@@ -266,7 +266,7 @@ class JumpController extends Controller {
 			data[prop] = this[prop];
 
 		window.localStorage.setItem(JumpController.STORAGE_PREFIX + "state", JSON.stringify(data));
-		console.log("Saved state", JSON.stringify(data));
+		console.log("Saved state", data);
 	}
 
 	clearState() {
@@ -315,11 +315,28 @@ class JumpController extends Controller {
 		while (pausemenuinfo.hasChildNodes())
 			pausemenuinfo.removeChild(pausemenuinfo.lastChild);
 		// Fyll på med rolig info
+		// \u00AD = soft hyphen, kan användas för att avstava långa ord
 		const tidbits = [
 			// visste du att...
-			"tomater är grönsaker (i livsmedels\u00ADsammanhang)",
-			"tomater är bär (botaniskt sett)",
-			"tomater är en slags potatisväxt (enligt Carl von Linné)",
+			"tomater är bär",
+			"tomatplantan är en slags potatisväxt",
+			'Potatisakademien har mottot "för potatisen i tiden"',
+			"potatisens dag infaller den 26 oktober",
+			"hallon är stenfrukter",
+			"ananaser är så kallade fruktförband",
+			"äpplen är falska frukter",
+			"potatis också kallas jordpäron",
+			"avokado också kallas alligatorpäron eller advokatpäron",
+			'ordet "avokado" kommer från aztekernas språk och betyder "testikel"',
+			"avokador är bär, liksom gurkor",
+			"nötter är äkta frukter",
+			"om du inte har A-vitaminbrist förbättrar inte morötter synen - det är en myt som spreds av brittiska flygvapnet under andra världskriget för att dölja att de uppfunnit radarn",
+			"örter är växter med oförvedade stammar, som till exempel morötter, bananer och squasher",
+			"tomater och gurkor inte ska förvaras tillsammans, då tomater avger etylengas som gör gurkor sega",
+			"i squash väger bollen 23 gram",
+			"durian också kallas stinkfrukt, och är förbjuden i bland annat Singapores tunnelbana",
+			"blåbärsris täcker ungefär 11 % av Sveriges yta",
+			"jordgubbar inte är bär, utan fruktförband med nötter",
 		];
 
 		// Generera statistikfakta
@@ -399,6 +416,8 @@ class JumpController extends Controller {
 			const distance = (this.stats.distance + this.currentLevel.totalElapsed) / controller.player.height;
 			tidbits.push(`du befinner dig ungefär ${Math.round(distance / 5) * 5} m upp`);
 		}
+
+		// TODO: total speltid (per nivå), antal gånger knockad av föhsare
 		
 		// Välj ut några på slump
 		const chosenTidbits = [];

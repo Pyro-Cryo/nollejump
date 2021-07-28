@@ -71,6 +71,10 @@ class JumpPlayer extends Player {
 			let ySpeed = 2 + t * (1.2 - 2);
 			if (this.angle)
 				[xSpeed, ySpeed] = [xSpeed * Math.cos(this.angle) + ySpeed * Math.sin(this.angle), -xSpeed * Math.sin(this.angle) + ySpeed * Math.cos(this.angle)];
+			if (this.isDying) {
+				xSpeed *= 0.8;
+				ySpeed *= 0.8;
+			}
 			new Pellet(this.x, this.y, xSpeed, ySpeed);
 			this.shootCooldown = this.shootCooldownTime;
 		}
