@@ -1,6 +1,7 @@
-const cornImg = Resource.addAsset("img/corn.png");
+const jannejanImg = Resource.addAsset("img/jannejan.png");
 class JumpPlayer extends Player {
-	static get image() { return Resource.getAsset(cornImg); }
+	static get image() { return Resource.getAsset(jannejanImg); }
+	static get scale() { return 0.25; }
 	
 	static ACTION_GO_LEFT = 1;
 	static ACTION_GO_RIGHT = 2;
