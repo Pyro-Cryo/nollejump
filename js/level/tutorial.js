@@ -1,4 +1,4 @@
-Level.tutorial = () => {
+Level.tutorial = (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SF0003",
@@ -9,9 +9,11 @@ Level.tutorial = () => {
 		1, // KS-tokens
 		0  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	const stairSpacing = 300;
-	const font = "32px Nunito";
+	const font = "32px Nunito, sans-serif";
 	const textCol = "#222222";
 	const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
 
@@ -195,6 +197,7 @@ Level.tutorial = () => {
 
 	return level;
 };
+Level.levels.set("SF0003", Level.tutorial);
 
 /*Level.choice = () => {
 	const level = new Level(

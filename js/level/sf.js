@@ -1,4 +1,4 @@
-Level.levels.set("SF1673", () => {
+Level.levels.set("SF1673", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SF1673",
@@ -10,12 +10,14 @@ Level.levels.set("SF1673", () => {
 		0, // KS-tokens
 		1  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("SF1672", () => {
+Level.levels.set("SF1672", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SF1672",
@@ -26,12 +28,14 @@ Level.levels.set("SF1672", () => {
 		1, // KS-tokens
 		1  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("SF1674", () => {
+Level.levels.set("SF1674", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SF1674",
@@ -43,12 +47,14 @@ Level.levels.set("SF1674", () => {
 		0, // KS-tokens
 		1  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("SF1922", () => {
+Level.levels.set("SF1922", (infoOnly) => {
 	// Sannstat (CTFYS)
 	const level = new Level(
 		{
@@ -61,12 +67,14 @@ Level.levels.set("SF1922", () => {
 		0, // KS-tokens
 		1  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("SF1918", () => {
+Level.levels.set("SF1918", (infoOnly) => {
 	// Sannstat (CTMAT)
 	const level = new Level(
 		{
@@ -79,12 +87,14 @@ Level.levels.set("SF1918", () => {
 		0, // KS-tokens
 		1  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("SF1550", () => {
+Level.levels.set("SF1550", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SF1550",
@@ -96,6 +106,8 @@ Level.levels.set("SF1550", () => {
 		0, // KS-tokens
 		1  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 

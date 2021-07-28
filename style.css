@@ -92,7 +92,29 @@ body.dark {
 
 	.pausemenu > div {
 		width: 80%;
+		max-width: 600px;
 		margin: 0.5em 0;
+	}
+
+	.pausemenu > ul {
+		width: 80%;
+		max-width: 600px;
+		margin: 0.5em 0;
+	}
+
+	.pausemenu > h2 {
+		width: 80%;
+		margin: 0.5em 0;
+		text-align: center;
+	}
+
+	.pausemenu > .footnote {
+		font-size: 10px;
+		position: fixed;
+		bottom: 0;
+		right: 0;
+		text-align: right;
+		margin-right: 0.5em;
 	}
 
 .resumeButton {

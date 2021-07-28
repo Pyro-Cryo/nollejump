@@ -15,6 +15,7 @@ class Level {
 		this.regionIdCounter = 1;
 		this.regions = new Map();
 		this.initial = null;
+		this.onNewRegion = null;
 
 		// State variables
 		this.currentRegion = null;
@@ -99,6 +100,8 @@ class Level {
 				if (this.currentRegion.name)
 					console.log("Ny region: " + this.currentRegion.name);
 				res = this.currentRegion.next(res.remainingDelta);
+				if (this.onNewRegion)
+					this.onNewRegion();
 			}
 		}
 		return false;

@@ -1,4 +1,4 @@
-Level.levels.set("DD1301", () => {
+Level.levels.set("DD1301", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "DD1301",
@@ -9,6 +9,8 @@ Level.levels.set("DD1301", () => {
 		0, // KS-tokens
 		0  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 	
 	// Skapa en liten stege
 	const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
@@ -64,7 +66,7 @@ Level.levels.set("DD1301", () => {
 				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
 					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
 			}
-			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent]
+			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent];
 		}).immediately()
 		.wait(start.length)
 		.spawn(RocketToken, 1, (elapsed, spawnHistory, level) => {
@@ -73,7 +75,7 @@ Level.levels.set("DD1301", () => {
 				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
 					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
 			}
-			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent]
+			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent];
 		}).immediately();
 
 	
@@ -90,7 +92,7 @@ Level.levels.set("DD1301", () => {
 
 	return level;
 });
-Level.levels.set("DD1331", () => {
+Level.levels.set("DD1331", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "DD1301",
@@ -102,12 +104,14 @@ Level.levels.set("DD1331", () => {
 		1, // KS-tokens
 		0  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("DD1320", () => {
+Level.levels.set("DD1320", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "DD1320",
@@ -118,12 +122,14 @@ Level.levels.set("DD1320", () => {
 		5, // KS-tokens
 		0  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("DD1396", () => {
+Level.levels.set("DD1396", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "DD1396",
@@ -134,6 +140,8 @@ Level.levels.set("DD1396", () => {
 		3, // KS-tokens
 		0  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 

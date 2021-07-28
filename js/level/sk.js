@@ -1,4 +1,4 @@
-Level.levels.set("SK1104", () => {
+Level.levels.set("SK1104", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SK1104",
@@ -9,12 +9,14 @@ Level.levels.set("SK1104", () => {
 		1, // KS-tokens
 		2  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 
 	return level;
 });
-Level.levels.set("SK1105", () => {
+Level.levels.set("SK1105", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SK1105",
@@ -25,6 +27,8 @@ Level.levels.set("SK1105", () => {
 		2, // KS-tokens
 		0  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 

@@ -2,9 +2,12 @@
 function screenWrap(obj) {
     if (obj.x >= controller.gameArea.rightEdgeInGrid) {
         obj.x -= controller.gameArea.gridWidth;
+        return true;
     } else if (obj.x < controller.gameArea.leftEdgeInGrid) {
         obj.x += controller.gameArea.gridWidth;
+        return true;
     }
+    return false;
 }
 
 function drawScreenWrap(gameArea, obj, superDraw) {
@@ -26,6 +29,9 @@ function collisionCheckScreenWrap(obj, other) {
 }
 
 function despawnIfBelowBottom(obj, margin = 3) {
-    if (obj.y + (obj.height || 0) * margin / 2 < controller.gameArea.bottomEdgeInGrid)
+    if (obj.y + (obj.height || 0) * margin / 2 < controller.gameArea.bottomEdgeInGrid) {
         obj.despawn();
+        return true;
+    }
+    return false;
 }

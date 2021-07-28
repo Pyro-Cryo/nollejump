@@ -134,7 +134,8 @@ class JumpPlayer extends Player {
 			this.despawn();
 		}
 		if (controller.screenWrap)
-			screenWrap(this);
+			if (screenWrap(this))
+				controller.stats.screenWraps++;
 
 		this.collisionCheck();
 		this.lastX = this.x;
@@ -171,6 +172,10 @@ class PlayerPhysics extends Physics {
 
 	bounceSurface(angle) {
 		super.bounceSurface(angle);
+		if (controller.currentLevel.code in controller.stats.bounces)
+			controller.stats.bounces[controller.currentLevel.code]++;
+		else
+			controller.stats.bounces[controller.currentLevel.code] = 1;
 
 		// let a = Math.atan2(this.vx, this.vy);
 		// this.vx = this.bounce_speed * Math.sin(a);

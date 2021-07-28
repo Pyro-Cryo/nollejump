@@ -10,8 +10,9 @@ class JumpController extends Controller {
 		this.gameArea.gridOrigin = GameArea.GRID_ORIGIN_LOWER_LEFT;
 
 		this.statusGraph = statusGraph;
+		/** @type {Level} */
 		this.currentLevel = null;
-		this.stateProperties = ["ctfys", "levelIndex", "nDeaths"];
+		this.stateProperties = ["ctfys", "levelIndex", "stats"];
 		this._screenWrap = true;
 	}
 
@@ -224,7 +225,26 @@ class JumpController extends Controller {
 		const defaultState = {
 			ctfys: null,
 			levelIndex: 0,
-			nDeaths: 0,
+			stats: {
+				deaths: {
+					// populeras med kurskod: antal
+				},
+				bounces: {
+					// populeras med kurskod: antal
+				},
+				powerups: {
+					// populeras med typ av powerup: antal
+				},
+				shots: {
+					"OF": 0,
+					"SF": 0,
+					"TF": 0,
+					"butler": 0,
+					"miss": 0,
+				},
+				screenWraps: 0,
+				distance: 0,
+			}
 		};
 		let data = window.localStorage.getItem(JumpController.STORAGE_PREFIX + "state");
 		if (data)
@@ -271,7 +291,10 @@ class JumpController extends Controller {
 	}
 
 	playerDied() {
-		this.nDeaths++;
+		if (this.currentLevel.code in this.stats.deaths)
+			this.stats.deaths[this.currentLevel.code]++;
+		else
+			this.stats.deaths[this.currentLevel.code] = 1;
 		this.saveState();
 		document.getElementById("deathmenu").classList.remove("hidden");
 	}
@@ -284,6 +307,113 @@ class JumpController extends Controller {
 	onPause() {
 		super.onPause();
 		document.getElementById("pausemenu").classList.remove("hidden");
+		this.funFacts();
+	}
+
+	funFacts() {
+		const pausemenuinfo = document.getElementById("pausemenuinfo");
+		while (pausemenuinfo.hasChildNodes())
+			pausemenuinfo.removeChild(pausemenuinfo.lastChild);
+		// Fyll på med rolig info
+		const tidbits = [
+			// visste du att...
+			"tomater är grönsaker (i livsmedels\u00ADsammanhang)",
+			"tomater är bär (botaniskt sett)",
+			"tomater är en slags potatisväxt (enligt Carl von Linné)",
+		];
+
+		// Generera statistikfakta
+		const totalShots = Object.keys(this.stats.shots).reduce((sum, key) => sum + this.stats.shots[key], 0);
+		const hits = totalShots - this.stats.shots.miss;
+		if (totalShots > 0) {
+			tidbits.push(`du har prickat ${Math.round(100 * hits / totalShots)} % av dina kast`);
+			tidbits.push(`du har kastat ${totalShots} frukter`);
+			// TODO: kan ha mer detaljerat vem man prickat osv
+			if (hits > 0)
+				tidbits.push(`du har prickat ${hits} Föhsare`);
+			if (this.stats.shots.miss > 0)
+				tidbits.push(`du har missat ${this.stats.shots.miss} kast`);
+		} else
+			tidbits.push("du inte kastat en enda frukt ännu");
+
+		const totalDeaths = Object.keys(this.stats.deaths).reduce((sum, key) => sum + this.stats.deaths[key], 0);
+		const currentLevelDeaths = this.currentLevel.code in this.stats.deaths ? 0 : this.stats.deaths[this.currentLevel.code];
+		if (totalDeaths > 0) {
+			tidbits.push(`du hoppat av ${totalDeaths} kursomgång${totalDeaths > 1 ? "ar" : ""}`);
+			if (currentLevelDeaths > 0)
+				tidbits.push(`du har hoppat av ${this.currentLevel.name} ${currentLevelDeaths} gång${currentLevelDeaths > 1 ? "er" : ""}`);
+
+			const maxDeaths = Object.keys(this.stats.deaths).reduce((max, key) => this.stats.deaths[key] > max[0] ? [this.stats.deaths[key], key] : max, [0, null]);
+			if (maxDeaths[1] === this.currentLevel.code)
+				tidbits.push(`du har försökt att klara ${this.currentLevel.name} ${maxDeaths[0]} gång${maxDeaths[0] > 1 ? "er" : ""}`);
+			else
+				tidbits.push(`det tog dig ${maxDeaths[0]} försök att klara ${Level.levels.get(maxDeaths[1])(true).name}`);
+		} else
+			tidbits.push("du inte hoppat av något än");
+
+		if (this.levelIndex > 0) {
+			const courses = this.ctfys ? Level.ctfysLevels : Level.ctmatLevels; // skippar tutorialen men den är inte jätteintressant
+			let totalHp = Level.tutorial(true).hp;
+			let totalHomework = Level.tutorial(true).homeworkNeeded + this.currentLevel.homeworkCurrent;
+			let totalKs = Level.tutorial(true).ksNeeded + this.currentLevel.ksCurrent;
+			let totalTenta = Level.tutorial(true).tentaNeeded + this.currentLevel.tentaCurrent;
+
+			for (let i = 1; i < this.levelIndex && i - 1 < courses.length; i++) {
+				const level = Level.levels.get(courses[i - 1])(true);
+				if (!(courses[i - 1] in totalDeaths))
+					tidbits.push(`du klarade ${level.name} på första försöket`);
+				totalHp += level.hp;
+				totalHomework += level.homeworkNeeded;
+				totalKs += level.ksNeeded;
+				totalTenta += level.tentaNeeded;
+			}
+			tidbits.push(`du har tagit ${totalHp.toLocaleString()} HP`);
+			if (totalHomework > 0)
+				tidbits.push(`du har klarat ${totalHomework} inlämningsuppgift${totalHomework > 1 ? "er" : ""}`);
+			if (totalKs > 0)
+				tidbits.push(`du har klarat ${totalKs} kontrollskrivning${totalKs > 1 ? "ar" : ""}`);
+			if (totalTenta > 0)
+				tidbits.push(`du har klarat ${totalTenta} tent${totalTenta > 1 ? "or" : "a"}`);
+		}
+
+		const totalBounces = Object.keys(this.stats.bounces).reduce((sum, key) => sum + this.stats.bounces[key], 0);
+		// const currentLevelBounces = this.currentLevel.code in this.stats.bounces ? 0 : this.stats.bounces[this.currentLevel.code];
+		tidbits.push(`du har studsat på ${totalBounces} plattform${totalBounces !== 1 ? "ar" : ""}`);
+		
+		const totalPowerups = Object.keys(this.stats.powerups).reduce((sum, key) => sum + this.stats.powerups[key], 0);
+		if (totalPowerups > 0) {
+			tidbits.push(`du har plockat upp ${totalPowerups} powerup${totalPowerups !== 1 ? "s" : ""}`);
+			const favoritePowerup = Object.keys(this.stats.powerups).reduce((max, key) => this.stats.powerups[key] > max[0] ? [this.stats.powerups[key], key] : max, [0, null]);
+			// TODO: klassnamnen som används kanske inte alltid är fina nog att skrivas ut
+			tidbits.push(`din favoritpowerup är ${favoritePowerup[1]}, och du använt den ${favoritePowerup[0]} gång${favoritePowerup[0] > 1 ? "er" : ""}`);
+		} else
+			tidbits.push(`du ännu inte plockat upp någon powerup`);
+		
+		if (this.stats.screenWraps > 0)
+			tidbits.push(`du passerat över skärmgränsen i x-led ${this.stats.screenWraps} gång${this.stats.screenWraps > 1 ? "er" : ""}`);
+		else
+			tidbits.push(`du aldrig passerat över skärmgränsen i x-led`);
+		
+		if (this.stats.distance > 0) { // Minst tutorialen avklarad
+			// Anta att Janne-Jan är 1 m lång
+			const distance = (this.stats.distance + this.currentLevel.totalElapsed) / controller.player.height;
+			tidbits.push(`du befinner dig ungefär ${Math.round(distance / 5) * 5} m upp`);
+		}
+		
+		// Välj ut några på slump
+		const chosenTidbits = [];
+		for (let i = 0; i < 3; i++) {
+			const index = Math.floor(Math.random() * tidbits.length);
+			chosenTidbits.push(tidbits[index]);
+			tidbits.splice(index, 1);
+		}
+
+		// Populera listan
+		for (const tidbit of chosenTidbits) {
+			const li = document.createElement("li");
+			li.innerText = "... " + tidbit + "?";
+			pausemenuinfo.appendChild(li);
+		}
 	}
 
 	startLevel(y = null) {
@@ -296,6 +426,7 @@ class JumpController extends Controller {
 				this.currentLevel = Level.levels.get(code)();
 				break;
 		}
+		this.currentLevel.onNewRegion = () => this.saveState(); // Så vi sparar stats osv
 		
 		if (y === null) {
 			this.currentLevel.warmup();
@@ -312,6 +443,7 @@ class JumpController extends Controller {
 		super.update(delta);
 		// level.update() returnerar true när den tar slut
 		if (this.currentLevel.update()) {
+			this.stats.distance += this.currentLevel.totalElapsed;
 			this.levelIndex++;
 			this.saveState();
 			this.startLevel(this.currentLevel.yCurrent);

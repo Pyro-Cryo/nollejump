@@ -24,11 +24,13 @@ class Pellet extends GameObject {
         for (const enemy of controller.enemies) {
             if (collisionCheckScreenWrap(this, enemy)) {
                 enemy.onShot(this);
+                controller.stats.shots[enemy.enemyType]++;
                 this.despawn();
             }
         }
 
-        despawnIfBelowBottom(this);
+        if (despawnIfBelowBottom(this))
+            controller.stats.shots.miss++;
         if (controller.screenWrap)
             screenWrap(this);
     }

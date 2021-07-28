@@ -1,4 +1,4 @@
-Level.levels.set("SI1121", () => {
+Level.levels.set("SI1121", (infoOnly) => {
 	const level = new Level(
 		{
 			"code": "SI1121",
@@ -9,6 +9,8 @@ Level.levels.set("SI1121", () => {
 		1, // KS-tokens
 		1  // Tenta-tokens
 	);
+	if (infoOnly)
+		return level;
 
 	// ...
 

@@ -20,7 +20,10 @@ class PowerupToken extends GameObject {
 	}
 
 	onCollision(player) {
-
+		if (this.constructor.powerup.name in controller.stats.powerups)
+			controller.stats.powerups[this.constructor.powerup.name]++;
+		else
+			controller.stats.powerups[this.constructor.powerup.name] = 1;
 		player.addEffect(new this.constructor.powerup());
 		this.despawn();
 	}
