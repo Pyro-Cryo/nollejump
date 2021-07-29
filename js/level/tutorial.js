@@ -110,7 +110,7 @@ Level.tutorial = (infoOnly) => {
 			]).spawn(Hint, 1, (elapsed, spawnHistory, level) => [
 				0, -48, "och ställer sig i vägen", font, textCol, spawnHistory[spawnHistory.length - 1].object
 			]).spawn(Hint, 1, (elapsed, spawnHistory, level) => [
-				0, -48, "Tur då att Janne-Jan har med sig", font, textCol, spawnHistory[spawnHistory.length - 1].object
+				0, -48, "Tur då att Jennie-Jan har med sig", font, textCol, spawnHistory[spawnHistory.length - 1].object
 			]).spawn(Hint, 1, (elapsed, spawnHistory, level) => [
 				0, -48, "en massa frukt att kasta", font, textCol, spawnHistory[spawnHistory.length - 1].object
 			]).immediately();
@@ -174,22 +174,26 @@ Level.tutorial = (infoOnly) => {
 	]).immediately();
 
 	const end = level.defineRegion("end");
-	end.wait(stairSpacing);
-	for (let x = platWidth * 0.6; x < controller.gameArea.gridWidth - 0.6 * platWidth; x += platWidth)
-		if (x > controller.gameArea.gridWidth / 3 && x < controller.gameArea.gridWidth * 2 / 3)
+	for (let i = 0; i < 2; i++) {
+		end.wait(stairSpacing);
+		for (let x = platWidth * 0.6; x < controller.gameArea.gridWidth - 0.6 * platWidth; x += platWidth) {
+			if (x > controller.gameArea.gridWidth / 3 && x < controller.gameArea.gridWidth * 2 / 3)
+				end.spawn(Platform, 1, (e, sH, level) => [x, level.yCurrent]);
+		}
+		if (i === 0)
+			end.spawn(KS, 1, (e, sH, level) => [
+				controller.gameArea.gridWidth / 2, level.yCurrent + 20
+			]);
+		end.immediately();
+		end.wait(stairSpacing);
+		for (let x = platWidth * 0.6; x < controller.gameArea.gridWidth / 3; x += platWidth)
 			end.spawn(Platform, 1, (e, sH, level) => [x, level.yCurrent]);
-	end.spawn(KS, 1, (e, sH, level) => [
-		controller.gameArea.gridWidth / 2, level.yCurrent + 20
-	]);
-	end.immediately();
-	end.wait(stairSpacing);
-	for (let x = platWidth * 0.6; x < controller.gameArea.gridWidth / 3; x += platWidth)
-		end.spawn(Platform, 1, (e, sH, level) => [x, level.yCurrent]);
-	end.immediately();
-	end.wait(stairSpacing);
-	for (let x = controller.gameArea.gridWidth - platWidth * 0.6; x > controller.gameArea.gridWidth * 2 / 3; x -= platWidth)
-		end.spawn(Platform, 1, (e, sH, level) => [x, level.yCurrent]);
-	end.immediately();
+		end.immediately();
+		end.wait(stairSpacing);
+		for (let x = controller.gameArea.gridWidth - platWidth * 0.6; x > controller.gameArea.gridWidth * 2 / 3; x -= platWidth)
+			end.spawn(Platform, 1, (e, sH, level) => [x, level.yCurrent]);
+		end.immediately();
+	}
 
 	level.initialRegion(initialStairs);
 	initialStairs.follower(end);
