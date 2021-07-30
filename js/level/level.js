@@ -40,6 +40,10 @@ class Level {
 		return this.homeworkCurrent >= this.homeworkNeeded && this.ksCurrent >= this.ksNeeded && this.tentaCurrent >= this.tentaNeeded;
 	}
 
+	get approximateProgress() {
+		return (this.homeworkCurrent + this.ksCurrent * 2 + this.tentaCurrent * 3) / (this.homeworkNeeded + this.ksNeeded * 2 + this.tentaNeeded * 3);
+	}
+
 	tokenPickup(type) {
 		console.log("Plockade upp token: " + type.name);
 		const wasCompleted = this.completed;

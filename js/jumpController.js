@@ -33,34 +33,20 @@ class JumpController extends Controller {
 	}
 
 	static get defaultStatusGraph() {
-		return [["Föhseriet", 2], ["Fadderiet", 0], ["nØllan", -2]];
+		return ["nØllan","/","/","-∞","/","-273,16","-π","0","e","42","Vanliga människor","/","/","Andra teknologer","1/ɛ","Fysiker","∞","/","Gud","/","Föhseriet"];
 	}
 
 	// Hämtar inte denna med övriga assets pga att den failar om man testar utan att hosta en server lokalt
 	static async loadStatusGraph() {
 		try {
 			const response = await Resource.load(
-				"https://docs.google.com/spreadsheets/d/e/2PACX-1vSmx5deoelJokU0Q0SmiCdnegZnEnJM8AuhEMq33rT1mk_9I0WidCpnMPYzovkkfReUgd8V8G8NP8VV/pub?gid=512844469&single=true&output=csv",
+				"https://docs.google.com/spreadsheets/d/e/2PACX-1vSZ-xcmOYMcJKxy8RkIlD3yqccYAm1Ogr4TsPMQqL2P7UXX1YtbVTN2KAuTqvLq2bY_nBVBihJDJwD7/pub?gid=1414378941&single=true&output=csv",
 				String);
 
-			// TODO: gör/använd en ordentlig CSV-parser för det här uppfyller inte alls specen
-			const matches = Array.from(response.matchAll(/^(("[^"]*")+|[^,]*),(("[^"]*")+|[^,]*)$/gm));
-			const trimQuotes = function (s) {
-				if (s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"')
-					return s.substring(1, s.length - 1);
-				else
-					return s;
-			};
-
-			const statusGraph = matches.map(match => [
-				trimQuotes(match[1]).trim(),
-				trimQuotes(match[3]).trim()
-					.replace(",", ".")
-					.replace("−", "-") // tack google forms
-					* 1
-			]);
-
-			console.log("Fetched status graph:", statusGraph);
+			const statusGraph = response.split("\n").slice(1).map(s => s.trim()).map(s =>
+				s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"' ? s.substr(1, s.length - 2) : s
+			);
+			console.log("Hämtade statusgrafen");
 			return statusGraph;
 			
 		} catch (response) {
@@ -70,6 +56,10 @@ class JumpController extends Controller {
 				console.warn("Kunde inte hämta statusgrafen. Prova att starta en server med ex. 'python -m http.server' i nollejump-mappen.");
 			return this.defaultStatusGraph;
 		}
+	}
+
+	get approximateProgress() {
+		return (this.levelIndex + this.currentLevel.approximateProgress) / ((this.ctfys ? Level.ctfysLevels : Level.ctmatLevels).length + 1);
 	}
 
 	startDrawLoop(barHeight, margin) {
@@ -430,7 +420,7 @@ class JumpController extends Controller {
 			tidbits.push(`du aldrig passerat över skärmgränsen i x-led`);
 		
 		if (this.stats.distance > 0) { // Minst tutorialen avklarad
-			// Anta att Janne-Jan är 1 m lång
+			// Anta att Jennie-Jan är 1 m lång
 			const distance = (this.stats.distance + this.currentLevel.totalElapsed) / controller.player.height;
 			tidbits.push(`du befinner dig ungefär ${Math.round(distance / 5) * 5} m upp`);
 		}
@@ -467,8 +457,7 @@ class JumpController extends Controller {
 		
 		if (y === null) {
 			this.currentLevel.warmup();
-			// TODO: Borde kanske också skötas i level
-			this.background = new Background(this.gameArea.gridWidth / 2, 0);
+			this.background = new Background(this.gameArea.gridWidth / 2, 0, this.statusGraph);
 		}
 		else
 			this.currentLevel.init(y, this.gameArea.gridHeight / 2);
@@ -554,5 +543,11 @@ class cheat {
 		document.body.classList.add("dark");
 		controller.background.dark = true;
 		Background.dark = true;
+	}
+
+	static get tokens() {
+		let pos = 1;
+		for (const type of [Homework, KS, Tenta])
+			new type(controller.gameArea.gridWidth * pos++ / 4, controller.gameArea.topEdgeInGrid - 200).level = controller.currentLevel;
 	}
 };
