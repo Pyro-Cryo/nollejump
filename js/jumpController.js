@@ -1,5 +1,5 @@
 let _JumpController_WIDTH_PX = 576;
-let _JumpController_HEIGHT_PX = JumpController.WIDTH_PX * 15 / 9;
+let _JumpController_HEIGHT_PX = _JumpController_WIDTH_PX * 15 / 9;
 let _JumpController_STORAGE_PREFIX = "nollejump_";
 
 class JumpController extends Controller {
