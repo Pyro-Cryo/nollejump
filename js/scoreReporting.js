@@ -14,6 +14,7 @@ class ScoreReporter {
     }
 
     static report(won) {
+        alert("API-inställningar: ", JSON.stringify(this.apiSettings));
         if (!this.apiSettings) {
             console.warn("API-parametrarna är inte definierade, så kan inte rapportera in poängen.");
             return;
