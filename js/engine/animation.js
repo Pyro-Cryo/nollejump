@@ -195,3 +195,4 @@ class BasicAnimation {
         this.objUpdate = null;
     }
 }
+cyberfohslog(`Laddat ${document.currentScript.src}`);

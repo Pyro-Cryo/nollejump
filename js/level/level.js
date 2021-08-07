@@ -289,3 +289,4 @@ class Region extends ArgableSequence {
 		return clone;
 	}
 }
+cyberfohslog(`Laddat ${document.currentScript.src}`);

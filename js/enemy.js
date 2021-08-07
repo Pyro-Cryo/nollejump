@@ -42,3 +42,4 @@ class SFPassive extends Enemy {
     static get scale() { return 0.25; }
     get enemyType() { return "SF"; }
 }
+cyberfohslog(`Laddat ${document.currentScript.src}`);

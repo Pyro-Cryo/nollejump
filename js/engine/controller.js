@@ -374,3 +374,4 @@ class LinkedList {
         return [...this];
     }
 }
+cyberfohslog(`Laddat ${document.currentScript.src}`);

@@ -52,3 +52,4 @@ class ScoreReporter {
         });
     }
 }
+cyberfohslog(`Laddat ${document.currentScript.src}`);

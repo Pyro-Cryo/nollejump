@@ -86,4 +86,4 @@ class FakePlatform extends Platform {
 	}
 
 }
-cyberfohslog("Laddat platform.js");
+cyberfohslog(`Laddat ${document.currentScript.src}`);

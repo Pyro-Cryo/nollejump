@@ -249,3 +249,4 @@ Level.levels.set("SF0003", Level.tutorial);
 
 	return level;
 };*/
+cyberfohslog(`Laddat ${document.currentScript.src}`);

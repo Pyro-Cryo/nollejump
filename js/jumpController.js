@@ -552,4 +552,4 @@ class cheat {
 			new type(controller.gameArea.gridWidth * pos++ / 4, controller.gameArea.topEdgeInGrid - 200).level = controller.currentLevel;
 	}
 };
-cyberfohslog("Laddat jumpController.js");
+cyberfohslog(`Laddat ${document.currentScript.src}`);
