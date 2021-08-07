@@ -1,3 +1,32 @@
+let _Level_tutorial = null;
+// let _Level_choice = null;
+let _Level_levels = new Map();
+let _Level_ctfysLevels = [
+	"DD1301", // Datorintro
+	"SF1673", // Envarre
+	"DD1331", // Gruprog
+	"SI1121", // Termo
+	"SF1672", // Linalg
+	"SK1104", // Klassfys
+	"SF1674", // Flervarre
+	"SG1112", // Mek 1
+	"SF1922", // Sannstat
+	"SK1105", // Expfys
+];
+let _Level_ctmatLevels = [
+	"DD1301", // Datorintro
+	"SF1673", // Envarre
+	"DD1331", // Gruprog
+	"SA1006", // Ingenjörsfärdigheter
+	"SF1672", // Linalg
+	"SF1918", // Sannstat, OBS annan kurskod
+	"SF1674", // Flervarre
+	"DD1320", // Tildat
+	"SF1550", // Numme
+	"DD1396", // Parallellprogrammering
+	"SG1115", // Partikeldynamik
+];
+
 /**
  * En level motsvarar en kurs. Man samlar ett
  * visst antal av varje typ av token för att
@@ -149,34 +178,16 @@ class Level {
 			this.initial = this.addRegion(region);
 	}
 
-	static tutorial = null;
-	// static choice = null;
-	static levels = new Map();
-	static ctfysLevels = [
-		"DD1301", // Datorintro
-		"SF1673", // Envarre
-		"DD1331", // Gruprog
-		"SI1121", // Termo
-		"SF1672", // Linalg
-		"SK1104", // Klassfys
-		"SF1674", // Flervarre
-		"SG1112", // Mek 1
-		"SF1922", // Sannstat
-		"SK1105", // Expfys
-	];
-	static ctmatLevels = [
-		"DD1301", // Datorintro
-		"SF1673", // Envarre
-		"DD1331", // Gruprog
-		"SA1006", // Ingenjörsfärdigheter
-		"SF1672", // Linalg
-		"SF1918", // Sannstat, OBS annan kurskod
-		"SF1674", // Flervarre
-		"DD1320", // Tildat
-		"SF1550", // Numme
-		"DD1396", // Parallellprogrammering
-		"SG1115", // Partikeldynamik
-	];
+	static get tutorial() { return _Level_tutorial;}
+	static set tutorial(value) { _Level_tutorial = value;}
+	// static get choice() { return _Level_choice;}
+	// static set choice(value) { _Level_choice = value;}
+	static get levels() { return _Level_levels;}
+	static set levels(value) { _Level_levels = value;}
+	static get ctfysLevels() { return _Level_ctfysLevels;}
+	static set ctfysLevels(value) { _Level_ctfysLevels = value;}
+	static get ctmatLevels() { return _Level_ctmatLevels;}
+	static set ctmatLevels(value) { _Level_ctmatLevels = value;}
 }
 
 /**

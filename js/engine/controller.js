@@ -1,5 +1,7 @@
+let _Controller__instances = [];
 class Controller {
-    static _instances = [];
+    static get _instances() { return _Controller__instances;}
+	static set _instances(value) { _Controller__instances = value;}
     static get isSingleInstance() {
         return this._instances.length === 1;
     }

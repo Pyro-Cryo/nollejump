@@ -1,7 +1,14 @@
+let _JumpController_WIDTH_PX = 576;
+let _JumpController_HEIGHT_PX = JumpController.WIDTH_PX * 15 / 9;
+let _JumpController_STORAGE_PREFIX = "nollejump_";
+
 class JumpController extends Controller {
-	static WIDTH_PX = 576;
-	static HEIGHT_PX = JumpController.WIDTH_PX * 15 / 9;
-	static STORAGE_PREFIX = "nollejump_";
+	static get WIDTH_PX() { return _Splines_WIDTH_PX;}
+	static set WIDTH_PX(value) { _JumpController_WIDTH_PX = value;}
+	static get HEIGHT_PX() { return _Splines_HEIGHT_PX;}
+	static set HEIGHT_PX(value) { _JumpController_HEIGHT_PX = value;}
+	static get STORAGE_PREFIX() { return _Splines_STORAGE_PREFIX;}
+	static set STORAGE_PREFIX(value) { _JumpController_STORAGE_PREFIX = value;}
 	constructor(statusGraph) {
 		super("gameboard");
 		this.canvasContainer = document.getElementById("gameboardContainer");

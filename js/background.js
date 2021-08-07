@@ -1,5 +1,7 @@
+let _Background_dark = false;
 class Background extends GameObject {
-	static dark = false;
+	static get dark() { return _Background_dark;}
+	static set dark(value) { _Background_dark = value;}
 	constructor(x, y, statusGraph) {
 		super(x, y, null, 0, 1, false);
 

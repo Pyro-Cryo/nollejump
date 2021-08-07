@@ -1,11 +1,24 @@
+let _Player_CAMERA_TRACKING_NONE = 0;
+// "regular" = keep an offset in gameArea used during drawing
+let _Player_CAMERA_TRACKING_CENTER = 1;
+let _Player_CAMERA_TRACKING_INFRAME = 2;
+// KSP = change all objects' coordinates
+let _Player_CAMERA_TRACKING_KSP_CENTER = 3;
+let _Player_CAMERA_TRACKING_KSP_INFRAME = 4;
+
 class Player extends EffectObject {
-	static CAMERA_TRACKING_NONE = 0;
+	static get CAMERA_TRACKING_NONE() { return _Player_CAMERA_TRACKING_NONE;}
+	static set CAMERA_TRACKING_NONE(value) { _Player_CAMERA_TRACKING_NONE = value;}
 	// "regular" = keep an offset in gameArea used during drawing
-	static CAMERA_TRACKING_CENTER = 1;
-	static CAMERA_TRACKING_INFRAME = 2;
+	static get CAMERA_TRACKING_CENTER() { return _Player_CAMERA_TRACKING_CENTER;}
+	static set CAMERA_TRACKING_CENTER(value) { _Player_CAMERA_TRACKING_CENTER = value;}
+	static get CAMERA_TRACKING_INFRAME() { return _Player_CAMERA_TRACKING_INFRAME;}
+	static set CAMERA_TRACKING_INFRAME(value) { _Player_CAMERA_TRACKING_INFRAME = value;}
 	// KSP = change all objects' coordinates
-	static CAMERA_TRACKING_KSP_CENTER = 3;
-	static CAMERA_TRACKING_KSP_INFRAME = 4;
+	static get CAMERA_TRACKING_KSP_CENTER() { return _Player_CAMERA_TRACKING_KSP_CENTER;}
+	static set CAMERA_TRACKING_KSP_CENTER(value) { _Player_CAMERA_TRACKING_KSP_CENTER = value;}
+	static get CAMERA_TRACKING_KSP_INFRAME() { return _Player_CAMERA_TRACKING_KSP_INFRAME;}
+	static set CAMERA_TRACKING_KSP_INFRAME(value) { _Player_CAMERA_TRACKING_KSP_INFRAME = value;}
 	
 	/**
 	 * Create a new player object, with additional support for camera tracking and input management.

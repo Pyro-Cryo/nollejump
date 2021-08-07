@@ -1,25 +1,36 @@
+let _JumpPlayer_ACTION_GO_LEFT = 1;
+let _JumpPlayer_ACTION_GO_RIGHT = 2;
+let _JumpPlayer_ACTION_SHOOT = 3;
+let _JumpPlayer_SCREENWRAP_TRACKING = [
+	Player.CAMERA_TRACKING_INFRAME,
+	400, // Margin top
+	Number.NEGATIVE_INFINITY, // Margin right
+	Number.NEGATIVE_INFINITY, // Margin bottom
+	Number.NEGATIVE_INFINITY // Margin left
+];
+let _JumpPlayer_NON_SCREENWRAP_TRACKING = [
+	Player.CAMERA_TRACKING_INFRAME,
+	100, // Margin top = JumpController.WIDTH_PX / 4
+	100, // Margin right
+	100, // Margin bottom
+	100, // Margin left
+]
+
 const jenniejanImg = Resource.addAsset("img/jenniejan.png");
 class JumpPlayer extends Player {
 	static get image() { return Resource.getAsset(jenniejanImg); }
 	static get scale() { return 0.25; }
 	
-	static ACTION_GO_LEFT = 1;
-	static ACTION_GO_RIGHT = 2;
-	static ACTION_SHOOT = 3;
-	static SCREENWRAP_TRACKING = [
-		Player.CAMERA_TRACKING_INFRAME,
-		400, // Margin top
-		Number.NEGATIVE_INFINITY, // Margin right
-		Number.NEGATIVE_INFINITY, // Margin bottom
-		Number.NEGATIVE_INFINITY // Margin left
-	];
-	static NON_SCREENWRAP_TRACKING = [
-		Player.CAMERA_TRACKING_INFRAME,
-		100, // Margin top = JumpController.WIDTH_PX / 4
-		100, // Margin right
-		100, // Margin bottom
-		100, // Margin left
-	];
+	static get ACTION_GO_LEFT() { return _JumpPlayer_ACTION_GO_LEFT;}
+	static set ACTION_GO_LEFT(value) { _JumpPlayer_ACTION_GO_LEFT = value;}
+	static get ACTION_GO_RIGHT() { return _JumpPlayer_ACTION_GO_RIGHT;}
+	static set ACTION_GO_RIGHT(value) { _JumpPlayer_ACTION_GO_RIGHT = value;}
+	static get ACTION_SHOOT() { return _JumpPlayer_ACTION_SHOOT;}
+	static set ACTION_SHOOT(value) { _JumpPlayer_ACTION_SHOOT = value;}
+	static get SCREENWRAP_TRACKING() { return _JumpPlayer_SCREENWRAP_TRACKING;}
+	static set SCREENWRAP_TRACKING(value) { _JumpPlayer_SCREENWRAP_TRACKING = value;}
+	static get NON_SCREENWRAP_TRACKING() { return _JumpPlayer_NON_SCREENWRAP_TRACKING;}
+	static set NON_SCREENWRAP_TRACKING(value) { _JumpPlayer_NON_SCREENWRAP_TRACKING = value;}
 
 	constructor(x, y) {
 		super(

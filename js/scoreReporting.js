@@ -1,17 +1,17 @@
+let SCORE_MAX = 2000;
+let SCORE_MIN_ON_WIN = 1000;
+let SCORE_REDUCTION_PER_DEATH = 50;
+let SCORE_PARTIAL_MAX = 800;
+let ApiSettings = null;
+
 class ScoreReporter {
-    static _apiSettings = null;
     static set apiSettings(value) {
-        this._apiSettings = value;
+        ApiSettings = value;
         console.log("Satte API-parametrar:", value);
     }
     static get apiSettings() {
-        return this._apiSettings;
+        return ApiSettings;
     }
-
-    static SCORE_MAX = 2000;
-    static SCORE_MIN_ON_WIN = 1000;
-    static SCORE_REDUCTION_PER_DEATH = 50;
-    static SCORE_PARTIAL_MAX = 800;
 
     static report(won) {
         if (!this.apiSettings) {
@@ -21,10 +21,10 @@ class ScoreReporter {
         // Räkna ut poäng
         let score;
         if (won) {
-            const totalDeaths = Object.keys(this.stats.deaths).reduce((sum, key) => sum + this.stats.deaths[key], 0);
-            score = Math.max(this.SCORE_MIN_ON_WIN, this.SCORE_MAX - totalDeaths * this.SCORE_REDUCTION_PER_DEATH);
+            const totalDeaths = Object.keys(controller.stats.deaths).reduce((sum, key) => sum + controller.stats.deaths[key], 0);
+            score = Math.max(SCORE_MIN_ON_WIN, SCORE_MAX - totalDeaths * SCORE_REDUCTION_PER_DEATH);
         } else {
-            score = this.SCORE_PARTIAL_MAX * controller.approximateProgress;
+            score = SCORE_PARTIAL_MAX * controller.approximateProgress;
         }
         score = Math.floor(score);
         console.log(score);
