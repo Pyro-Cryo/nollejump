@@ -3,11 +3,11 @@ let _JumpController_HEIGHT_PX = _JumpController_WIDTH_PX * 15 / 9;
 let _JumpController_STORAGE_PREFIX = "nollejump_";
 
 class JumpController extends Controller {
-	static get WIDTH_PX() { return _Splines_WIDTH_PX;}
+	static get WIDTH_PX() { return _JumpController_WIDTH_PX;}
 	static set WIDTH_PX(value) { _JumpController_WIDTH_PX = value;}
-	static get HEIGHT_PX() { return _Splines_HEIGHT_PX;}
+	static get HEIGHT_PX() { return _JumpController_HEIGHT_PX;}
 	static set HEIGHT_PX(value) { _JumpController_HEIGHT_PX = value;}
-	static get STORAGE_PREFIX() { return _Splines_STORAGE_PREFIX;}
+	static get STORAGE_PREFIX() { return _JumpController_STORAGE_PREFIX;}
 	static set STORAGE_PREFIX(value) { _JumpController_STORAGE_PREFIX = value;}
 	constructor(statusGraph) {
 		super("gameboard");
