@@ -431,4 +431,3 @@ class Splines {
         return sum;
     }
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

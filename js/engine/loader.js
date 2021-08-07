@@ -164,4 +164,3 @@ class Resource {
 		}
 	}
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

@@ -113,4 +113,3 @@ class Rocket extends PowerUp {
 class RocketToken extends PowerupToken {
 	static get powerup() { return Rocket; }
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

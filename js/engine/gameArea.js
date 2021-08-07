@@ -325,4 +325,3 @@ class GameArea {
         this.context.restore();
     }
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

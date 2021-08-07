@@ -41,4 +41,3 @@ class Pellet extends GameObject {
             drawScreenWrap(gameArea, this, super.draw.bind(this));
     }
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

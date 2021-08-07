@@ -189,4 +189,3 @@ class PlayerPhysics extends Physics {
 	}
 
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

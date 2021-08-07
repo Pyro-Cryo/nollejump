@@ -462,4 +462,3 @@ class ArgableSequence extends BaseSequence {
 // 		return super.spawn(instruction);
 // 	}
 // }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

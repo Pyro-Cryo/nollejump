@@ -274,4 +274,3 @@ class Player extends EffectObject {
 
 
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

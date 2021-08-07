@@ -245,4 +245,3 @@ class Background extends GameObject {
         return canvas;
     }
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

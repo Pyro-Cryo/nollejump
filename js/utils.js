@@ -35,4 +35,3 @@ function despawnIfBelowBottom(obj, margin = 3) {
     }
     return false;
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

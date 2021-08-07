@@ -32,4 +32,3 @@ class Tenta extends Token {
 	static get scale() { return 0.25; }
 	static get angle() { return 0; }
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

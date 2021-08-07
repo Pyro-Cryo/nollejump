@@ -172,5 +172,3 @@ class PhysicsNull extends Physics {
 	} 
 
 }
-
-cyberfohslog(`Laddat ${document.currentScript.src}`);

@@ -276,4 +276,3 @@ class BaseEffect extends PrerenderedObject {
 		object.removeEffect(this);
 	}
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

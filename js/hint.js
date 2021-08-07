@@ -158,4 +158,3 @@ class Hint extends GameObject {
 	// 	this._lastDrawnAngle = this.angle;
     // }
 }
-cyberfohslog(`Laddat ${document.currentScript.src}`);

@@ -16,33 +16,6 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="style.css">
 
-	<script type="text/javascript">
-		function cyberfohslog(msg) {
-			const msgElement = document.createElement("li");
-			msgElement.innerText = msg;
-			const logElement = document.getElementById("cyberfohslog");
-			if (logElement)
-				logElement.appendChild(msgElement);
-			else
-				setTimeout(() => cyberfohslog(msg), 1000);
-		}
-		console.defaultError = console.error.bind(console);
-		console.defaultWarn = console.warn.bind(console);
-		console.defaultLog = console.log.bind(console);
-		const logged = [];
-		console.log = (...args) => {
-			logged.push(args);
-			console.defaultLog(...args);
-		};
-		console.warn = (...args) => {
-			logged.push(args);
-			console.defaultWarn(...args);
-		};
-		console.error = (...args) => {
-			logged.push(args);
-			console.defaultError(...args);
-		};
-	</script>
 	<!-- Kelvin -->
 	<script type="text/javascript" src="js/engine/audio.js"></script>
 	<script type="text/javascript" src="js/engine/loader.js"></script>
@@ -148,23 +121,13 @@
 	</div>
 	<ol id="cyberfohslog"></ol>
 	<script type="text/javascript">
-		cyberfohslog("i princip laddat all html");
 		let controller;
 		window.addEventListener("load", () => {
-			cyberfohslog("Laddat sidan");
 			JumpController.loadStatusGraph()
 				.then(statusGraph => {
-					cyberfohslog("Laddat statusgraf");
 					controller = new JumpController(statusGraph);
 				});
 		});
-		setTimeout(() => {
-			console.log = console.defaultLog.bind(console);
-			console.warn = console.defaultWarn.bind(console);
-			console.error = console.defaultError.bind(console);
-			cyberfohslog("Konsollog:");
-			logged.map(cyberfohslog);
-		}, 10000);
 	</script>
 </body>
 </html>
