@@ -551,4 +551,12 @@ class cheat {
 		for (const type of [Homework, KS, Tenta])
 			new type(controller.gameArea.gridWidth * pos++ / 4, controller.gameArea.topEdgeInGrid - 200).level = controller.currentLevel;
 	}
+
+	static get break() {
+		controller.registerObject({
+			update: delta => (undefined).doesNotExist(),
+			id: 123456789,
+			draw: gameArea => null
+		});
+	}
 };

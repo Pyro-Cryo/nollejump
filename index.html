@@ -9,6 +9,16 @@
 	<meta name="author" content="Pyro & Cryo">
 	<meta name="theme-color" content="#df3c48">
 	<link rel="icon" type="image/png" href="img/fadderietslogga.png" />
+
+	<script type="text/javascript">
+		window.onerror = function(message, sourcefile, lineno, colno, error) {
+			alert("Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno);
+			const el = document.createElement("div");
+			el.innerText = "Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno;
+			document.body.appendChild(el);
+			return true;
+		};
+  	</script>
 	
 	<!-- Font och ikoner -->
 	<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet" />
