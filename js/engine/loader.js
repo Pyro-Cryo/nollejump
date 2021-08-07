@@ -1,7 +1,7 @@
-let _loadedAssets = new Map();
-let _registeredAssets = new Map();
-let _assetsDirty = false;
-let _assetsCurrentlyLoading = false;
+let _Resource__loadedAssets = new Map();
+let _Resource__registeredAssets = new Map();
+let _Resource__assetsDirty = false;
+let _Resource__assetsCurrentlyLoading = false;
 
 class Resource {
 	/**
@@ -99,12 +99,16 @@ class Resource {
 			return mappedItem;
 	}
 
-	// static _loadedAssets = new Map();
-	// static _registeredAssets = new Map();
-	// static _assetsDirty = false;
-	// static _assetsCurrentlyLoading = false;
+	static get _loadedAssets() { return _Resource__loadedAssets;}
+	static set _loadedAssets(value) { _Resource__loadedAssets = value;}
+	static get _registeredAssets() { return _Resource__registeredAssets;}
+	static set _registeredAssets(value) { _Resource__registeredAssets = value;}
+	static get _assetsDirty() { return _Resource__assetsDirty;}
+	static set _assetsDirty(value) { _Resource__assetsDirty = value;}
+	static get _assetsCurrentlyLoading() { return _Resource__assetsCurrentlyLoading;}
+	static set _assetsCurrentlyLoading(value) { _Resource__assetsCurrentlyLoading = value;}
 	static get assetsLoaded() {
-		return !_assetsDirty;
+		return !this._assetsDirty;
 	}
 
 	/**
@@ -115,54 +119,54 @@ class Resource {
 	 * @returns Den URI som angavs.
 	 */
 	static addAsset(path, type = Image, map = null) {
-		if (_assetsCurrentlyLoading)
+		if (this._assetsCurrentlyLoading)
 			throw new Error("Cannot add assets while assets are currently loading.");
 
-		_registeredAssets.set(path, [type, map]);
+		this._registeredAssets.set(path, [type, map]);
 
-		if (_loadedAssets.has(path)) {
-			_loadedAssets.delete(path);
+		if (this._loadedAssets.has(path)) {
+			this._loadedAssets.delete(path);
 			console.warn("Overwriting or reloading asset: " + path);
 		}
 
-		_assetsDirty = true;
+		this._assetsDirty = true;
 
 		return path;
 	}
 
 	static getAsset(path, checkDirty = true) {
-		if (checkDirty && _assetsDirty)
+		if (checkDirty && this._assetsDirty)
 			throw new Error("All assets not loaded");
 		
-		if (_loadedAssets.has(path))
-			return _loadedAssets.get(path);
-		else if (!checkDirty && _registeredAssets.has(path))
+		if (this._loadedAssets.has(path))
+			return this._loadedAssets.get(path);
+		else if (!checkDirty && this._registeredAssets.has(path))
 			throw new Error("Asset not yet loaded: " + path);
 		else
 			throw new Error("Asset not registered: " + path);
 	}
 
 	static loadAssets(onUpdate = null) {
-		if (_assetsDirty) {
-			_assetsCurrentlyLoading = true;
+		if (this._assetsDirty) {
+			this._assetsCurrentlyLoading = true;
 
-			let resources = Array.from(_registeredAssets)
+			let resources = Array.from(this._registeredAssets)
 				.map(assetSpec => [
 					assetSpec[0], // path
 					assetSpec[1][0], // type
 					item => { // map
 						if (assetSpec[1][1])
 							item = this._applyMap(item, assetSpec[1][1])
-						_loadedAssets.set(assetSpec[0], item);
+						this._loadedAssets.set(assetSpec[0], item);
 						return item;
 					}
 				])
-				.filter(assetSpec => !_loadedAssets.has(assetSpec[0]));
+				.filter(assetSpec => !this._loadedAssets.has(assetSpec[0]));
 
 			// Defaulttypen behövs inte då alla assets definierar egna
 			return this.load(resources, null, onUpdate).then(assets => {
-				_assetsDirty = false;
-				_assetsCurrentlyLoading = false;
+				this._assetsDirty = false;
+				this._assetsCurrentlyLoading = false;
 			});
 		} else {
 			return new Promise((resolve, _) => resolve());
