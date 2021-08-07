@@ -4,6 +4,7 @@ class PowerUp extends BaseEffect {
 	static get maxInvocations() { return 1; }
 	static get imgOffset() { return [0, -25]; }
 	static get angle() { return 0; }
+	static get prettyName() { return "Powerup"; }
 
 }
 
@@ -21,18 +22,21 @@ class PowerupToken extends GameObject {
 
 	onCollision(player) {
 		if (this.constructor.powerup.name in controller.stats.powerups)
-			controller.stats.powerups[this.constructor.powerup.name]++;
+			controller.stats.powerups[this.constructor.powerup.prettyName]++;
 		else
-			controller.stats.powerups[this.constructor.powerup.name] = 1;
+			controller.stats.powerups[this.constructor.powerup.prettyName] = 1;
 		player.addEffect(new this.constructor.powerup());
 		this.despawn();
 	}
 }
 
-
+// const appleImg = Resource.addAsset("img/fruit/apple.png");
 class Immortal extends PowerUp {
 
+	// static get image() { return Resource.getAsset(appleImg); }
+	// static get scale() { return 0.1; }
 	static get cooldown() { return 5000; }
+	static get prettyName() { return "Osårbarhet"; }
 
 	init(player) {
 		super.init(player);
@@ -47,6 +51,8 @@ class Immortal extends PowerUp {
 			player.lives = this.lives;
 		super.remove(player);
 	}
+
+	draw(gameArea) {}
 }
 
 
@@ -56,6 +62,7 @@ class JumpBoost extends PowerUp {
 	static get image() { return Resource.getAsset(aubimg); }
 	static get scale() { return 0.2; }
 	static get cooldown() { return 5000; }
+	static get prettyName() { return "Hoppboost"; }
 
 	init(player) {
 		super.init(player);
@@ -79,6 +86,7 @@ class Rocket extends PowerUp {
 	static get image() { return Resource.getAsset(orangeimg); }
 	static get scale() { return 0.1; }
 	static get cooldown() { return 2200; }
+	static get prettyName() { return "Raket"; }
 
 	init(player) {
 		super.init(player);

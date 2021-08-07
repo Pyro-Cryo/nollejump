@@ -305,6 +305,7 @@ class JumpController extends Controller {
 			this.stats.deaths[this.currentLevel.code] = 1;
 		this.saveState();
 		document.getElementById("deathmenu").classList.remove("hidden");
+		ScoreReporter.report(false);
 	}
 
 	onPlay() {
@@ -551,3 +552,4 @@ class cheat {
 			new type(controller.gameArea.gridWidth * pos++ / 4, controller.gameArea.topEdgeInGrid - 200).level = controller.currentLevel;
 	}
 };
+cyberfohslog("Laddat jumpController.js");

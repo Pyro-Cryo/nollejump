@@ -16,6 +16,17 @@
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" href="style.css">
 
+	<script type="text/javascript">
+		function cyberfohslog(msg) {
+			const msgElement = document.createElement("li");
+			msgElement.innerText = msg;
+			const logElement = document.getElementById("cyberfohslog");
+			if (logElement)
+				logElement.appendChild(msgElement);
+			else
+				setTimeout(() => cyberfohslog(msg), 1000);
+		}
+	</script>
 	<!-- Kelvin -->
 	<script type="text/javascript" src="js/engine/audio.js"></script>
 	<script type="text/javascript" src="js/engine/loader.js"></script>
@@ -48,6 +59,9 @@
 	<script type="text/javascript" src="js/level/sg.js"></script>
 	<script type="text/javascript" src="js/level/si.js"></script>
 	<script type="text/javascript" src="js/level/sk.js"></script>
+	
+	<!-- Cyberföhs -->
+	<script type="text/javascript" src="js/scoreReporting.js"></script>
 
 	<!-- Controller -->
 	<script type="text/javascript" src="js/jumpController.js"></script>
@@ -116,11 +130,14 @@
 		</div>
 		<div class="footnote">*Enligt anonyma källor.</div>
 	</div>
+	<ol id="cyberfohslog"></ol>
 	<script type="text/javascript">
 		let controller;
 		window.addEventListener("load", () => {
+			cyberfohslog("Laddat sidan");
 			JumpController.loadStatusGraph()
 				.then(statusGraph => {
+					cyberfohslog("Laddat statusgraf");
 					controller = new JumpController(statusGraph);
 				});
 		});

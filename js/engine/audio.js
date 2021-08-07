@@ -12,3 +12,4 @@ class LoopableAudio extends Audio {
         this.volume = volume;
     }
 }
+cyberfohslog("Laddat audio.js");

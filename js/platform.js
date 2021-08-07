@@ -86,3 +86,4 @@ class FakePlatform extends Platform {
 	}
 
 }
+cyberfohslog("Laddat platform.js");
