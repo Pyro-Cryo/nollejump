@@ -34,7 +34,7 @@ Level.tutorial = (infoOnly) => {
 			])
 				.spawn(Hint, 1, (elapsed, spawnHistory, level) => [
 					controller.gameArea.gridWidth / 2, level.yCurrent - stairSpacing / 2,
-					"",
+					"Piltangenter eller A/D för att styra",
 					font,
 					textCol
 				]).immediately();
@@ -43,7 +43,8 @@ Level.tutorial = (infoOnly) => {
 					// Eftersom den här hinten spawnas efter spelaren så registreras eventlistenern efter,
 					// vilket gör att spelarens .deviceTiltAvailable uppdateras innan
 					window.addEventListener("deviceorientation", e => {
-						hint.text = controller.player.deviceTiltAvailable ? "Luta mobilen för att styra" : "Piltangenter eller A/D för att styra";
+						if (controller.player.deviceTiltAvailable)
+							hint.text = "Luta mobilen för att styra";
 					}, { once: true });
 				}, 0, (elapsed, spawnHistory, level) => [spawnHistory[spawnHistory.length - 1].object]);
 		}

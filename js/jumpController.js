@@ -174,6 +174,17 @@ class JumpController extends Controller {
 				}
 			}
 		}, true);
+		
+		// För att tilt controls ska funka på gamla versioner av iOS
+		if (DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) {
+			document.body.addEventListener("click", e => {
+				DeviceOrientationEvent.requestPermission();
+			}, {
+				capture: true,
+				once: true,
+				passive: true
+			});
+		}
 	}
 
 	setLevelMessage() {

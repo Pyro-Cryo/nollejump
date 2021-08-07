@@ -14,7 +14,14 @@ class ScoreReporter {
     }
 
     static report(won) {
-        alert("API-inställningar: ", JSON.stringify(this.apiSettings));
+        const url = new URL(window.location.href);
+        const token = url.searchParams.get("token");
+        const problemStatusId = url.searchParams.get("problemStatusId");
+        if (!this.apiSettings && token !== null && problemStatusId !== null)
+            this.apiSettings = {token: token, problemStatusId: problemStatusId};
+        
+        // TODO: remove
+        alert("API-inställningar: " + JSON.stringify(this.apiSettings));
         if (!this.apiSettings) {
             console.warn("API-parametrarna är inte definierade, så kan inte rapportera in poängen.");
             return;
@@ -28,7 +35,7 @@ class ScoreReporter {
             score = SCORE_PARTIAL_MAX * controller.approximateProgress;
         }
         score = Math.floor(score);
-        console.log(score);
+        console.log("Rapporterar poäng:", score);
         
         // Skicka in
         let data = { "score": score, "solved": true };
