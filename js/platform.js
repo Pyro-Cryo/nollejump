@@ -1,7 +1,9 @@
-const platformImg = Resource.addAsset("img/oneliner.png");
+const platformImgs = Object.fromEntries([
+	"normal", "green", "broken"
+].map(file => [file, Resource.addAsset(`img/platforms/${file}.png`)]));
 class Platform extends EffectObject {
-	static get image() { return Resource.getAsset(platformImg); }
-	static get scale() { return 0.1; }
+	static get image() { return Resource.getAsset(platformImgs.normal); }
+	static get scale() { return 0.2; }
 
 	constructor(x, y) {
 		super(x, y);
@@ -57,6 +59,7 @@ class Platform extends EffectObject {
 }
 
 class BasicMovingPlatform extends Platform {
+	static get image() { return Resource.getAsset(platformImgs.green); }
 	constructor(x, y) {
 		super(x, y);
 		new BasicAnimation(this)
@@ -75,8 +78,7 @@ class BasicMovingPlatform extends Platform {
 }
 
 class FakePlatform extends Platform {
-
-	static get scale() { return 0.12; }
+	static get image() { return Resource.getAsset(platformImgs.broken); }
 
 	onCollision(player) {
 		if (player.physics.vy < 0 && player.lastY - player.height / 2 >= this.y + this.height / 2){

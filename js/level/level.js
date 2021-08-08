@@ -2,6 +2,7 @@ let _Level_tutorial = null;
 // let _Level_choice = null;
 let _Level_levels = new Map();
 let _Level_ctfysLevels = [
+	"test",
 	"DD1301", // Datorintro
 	"SF1673", // Envarre
 	"DD1331", // Gruprog
@@ -14,6 +15,7 @@ let _Level_ctfysLevels = [
 	"SK1105", // Expfys
 ];
 let _Level_ctmatLevels = [
+	"test",
 	"DD1301", // Datorintro
 	"SF1673", // Envarre
 	"DD1331", // Gruprog

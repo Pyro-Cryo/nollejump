@@ -214,7 +214,7 @@ class Background extends GameObject {
 				if (i === Math.floor(ticks.perBuffer / 2) && statusElement !== null) {
 					ctx.fillRect(x - ticks.length * 3 / 4, y - ticks.thickness * 3 / 4, ticks.length * 3 / 2, ticks.thickness * 3 / 2);
 					if (statusElement === "/") // TODO: gör ett diskontinuitetshopp av detta
-						statusElement = "<insert snyggt hopp>";
+						statusElement = " ";
 					if (!controller.ctfys)
 						statusElement.replace("Fysiker", "Matematiker");
 
