@@ -267,7 +267,6 @@ Level.levels.set("test", infoOnly => {
 	const powerups = new Region()
 		.wait(start.length)
 		.spawn(RocketToken, 1, (elapsed, spawnHistory, level) => {
-			console.log("jumpboost");
 			for (let i = spawnHistory.length - 1; i >= 0; i--) {
 				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
 					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
@@ -276,7 +275,6 @@ Level.levels.set("test", infoOnly => {
 		}).immediately()
 		.wait(start.length)
 		.spawn(RocketToken, 1, (elapsed, spawnHistory, level) => {
-			console.log("jumpboost");
 			for (let i = spawnHistory.length - 1; i >= 0; i--) {
 				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
 					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];

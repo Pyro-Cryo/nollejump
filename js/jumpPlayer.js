@@ -57,7 +57,7 @@ class JumpPlayer extends Player {
 		this.lastY = y;
 
 		this.shootCooldown = 0;
-		this.shootCooldownTime = 40; //ms, rimligare med 400 typ
+		this.shootCooldownTime = 250;
 		controller.gameArea.canvas.addEventListener("click", e => {
 			if (this.deviceTiltAvailable) {
 				this.shoot();

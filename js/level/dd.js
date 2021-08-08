@@ -12,7 +12,57 @@ Level.levels.set("DD1301", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	
+	const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
+	const spacing = 180;
+
+	const lecture = level.defineRegion("lecture");
+	const twoWideLadder = (e, spawnHistory, level) => {
+		const spawnedPlatforms = spawnHistory.filter(spawned => spawned.object instanceof Platform);
+		let xLeft;
+		if (spawnedPlatforms.length === 0)
+			xLeft = platWidth / 2 + Math.random() * (controller.gameArea.gridWidth / 2 - platWidth);
+		else
+			xLeft = spawnedPlatforms[0].xSpawn;
+		if (spawnedPlatforms.length % 2 === 0)
+			return [xLeft, level.yCurrent];
+		else
+			return [xLeft + platWidth, spawnedPlatforms[spawnedPlatforms.length - 1].ySpawn];
+	};
+	const jumpRight = (e, spawnHistory, level) => {
+		const spawnedPlatforms = spawnHistory.filter(spawned => spawned.object instanceof Platform);
+		const lastSpawned = spawnedPlatforms[spawnedPlatforms.length - 1];
+		if (spawnedPlatforms.length % 2 === 0)
+			return [controller.gameArea.gridWidth - lastSpawned.xSpawn, level.yCurrent];
+		else
+			return [lastSpawned.xSpawn - platWidth, lastSpawned.ySpawn];
+	};
+	lecture.wait(spacing)
+		.spawn(Platform, 6, twoWideLadder)
+		.spawn(Platform, 2, jumpRight)
+		.spaced(spacing);
+
+	const test = level.defineRegion("test");
+	test.wait(spacing).spawn(Platform, 6, twoWideLadder).spaced(spacing);
+	test.wait(spacing / 2).spawn(BasicMovingPlatform, 2, jumpRight).immediately().wait(spacing / 2);
+	test.spawn(Homework, 1, (e, spawnHistory, l) => [
+		spawnHistory[spawnHistory.length - 1].xSpawn + platWidth / 2,
+		spawnHistory[spawnHistory.length - 1].ySpawn + platWidth / 2
+	]).immediately();
+
+	const riggedTest = level.defineRegion("riggedTest");
+	riggedTest.wait(spacing).spawn(Platform, 6, twoWideLadder).spaced(spacing);
+	riggedTest.wait(spacing / 8).spawn(FakePlatform, 2, jumpRight).immediately().wait(spacing / 8);
+	riggedTest.spawn(Homework, 1, (e, spawnHistory, l) => [
+		spawnHistory[spawnHistory.length - 1].xSpawn + platWidth / 2,
+		spawnHistory[spawnHistory.length - 1].ySpawn + platWidth / 2
+	]).immediately();
+
+	level.initialRegion(lecture);
+	lecture.follower(lecture, 1);
+	lecture.follower(test, 2, level => level.homeworkCurrent < 2);
+	lecture.follower(riggedTest, 2, level => level.homeworkCurrent >= 2);
+	test.follower(lecture);
+	riggedTest.follower(lecture);
 
 	return level;
 });
