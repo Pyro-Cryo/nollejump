@@ -317,12 +317,29 @@ class JumpController extends Controller {
 	}
 
 	playerDied() {
+		const countWord = index => index < 20 ? [
+			"nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+			"tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde", "sjuttonde",
+			"artonde", "nittonde"
+		][index] : (index + ":" + "eaaeeeeeee"[index % 10]);
+
 		if (this.currentLevel.code in this.stats.deaths)
 			this.stats.deaths[this.currentLevel.code]++;
 		else
 			this.stats.deaths[this.currentLevel.code] = 1;
 		this.saveState();
+
 		document.getElementById("deathmenu").classList.remove("hidden");
+		document.getElementById("deathmenuCoursename").innerText = this.currentLevel.name;
+		const deathmenuAttempts = document.getElementById("deathmenuAttempts");
+		const attempts = this.stats.deaths[this.currentLevel.code];
+		if (attempts > 1) {
+			deathmenuAttempts.innerText = ` för ${countWord(attempts)} gången`;
+			deathmenuAttempts.classList.remove("hidden");
+		} else
+			deathmenuAttempts.classList.add("hidden");
+		document.getElementById("deathmenuScore").innerText = ScoreReporter.currentScore(false);
+
 		ScoreReporter.report(false);
 	}
 

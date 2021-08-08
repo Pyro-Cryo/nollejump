@@ -69,8 +69,8 @@ Level.levels.set("DD1301", (infoOnly) => {
 Level.levels.set("DD1331", (infoOnly) => {
 	const level = new Level(
 		{
-			"code": "DD1301",
-			"name": "Datorintroduktion",
+			"code": "DD1331",
+			"name": "Grundläggande programmering",
 			"hp": 5
 		},
 		// Oklart hur många labbar

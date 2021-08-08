@@ -13,6 +13,17 @@ class ScoreReporter {
         return ApiSettings;
     }
 
+    static currentScore(won) {
+        let score;
+        if (won) {
+            const totalDeaths = Object.keys(controller.stats.deaths).reduce((sum, key) => sum + controller.stats.deaths[key], 0);
+            score = Math.max(SCORE_MIN_ON_WIN, SCORE_MAX - totalDeaths * SCORE_REDUCTION_PER_DEATH);
+        } else {
+            score = SCORE_PARTIAL_MAX * controller.approximateProgress;
+        }
+        return Math.floor(score);
+    }
+
     static report(won) {
         const url = new URL(window.location.href);
         const token = url.searchParams.get("token");
@@ -27,14 +38,7 @@ class ScoreReporter {
             return;
         }
         // Räkna ut poäng
-        let score;
-        if (won) {
-            const totalDeaths = Object.keys(controller.stats.deaths).reduce((sum, key) => sum + controller.stats.deaths[key], 0);
-            score = Math.max(SCORE_MIN_ON_WIN, SCORE_MAX - totalDeaths * SCORE_REDUCTION_PER_DEATH);
-        } else {
-            score = SCORE_PARTIAL_MAX * controller.approximateProgress;
-        }
-        score = Math.floor(score);
+        let score = this.currentScore(won);
         console.log("Rapporterar poäng:", score);
         
         // Skicka in
