@@ -200,7 +200,7 @@ class JumpController extends Controller {
 			const scoreElement = document.getElementById(type.name.toLowerCase() + "Score");
 			const current = this.currentLevel[type.name.toLowerCase() + "Current"];
 			const needed = this.currentLevel[type.name.toLowerCase() + "Needed"];
-			if (needed > 0) {
+			if (needed > 0 && !this.currentLevel.isEndLevel) {
 				if (scoreElement.parentElement.classList.contains("hidden")) {
 					scoreElement.parentElement.classList.remove("hidden");
 				}
@@ -343,6 +343,25 @@ class JumpController extends Controller {
 		ScoreReporter.report(false);
 	}
 
+	playerWon() {
+		this.fastForwardFactor = 0.2;
+		this.toggleFastForward();
+		setTimeout(() => {
+			// TODO: snyggare vinstskärm
+			alert(`Du har guidat Jennie-Jan genom hela sitt första år på KTH, och tjänat ihop ${ScoreReporter.currentScore(true)} poäng. Grattis!`);
+			ScoreReporter.report(true, () => {
+				this.toggleFastForward();
+				this.clearState();
+				this.loadState(); // Laddar defaultstate
+				this.objects.clear();
+				this.delayedRenderObjects = [];
+				this.gameArea.resetDrawOffset();
+				this.spawnPlayer();
+				this.startLevel();
+			});
+		}, 2000);
+	}
+
 	onPlay() {
 		super.onPlay();
 		document.getElementById("pausemenu").classList.add("hidden");
@@ -421,7 +440,7 @@ class JumpController extends Controller {
 
 			for (let i = 1; i < this.levelIndex && i - 1 < courses.length; i++) {
 				const level = Level.levels.get(courses[i - 1])(true);
-				if (!(courses[i - 1] in totalDeaths))
+				if (!(courses[i - 1] in this.stats.deaths))
 					tidbits.push(`du klarade ${level.name} på första försöket`);
 				totalHp += level.hp;
 				totalHomework += level.homeworkNeeded;
@@ -485,8 +504,13 @@ class JumpController extends Controller {
 				this.currentLevel = Level.tutorial();
 				break;
 			default:
-				const code = (this.ctfys ? Level.ctfysLevels : Level.ctmatLevels)[this.levelIndex - 1];
-				this.currentLevel = Level.levels.get(code)();
+				const levelSet = this.ctfys ? Level.ctfysLevels : Level.ctmatLevels;
+				if (this.levelIndex - 1 >= levelSet.length)
+					this.currentLevel = Level.win();
+				else {
+					const code = levelSet[this.levelIndex - 1];
+					this.currentLevel = Level.levels.get(code)();
+				}
 				break;
 		}
 		this.currentLevel.onNewRegion = () => this.saveState(); // Så vi sparar stats osv

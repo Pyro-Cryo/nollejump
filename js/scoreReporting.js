@@ -24,7 +24,7 @@ class ScoreReporter {
         return Math.floor(score);
     }
 
-    static report(won) {
+    static report(won, onSuccess = null) {
         const url = new URL(window.location.href);
         const token = url.searchParams.get("token");
         const problemStatusId = url.searchParams.get("problemStatusId");
@@ -55,8 +55,11 @@ class ScoreReporter {
                 // credentials: "include" ???
             }
         ).then(response => {
-            if (response.status >= 200 && response.status < 300)
+            if (response.status >= 200 && response.status < 300) {
                 console.log("Rapporterade in poäng:", score);
+                if (onSuccess)
+                    onSuccess();
+            }
             else
                 console.warn("Oväntad respons vid poänginrapportering:", response);
         }, reason => {

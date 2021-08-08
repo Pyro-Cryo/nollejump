@@ -16,18 +16,19 @@ let _Level_ctfysLevels = [
 ];
 let _Level_ctmatLevels = [
 	"DD1301", // Datorintro
-	"test",
-	"SF1673", // Envarre
-	"DD1331", // Gruprog
-	"SA1006", // Ingenjörsfärdigheter
-	"SF1672", // Linalg
-	"SF1918", // Sannstat, OBS annan kurskod
-	"SF1674", // Flervarre
-	"DD1320", // Tildat
-	"SF1550", // Numme
-	"DD1396", // Parallellprogrammering
-	"SG1115", // Partikeldynamik
+	// "test",
+	// "SF1673", // Envarre
+	// "DD1331", // Gruprog
+	// "SA1006", // Ingenjörsfärdigheter
+	// "SF1672", // Linalg
+	// "SF1918", // Sannstat, OBS annan kurskod
+	// "SF1674", // Flervarre
+	// "DD1320", // Tildat
+	// "SF1550", // Numme
+	// "DD1396", // Parallellprogrammering
+	// "SG1115", // Partikeldynamik
 ];
+let _Level_win = null;
 
 /**
  * En level motsvarar en kurs. Man samlar ett
@@ -47,6 +48,7 @@ class Level {
 		this.regions = new Map();
 		this.initial = null;
 		this.onNewRegion = null;
+		this.isEndLevel = false;
 
 		// State variables
 		this.currentRegion = null;
@@ -190,6 +192,8 @@ class Level {
 	static set ctfysLevels(value) { _Level_ctfysLevels = value;}
 	static get ctmatLevels() { return _Level_ctmatLevels;}
 	static set ctmatLevels(value) { _Level_ctmatLevels = value;}
+	static get win() { return _Level_win;}
+	static set win(value) { _Level_win = value;}
 }
 
 /**
