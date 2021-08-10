@@ -2,6 +2,32 @@ let _JumpController_WIDTH_PX = 576;
 let _JumpController_HEIGHT_PX = _JumpController_WIDTH_PX * 15 / 9;
 let _JumpController_STORAGE_PREFIX = "nollejump_";
 
+const MUSIC_BPM = 60;// 151;
+const INTRO_BEATS = 86.5;// 237;
+const LOOP_BEATS = 37;// 140;
+const musicIntro = Resource.addAsset(
+	"audio/myrstacken_intro.mp3",
+	LoopableAudioWithTail,
+	audio => {
+		audio.length = INTRO_BEATS * 60 / MUSIC_BPM;
+		audio.onLoop = () => {
+			const time = audio.currentTime - audio.length;
+			audio.pause();
+			const loop = Resource.getAsset(musicLoop);
+			loop.currentTime = time;
+			loop.play();
+			controller.currentMusic = loop;
+		};
+		return audio;
+	});
+const musicLoop = Resource.addAsset(
+	"audio/myrstacken_loop.mp3",
+	LoopableAudioWithTail,
+	audio => {
+		audio.length = LOOP_BEATS * 60 / MUSIC_BPM;
+		return audio;
+	});
+
 class JumpController extends Controller {
 	static get WIDTH_PX() { return _JumpController_WIDTH_PX;}
 	static set WIDTH_PX(value) { _JumpController_WIDTH_PX = value;}
@@ -19,6 +45,7 @@ class JumpController extends Controller {
 		this.statusGraph = statusGraph;
 		/** @type {Level} */
 		this.currentLevel = null;
+		this.currentMusic = null;
 		this.stateProperties = ["ctfys", "levelIndex", "stats"];
 		this._screenWrap = true;
 	}
@@ -93,7 +120,7 @@ class JumpController extends Controller {
 		if (this.ctfys === null)
 			document.getElementById("choicemenu").classList.remove("hidden");
 		else
-			this.togglePause();
+			this.onPause();
 	}
 
 	setupElements() {
@@ -109,6 +136,9 @@ class JumpController extends Controller {
 			this.gameArea.resetDrawOffset();
 			this.spawnPlayer();
 			this.startLevel();
+			this.currentMusic = Resource.getAsset(musicIntro);
+			this.currentMusic.currentTime = 0;
+			this.currentMusic.play();
 			document.getElementById("deathmenu").classList.add("hidden");
 			e.preventDefault();
 		}, true);
@@ -124,9 +154,11 @@ class JumpController extends Controller {
 					this.gameArea.resetDrawOffset();
 					this.spawnPlayer();
 					this.startLevel();
+					this.currentMusic = Resource.getAsset(musicIntro);
+					this.currentMusic.currentTime = 0;
 					if (!this.isPaused) { // Dödsmenyn är uppe
 						document.getElementById("deathmenu").classList.add("hidden");
-						super.onPause(); // Pausa utan att öppna pausmenyn
+						super.onPause(); // Pausa utan att öppna pausmenyn, eftersom vi vill visa choicemenu istället
 					} else // Pausmenyn är uppe
 						document.getElementById("pausemenu").classList.add("hidden");
 					document.getElementById("choicemenu").classList.remove("hidden");
@@ -340,6 +372,8 @@ class JumpController extends Controller {
 			deathmenuAttempts.classList.add("hidden");
 		document.getElementById("deathmenuScore").innerText = ScoreReporter.currentScore(false);
 
+		this.currentMusic.pause();
+		this.currentMusic = null;
 		ScoreReporter.report(false);
 	}
 
@@ -365,12 +399,19 @@ class JumpController extends Controller {
 	onPlay() {
 		super.onPlay();
 		document.getElementById("pausemenu").classList.add("hidden");
+		if (!this.currentMusic) {
+			this.currentMusic = Resource.getAsset(musicIntro);
+			this.currentMusic.currentTime = 0;
+		}
+		this.currentMusic.play();
 	}
 
 	onPause() {
 		super.onPause();
 		document.getElementById("pausemenu").classList.remove("hidden");
 		this.funFacts();
+		if (this.currentMusic)
+			this.currentMusic.pause();
 	}
 
 	funFacts() {
