@@ -252,7 +252,12 @@ Level.levels.set("test", infoOnly => {
 			Math.random() * controller.gameArea.gridWidth,
 			level.yCurrent + Math.random() * 200
 		])
-		.over(regular.length * 9 / 10);
+		.over(regular.length * 9 / 10)
+		.interleave(new Region()
+			.wait(regular.length / 5)
+			.spawn(OFFlipScreen, 1, (e, sH, l) => [controller.gameArea.gridWidth / 2, level.yCurrent])
+			.immediately()
+			.wait(regular.length * 4 / 5));
 	
 	const tokens = new Region()
 		.wait(regular.length / 5)
@@ -295,4 +300,4 @@ Level.levels.set("test", infoOnly => {
 	looping.follower(looping);
 
 	return level;
-})
+});

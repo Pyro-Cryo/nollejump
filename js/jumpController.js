@@ -14,9 +14,9 @@ const musicIntro = Resource.addAsset(
 			const time = audio.currentTime - audio.length;
 			audio.pause();
 			const loop = Resource.getAsset(musicLoop);
+			controller.currentMusic = loop;
 			loop.currentTime = time;
 			loop.play();
-			controller.currentMusic = loop;
 		};
 		return audio;
 	});
@@ -48,6 +48,9 @@ class JumpController extends Controller {
 		this.currentMusic = null;
 		this.stateProperties = ["ctfys", "levelIndex", "stats"];
 		this._screenWrap = true;
+		this.barHeight = 64;
+		this.margin = 16;
+		this.flipX = false;
 	}
 
 	set screenWrap(value) {
@@ -96,11 +99,11 @@ class JumpController extends Controller {
 		return (this.levelIndex + this.currentLevel.approximateProgress) / ((this.ctfys ? Level.ctfysLevels : Level.ctmatLevels).length + 1);
 	}
 
-	startDrawLoop(barHeight, margin) {
+	startDrawLoop() {
 		// Usch fy skriv aldrig sån här kod igen
-		this.setCanvasDimensions(barHeight, margin, margin / 2); // Första tar bort scrollbar
-		this.setCanvasDimensions(barHeight, margin, margin / 2); // Andra sätter rätt värden
-		window.addEventListener("resize", () => this.setCanvasDimensions(barHeight, margin, margin / 2));
+		this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2); // Första tar bort scrollbar
+		this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2); // Andra sätter rätt värden
+		window.addEventListener("resize", () => this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2));
 		super.startDrawLoop();
 	}
 
@@ -112,7 +115,7 @@ class JumpController extends Controller {
 		super.onAssetsLoaded();
 		this.clearOnDraw = false;
 		this.setMessage(`Laddat klart`);
-		this.startDrawLoop(64, 16);
+		this.startDrawLoop();
 		this.loadState();
 		this.spawnPlayer();
 		this.startLevel();
@@ -136,10 +139,10 @@ class JumpController extends Controller {
 			this.gameArea.resetDrawOffset();
 			this.spawnPlayer();
 			this.startLevel();
+			document.getElementById("deathmenu").classList.add("hidden");
 			this.currentMusic = Resource.getAsset(musicIntro);
 			this.currentMusic.currentTime = 0;
 			this.currentMusic.play();
-			document.getElementById("deathmenu").classList.add("hidden");
 			e.preventDefault();
 		}, true);
 		// Restartknappar finns på både paus- och dogsidan
@@ -269,12 +272,14 @@ class JumpController extends Controller {
 		const scale = Math.min(wScale, hScale);
 
 		// Varifrån kommer de magiska siffrorna? Det du!
+		// TODO: kan nog fixas med en overflow: visible på body eller liknande
 		if (maxWidthPx < JumpController.WIDTH_PX - 30) {
 			const leftpad = marginHorizontal + Math.max(maxWidthPx - 300, 0) / 2;
-			this.gameArea.canvas.style = `transform: scale(${scale}); position: absolute; left: ${leftpad}px; transform-origin: left top;`;
+			// transform-origin: left borde egentligen inte lira med this.flipX?
+			this.gameArea.canvas.style = `transform: scale(${this.flipX ? (-scale) + ", " + scale : scale}); position: absolute; left: ${leftpad}px; transform-origin: left top;`;
 			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px; position: relative;`;
 		} else {
-			this.gameArea.canvas.style = `transform: scale(${scale});`;
+			this.gameArea.canvas.style = `transform: scale(${this.flipX ? (-scale) + ", " + scale : scale});`;
 			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px;`;
 		}
 	}
@@ -420,7 +425,7 @@ class JumpController extends Controller {
 			pausemenuinfo.removeChild(pausemenuinfo.lastChild);
 		// Fyll på med rolig info
 		// \u00AD = soft hyphen, kan användas för att avstava långa ord
-		const tidbits = [
+		const staticTidbits = [
 			// visste du att...
 			"tomater är bär",
 			"tomatplantan är en slags potatisväxt",
@@ -442,6 +447,7 @@ class JumpController extends Controller {
 			"blåbärsris täcker ungefär 11 % av Sveriges yta",
 			"jordgubbar inte är bär, utan fruktförband med nötter",
 		];
+		const tidbits = [];
 
 		// Generera statistikfakta
 		const totalShots = Object.keys(this.stats.shots).reduce((sum, key) => sum + this.stats.shots[key], 0);
@@ -525,10 +531,15 @@ class JumpController extends Controller {
 		
 		// Välj ut några på slump
 		const chosenTidbits = [];
-		for (let i = 0; i < 3; i++) {
+		for (let i = 0; i < 2; i++) {
 			const index = Math.floor(Math.random() * tidbits.length);
 			chosenTidbits.push(tidbits[index]);
 			tidbits.splice(index, 1);
+		}
+		for (let i = 0; i < 1; i++) {
+			const index = Math.floor(Math.random() * staticTidbits.length);
+			chosenTidbits.push(staticTidbits[index]);
+			staticTidbits.splice(index, 1);
 		}
 
 		// Populera listan
@@ -658,5 +669,10 @@ class cheat {
 			id: 123456789,
 			draw: gameArea => null
 		});
+	}
+
+	static get mute() {
+		Resource.getAsset(musicIntro).volume = 0;
+		Resource.getAsset(musicLoop).volume = 0;
 	}
 };

@@ -15,30 +15,101 @@ class Enemy extends GameObject {
     
     onShot(pellet) {
         this.despawn();
-        controller.enemies = controller.enemies.filter(obj => obj.id != null)
+        // controller.enemies = controller.enemies.filter(obj => obj.id != null)
     }
 
     despawn() {
         super.despawn();
         controller.enemies = controller.enemies.filter(e => e !== this);
     }
+
+    update() {
+        super.update();
+        if (this.y + this.height < controller.gameArea.bottomEdgeInGrid)
+            this.despawn();
+    }
 }
 
 const tfImg = Resource.addAsset("img/tf.png");
+const ofImg = Resource.addAsset("img/of.png");
+const sfImg = Resource.addAsset("img/sf.png");
+
+class Boss extends Enemy {
+    constructor(x, y) {
+        super(x, y);
+        this.hasEntered = false;
+        this.hoverDistance = 100; // units
+        this.hoverProgress = 0;
+        this.arrivingSpeed = this.hoverDistance / 1000; // units / ms
+        this.health = 1;
+    }
+    
+    arrive() {}
+    leave() {}
+
+    update(delta) {
+        super.update(delta);
+
+        if (!this.hasEntered && this.y - this.height / 2 < controller.gameArea.topEdgeInGrid)
+            this.hasEntered = true;
+
+        if (this.hasEntered) {
+            if (this.despawnTimer === -1) {
+                const prev = this.hoverProgress;
+                this.hoverProgress = Math.min(
+                    this.hoverDistance,
+                    this.hoverProgress + this.arrivingSpeed * delta);
+                if (prev < this.hoverDistance && this.hoverProgress == this.hoverDistance)
+                    this.arrive();
+            }
+            else
+                this.hoverProgress -= this.arrivingSpeed * delta;
+            this.y = controller.gameArea.topEdgeInGrid - this.hoverProgress + this.height / 2;
+        }
+    }
+
+    onShot(pellet) {
+        if (this.despawnTimer === -1 && --this.health <= 0) {
+            this.despawnTimer = this.hoverDistance / this.arrivingSpeed;
+            this.leave();
+        }
+    }
+}
+
 class TFPassive extends Enemy {
     static get image() { return Resource.getAsset(tfImg); }
     static get scale() { return 0.25; }
     get enemyType() { return "TF"; }
 }
-const ofImg = Resource.addAsset("img/of.png");
 class OFPassive extends Enemy {
     static get image() { return Resource.getAsset(ofImg); }
     static get scale() { return 0.25; }
     get enemyType() { return "OF"; }
 }
-const sfImg = Resource.addAsset("img/sf.png");
 class SFPassive extends Enemy {
     static get image() { return Resource.getAsset(sfImg); }
     static get scale() { return 0.25; }
     get enemyType() { return "SF"; }
+}
+
+class OFBoss extends Boss {
+    static get image() { return Resource.getAsset(ofImg); }
+    static get scale() { return 0.25; }
+    get enemyType() { return "OF"; }
+}
+
+class OFFlipScreen extends OFBoss {
+    arrive() {
+        controller.flipX = true;
+        controller.setCanvasDimensions(controller.barHeight, controller.margin, controller.margin / 2);
+    }
+    leave() {
+        controller.flipX = false;
+        controller.setCanvasDimensions(controller.barHeight, controller.margin, controller.margin / 2);
+    }
+    despawn() {
+        super.despawn();
+        if (controller.flipX) 
+            this.leave();
+    }
 }

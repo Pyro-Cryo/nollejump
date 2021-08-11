@@ -31,8 +31,7 @@ class ScoreReporter {
         if (!this.apiSettings && token !== null && problemStatusId !== null)
             this.apiSettings = {token: token, problemStatusId: problemStatusId};
         
-        // TODO: remove
-        alert("API-inställningar: " + JSON.stringify(this.apiSettings));
+        // alert("API-inställningar: " + JSON.stringify(this.apiSettings));
         if (!this.apiSettings) {
             console.warn("API-parametrarna är inte definierade, så kan inte rapportera in poängen.");
             return;

@@ -245,7 +245,7 @@ class Splines {
 
     /**
      * Linear interpolation along the provided path. See https://en.wikipedia.org/wiki/Linear_interpolation.
-     * @param {Number} t Interpolation variable in the range [0, path.length - 1].
+     * @param {Number} t Interpolation variable in the range [0, 1].
      * @param {Number[][]} path The path to interpolate along.
      * @returns {Number[]} The interpolated point.
      */

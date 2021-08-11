@@ -60,20 +60,37 @@ class Platform extends EffectObject {
 
 class BasicMovingPlatform extends Platform {
 	static get image() { return Resource.getAsset(platformImgs.green); }
-	constructor(x, y) {
+	constructor(x, y, amplitude = 100, speed = 1) {
 		super(x, y);
-		new BasicAnimation(this)
-			.set({x: x})
-			.after(1).set({x: x - 100})
-			.after(2).set({x: x + 100})
-			.after(1).loop()
-			.start();
+		this.path = [
+			[x, y],
+			[x + amplitude, y],
+			[x, y],
+			[x - amplitude, y],
+			[x, y]
+		];
+		this.speed = speed / 1000; // Path steps / ms
+		this.t = 0;
+		this.interpolation = t => Splines.interpolateLinear(t, this.path);
 	}
 
 	update(delta) {
 		super.update(delta);
+		this.t = (this.t + delta * this.speed / (this.path.length - 1)) % 1;
+		[this.x, this.y] = this.interpolation(this.t);
+
 		if (controller.screenWrap)
 			screenWrap(this);
+	}
+}
+
+class DiscreteMovingPlatform extends BasicMovingPlatform {
+	constructor(x, y, amplitude = 100, speed = 1, steps = null) {
+		super(x, y, amplitude, speed);
+		this.steps = steps || (this.path.length - 1);
+		this.interpolation = t => Splines.interpolateLinear(
+			Math.round(t * this.steps) / this.steps,
+			this.path);
 	}
 }
 

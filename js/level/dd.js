@@ -43,10 +43,11 @@ Level.levels.set("DD1301", (infoOnly) => {
 
 	const test = level.defineRegion("test");
 	test.wait(spacing).spawn(Platform, 6, twoWideLadder).spaced(spacing);
-	test.wait(spacing / 2).spawn(BasicMovingPlatform, 2, jumpRight).immediately().wait(spacing / 2);
+	test.wait(spacing / 2).spawn(DiscreteMovingPlatform, 2,
+		(e, sH, l) => [...jumpRight(e, sH, l), 100, 1, 8]).immediately().wait(spacing / 2);
 	test.spawn(Homework, 1, (e, spawnHistory, l) => [
 		spawnHistory[spawnHistory.length - 1].xSpawn + platWidth / 2,
-		spawnHistory[spawnHistory.length - 1].ySpawn + platWidth / 2
+		spawnHistory[spawnHistory.length - 1].ySpawn + platWidth / 2,
 	]).immediately();
 
 	const riggedTest = level.defineRegion("riggedTest");
