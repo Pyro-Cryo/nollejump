@@ -55,7 +55,8 @@ class ScoreReporter {
                 method: "PATCH",
                 body: JSON.stringify(data),
                 headers: new Headers({
-                    "Authorization": `Token ${this.apiSettings.token}`
+                    "Authorization": `Token ${this.apiSettings.token}`,
+                    "Content-Type": "application/json",
                 }),
                 // mode: "no-cors" ???
                 // credentials: "include" ???
@@ -80,7 +81,8 @@ class ScoreReporter {
                 method: "PATCH",
                 body: JSON.stringify(data),
                 headers: new Headers({
-                    "Authorization": `Token ${this.apiSettings.token}`
+                    "Authorization": `Token ${this.apiSettings.token}`,
+                    "Content-Type": "application/json",
                 }),
             }
         ).then(response => {

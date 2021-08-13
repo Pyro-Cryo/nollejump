@@ -5,29 +5,22 @@ let _JumpController_STORAGE_PREFIX = "nollejump_";
 const MUSIC_BPM = 60;// 151;
 const INTRO_BEATS = 86.5;// 237;
 const LOOP_BEATS = 37;// 140;
-const musicIntro = Resource.addAsset(
-	"audio/myrstacken_intro.mp3",
+const music = Resource.addAsset(
+	"audio/myrstacken.mp3",
 	LoopableAudioWithTail,
 	audio => {
-		audio.length = INTRO_BEATS * 60 / MUSIC_BPM;
+		audio.volume = 0.2;
+		audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
+
 		audio.onLoop = () => {
-			const time = audio.currentTime - audio.length;
-			audio.pause();
-			const loop = Resource.getAsset(musicLoop);
-			controller.currentMusic = loop;
-			loop.currentTime = time;
-			loop.play();
+			audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
+				+ (audio.currentTime - audio.length)
+				+ (audio.currentTime - audio.currentTimeLast);
+			
+			audio.play();
 		};
 		return audio;
 	});
-const musicLoop = Resource.addAsset(
-	"audio/myrstacken_loop.mp3",
-	LoopableAudioWithTail,
-	audio => {
-		audio.length = LOOP_BEATS * 60 / MUSIC_BPM;
-		return audio;
-	});
-
 class JumpController extends Controller {
 	static get WIDTH_PX() { return _JumpController_WIDTH_PX;}
 	static set WIDTH_PX(value) { _JumpController_WIDTH_PX = value;}
@@ -140,7 +133,7 @@ class JumpController extends Controller {
 			this.spawnPlayer();
 			this.startLevel();
 			document.getElementById("deathmenu").classList.add("hidden");
-			this.currentMusic = Resource.getAsset(musicIntro);
+			this.currentMusic = Resource.getAsset(music);
 			this.currentMusic.currentTime = 0;
 			this.currentMusic.play();
 			e.preventDefault();
@@ -150,6 +143,8 @@ class JumpController extends Controller {
 		for (let i = 0; i < restartButtons.length; i++)
 			restartButtons.item(i).addEventListener("click", e => {
 				if (window.confirm("Är du säker på att du vill börja om från alla första början?")) {
+					if (this.isFF)
+						this.toggleFastForward();
 					this.clearState();
 					this.loadState(); // Laddar defaultstate
 					this.objects.clear();
@@ -157,7 +152,7 @@ class JumpController extends Controller {
 					this.gameArea.resetDrawOffset();
 					this.spawnPlayer();
 					this.startLevel();
-					this.currentMusic = Resource.getAsset(musicIntro);
+					this.currentMusic = Resource.getAsset(music);
 					this.currentMusic.currentTime = 0;
 					if (!this.isPaused) { // Dödsmenyn är uppe
 						document.getElementById("deathmenu").classList.add("hidden");
@@ -397,6 +392,8 @@ class JumpController extends Controller {
 				this.gameArea.resetDrawOffset();
 				this.spawnPlayer();
 				this.startLevel();
+				this.currentMusic = Resource.getAsset(music);
+				this.currentMusic.currentTime = 0;
 			});
 		}, 2000);
 	}
@@ -405,7 +402,7 @@ class JumpController extends Controller {
 		super.onPlay();
 		document.getElementById("pausemenu").classList.add("hidden");
 		if (!this.currentMusic) {
-			this.currentMusic = Resource.getAsset(musicIntro);
+			this.currentMusic = Resource.getAsset(music);
 			this.currentMusic.currentTime = 0;
 		}
 		this.currentMusic.play();
@@ -672,7 +669,6 @@ class cheat {
 	}
 
 	static get mute() {
-		Resource.getAsset(musicIntro).volume = 0;
-		Resource.getAsset(musicLoop).volume = 0;
+		Resource.getAsset(music).volume = 0;
 	}
 };

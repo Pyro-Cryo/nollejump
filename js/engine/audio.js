@@ -21,13 +21,15 @@ class LoopableAudioWithTail extends Audio {
         this.preload = true;
         this.length = length;
         this.margin = margin;
+        this.currentTimeLast = 0;
         this.onLoop = () => {
             this.currentTime -= this.length;
             this.play();
         };
         this.addEventListener('timeupdate', () => {
-            if (this.currentTime > (this.length || this.duration) - this.margin)
+            if (this.currentTime >= (this.length || this.duration) - this.margin)
                 this.onLoop();
+            this.currentTimeLast = this.currentTime;
         }, false);
     }
 }
