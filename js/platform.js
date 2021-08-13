@@ -1,5 +1,5 @@
 const platformImgs = Object.fromEntries([
-	"normal", "green", "broken"
+	"normal", "green", "broken", "blue"
 ].map(file => [file, Resource.addAsset(`img/platforms/${file}.png`)]));
 class Platform extends EffectObject {
 	static get image() { return Resource.getAsset(platformImgs.normal); }
@@ -14,13 +14,20 @@ class Platform extends EffectObject {
 			controller.player.addCollidible(this);
 	}
 
+	despawnCheck(){
+		// Inte intuitivt uppenbart varför vi avstår om man inte screenwrappar
+		// men tanken är att man ska kunna hoppa tillbaka
+		if (controller.screenWrap)
+			despawnIfBelowBottom(this);
+	}
+
 	/**
 	 * 
 	 * @param {JumpPlayer} player 
 	 */
 	onCollision(player) {
 		// If the player was above us and is going down
-		if (player.physics.vy < 0 && player.lastY - player.height / 2 >= this.y + this.height / 2)
+		if (player.physics.vy <= this.physics.vy && player.lastY - player.height / 2 >= this.y + this.height / 2)
 			this.onPlayerBounce(player);
 		else
 			this.onPlayerPass(player);
@@ -28,7 +35,7 @@ class Platform extends EffectObject {
 
 	onPlayerBounce(player) {
 		player.y = this.y + this.height / 2 + player.height / 2;
-		player.standardBounce();
+		player.standardBounce(this);
 	}
 
 	onPlayerPass(player) {}
@@ -36,10 +43,7 @@ class Platform extends EffectObject {
 	update(delta) {
 		super.update(delta);
 
-		// Inte intuitivt uppenbart varför vi avstår om man inte screenwrappar
-		// men tanken är att man ska kunna hoppa tillbaka
-		if (controller.screenWrap)
-			despawnIfBelowBottom(this);
+		this.despawnCheck();
 	}
 
 	draw(gameArea) {
@@ -99,9 +103,61 @@ class FakePlatform extends Platform {
 
 	onCollision(player) {
 		if (player.physics.vy < 0 && player.lastY - player.height / 2 >= this.y + this.height / 2){
-			this.physics = new PlayerPhysics(this);
+			this.physics = new StandardPhysics(this);
 		}
 		this.onPlayerPass(player);
+	}
+
+}
+
+class GhostPlatform extends GameObject {
+
+	static get innerPlatform() { return DynamicPlatform; }
+	static get image() { return this.innerPlatform.image; }
+
+	update(delta){
+		super.update(delta);
+
+		if (controller.gameArea.isInFrame(this.x, this.y)){
+			console.log("Spawning dynamic platform");
+			let platform = new DynamicPlatform(this.x, controller.gameArea.canvasToGridY(960, true), 0, controller.player.physics.bounce_speed);
+			this.despawn();
+		}
+		despawnIfBelowBottom(this);
+	}
+
+	draw(gameArea){
+		// Nope
+	}
+}
+
+
+
+class DynamicPlatform extends Platform {
+
+	static get image() { return Resource.getAsset(platformImgs.blue); }
+
+	constructor(x,y,vx,vy){
+		super(x,y);
+
+		this.physics = new StandardPhysics(this);
+		this.physics.gy /= 2;
+		this.physics.setSpeed(vx, vy);
+	}
+
+	despawnCheck(){
+		// Despawna inte om vi är påväg uppåt, vilket vi är när vi
+		// precis spawnat 
+		if (this.vy >= 0)
+			return;
+
+		super.despawnCheck();
+	}
+
+
+	onPlayerBounce(player) {
+		super.onPlayerBounce(player);
+		this.physics.vy -= player.physics.bounce_speed/2;
 	}
 
 }

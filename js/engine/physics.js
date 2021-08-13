@@ -5,7 +5,7 @@ class Physics {
 
 		this.object = object;
 
-		this.mass = 0;
+		this.mass = 1;
 		this.e = 1;	// studstal
 
 		this.decay_speed = true;

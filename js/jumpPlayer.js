@@ -72,8 +72,8 @@ class JumpPlayer extends Player {
 		this.lives = 1;
 	}
 
-	standardBounce() {
-		this.physics.bounceSurface(0);
+	standardBounce(object) {
+		this.physics.bounceObject(object.physics);
 	}
 
 	shoot() {
@@ -169,12 +169,10 @@ class JumpPlayer extends Player {
 }
 
 
-class PlayerPhysics extends Physics {
+class StandardPhysics extends Physics {
 
-	constructor(player) {
-		super(player);
-
-		this.bounce_speed = 125;
+	constructor(object) {
+		super(object);
 
 		this.gy = -18;
 
@@ -185,18 +183,31 @@ class PlayerPhysics extends Physics {
 		this.max_vy = 300;
 
 	}
+}
 
-	bounceSurface(angle) {
-		super.bounceSurface(angle);
+class PlayerPhysics extends StandardPhysics {
+
+	constructor(object){
+		super(object);
+		this.bounce_speed = 125;
+	}
+
+
+	bounceObject(other) {
 		if (controller.currentLevel.code in controller.stats.bounces)
 			controller.stats.bounces[controller.currentLevel.code]++;
 		else
 			controller.stats.bounces[controller.currentLevel.code] = 1;
 
-		// let a = Math.atan2(this.vx, this.vy);
-		// this.vx = this.bounce_speed * Math.sin(a);
-		this.vy = this.bounce_speed; // * Math.cos(a);
 
+		this.vy = this.bounce_speed + other.vy;
+		// this.vx += this.bounce_speed * Math.sin(other.angle);
 	}
 
+	// update(dt){
+
+	// 	let dx = super.update(dt);
+	// 	console.log(this.vy, dx);
+	// 	return dx;
+	// }
 }

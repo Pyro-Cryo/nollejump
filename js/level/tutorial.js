@@ -246,6 +246,12 @@ Level.levels.set("test", infoOnly => {
 			level.yCurrent + Math.random() * 200
 		]).over(regular.length);
 
+	const dynamic = new Region()
+	.spawn(GhostPlatform, 100, (elapsed, spawnHistory, level) => [
+			Math.random() * controller.gameArea.gridWidth,
+			level.yCurrent + Math.random() * 200
+		]).over(regular.length);
+
 	const enemies = new Region()
 		.wait(regular.length / 10)
 		.spawn(TFPassive, 9, (elapsed, spawnHistory, level) => [
@@ -291,6 +297,7 @@ Level.levels.set("test", infoOnly => {
 	const looping = regular
 		.interleave(moving)
 		.interleave(fake)
+		.interleave(dynamic)
 		.interleave(enemies)
 		.interleave(tokens)
 		.interleave(powerups);
