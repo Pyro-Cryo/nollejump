@@ -540,7 +540,6 @@ class JumpController extends Controller {
 		if (totalPowerups > 0) {
 			tidbits.push(`du har plockat upp ${totalPowerups} powerup${totalPowerups !== 1 ? "s" : ""}`);
 			const favoritePowerup = Object.keys(this.stats.powerups).reduce((max, key) => this.stats.powerups[key] > max[0] ? [this.stats.powerups[key], key] : max, [0, null]);
-			// TODO: klassnamnen som används kanske inte alltid är fina nog att skrivas ut
 			tidbits.push(`din favoritpowerup är ${favoritePowerup[1]}, och du använt den ${favoritePowerup[0]} gång${favoritePowerup[0] > 1 ? "er" : ""}`);
 		} else
 			tidbits.push(`du ännu inte plockat upp någon powerup`);

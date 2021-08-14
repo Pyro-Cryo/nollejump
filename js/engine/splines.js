@@ -83,7 +83,7 @@ class Splines {
     //  * @param {Number} bezierOffset Shift the selection of the n points by this.
     //  * @returns {Number[]} The interpolated point.
     //  */
-    // TODO: Currently not equivalent to old implementation (see below)
+    // TODO : Currently not equivalent to old implementation (see below)
     // Mainly, will not reach the endpoint and looks more crooked.
     // static interpolateLocalBezier(t, path, n, smooth = true, endpoints = this.ENDPOINT_SAME, bezierOffset = 0) {
     //     if (path.length === 1)
