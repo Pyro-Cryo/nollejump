@@ -1,8 +1,9 @@
-class Enemy extends GameObject {
+class Enemy extends EffectObject {
     constructor(x, y) {
         super(x, y);
         controller.player.addCollidible(this);
         controller.enemies.push(this);
+        this.health = 1;
     }
 
     /**
@@ -14,8 +15,8 @@ class Enemy extends GameObject {
     }
     
     onShot(pellet) {
-        this.despawn();
-        // controller.enemies = controller.enemies.filter(obj => obj.id != null)
+        if (--this.health <= 0)
+            this.despawn();
     }
 
     despawn() {
@@ -41,7 +42,6 @@ class Boss extends Enemy {
         this.hoverDistance = 100; // units
         this.hoverProgress = 0;
         this.arrivingSpeed = this.hoverDistance / 1000; // units / ms
-        this.health = 1;
     }
     
     arrive() {}
@@ -111,5 +111,47 @@ class OFFlipScreen extends OFBoss {
         super.despawn();
         if (controller.flipX) 
             this.leave();
+    }
+}
+
+const hardhatImg = Resource.addAsset("img/hat.png");
+class Hardhat extends BaseEffect {
+    static get image() { return Resource.getAsset(hardhatImg); }
+    static get maxInvocations() { return 1; }
+    static get scale() { return 0.5; }
+    static get imgOffset() { return [0, 25]; }
+    static get cooldown() { return 120000; }
+
+    constructor(healthBoost = 100) {
+        super();
+        this.healthBoost = healthBoost;
+    }
+
+    init(object) {
+        object.health += this.healthBoost;
+    }
+    remove(object) {
+        object.health -= this.healthBoost;
+        if (object.health <= 0)
+            object.onShot(null);
+    }
+}
+
+class TFHardhat extends TFPassive {
+    constructor(x, y) {
+        super(x, y);
+        this.addEffect(new Hardhat());
+    }
+}
+class OFHardhat extends OFPassive {
+    constructor(x, y) {
+        super(x, y);
+        this.addEffect(new Hardhat());
+    }
+}
+class SFHardhat extends SFPassive {
+    constructor(x, y) {
+        super(x, y);
+        this.addEffect(new Hardhat());
     }
 }

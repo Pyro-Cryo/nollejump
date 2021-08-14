@@ -233,7 +233,7 @@ class BaseEffect extends PrerenderedObject {
 	static get cooldown() { return 1000; }
 
 	constructor() {
-		super(null, 1, 0);
+		super(null, 0, 1);
 
 		this.image = this.constructor.image;
 		this.scale = this.constructor.scale;
@@ -241,6 +241,7 @@ class BaseEffect extends PrerenderedObject {
 		this.cooldown = this.constructor.cooldown;
 		this.cdtime = this.cooldown;
 		this.timesinitialized = 0;
+		this.imgOffset = this.constructor.imgOffset;
 
 		this.invocations = 0;
 	}
@@ -261,10 +262,8 @@ class BaseEffect extends PrerenderedObject {
 	}
 
 	draw(object, gameArea, index) {
-		let defaultoffset = this.constructor.imgOffset;
-
-		let x = object.x + (defaultoffset[0] === null ? 0.5 - 0.3 * index : defaultoffset[0]);		
-		let y = object.y + (defaultoffset[1] === null ? -0.5 : defaultoffset[1]);
+		let x = object.x + (this.imgOffset[0] === null ? 0.5 - 0.3 * index : this.imgOffset[0]);		
+		let y = object.y + (this.imgOffset[1] === null ? -0.5 : this.imgOffset[1]);
 
 		super.draw(gameArea, x, y);
 		return index + 1;
