@@ -89,22 +89,22 @@
 	</div>
 	<!-- Spelområdet -->
 	<div id="gameboardContainer">
-		<canvas id="gameboard" style="transform: scale(1);"></canvas>
+		<canvas id="gameboard" style="transform: translateX(-50%) scale(1);"></canvas>
 	</div>
 	<!-- Pausmeny -->
-	<div id="pausemenu" class="pausemenu hidden">
+	<div id="pausemenu" class="menu hidden">
 		<h2>Pausat</h2>
 		<div>Visste du att...</div>
 		<ul id="pausemenuinfo"></ul>
-		<div id="resumeButton" class="resumeButton">
+		<div id="resumeButton" class="menuButton">
 			Fortsätt <span style="font-size: 32px;" class="material-icons-round">&#xe037;</span>
 		</div>
-		<div class="resumeButton restartButton">
+		<div class="menuButton restartButton">
 			Börja om <span style="font-size: 32px;" class="material-icons-round">&#xe042;</span>
 		</div>
 	</div>
 	<!-- Game over-meny -->
-	<div id="deathmenu" class="pausemenu hidden">
+	<div id="deathmenu" class="menu hidden">
 		<h2>Åh nej!</h2>
 		<div>
 			Jennie-Jan hoppade av <span id="deathmenuCoursename">kursen</span><span id="deathmenuAttempts" class="hidden"></span>.
@@ -112,15 +112,15 @@
 		<div>
 			Med din hjälp samlade hon ihop <span id="deathmenuScore">X</span> poäng.
 		</div>
-		<div id="respawnButton" class="resumeButton">
+		<div id="respawnButton" class="menuButton">
 			Försök igen <span style="font-size: 32px;" class="material-icons-round">&#xe045;</span>
 		</div>
-		<div class="resumeButton restartButton">
+		<div class="menuButton restartButton">
 			Börja om <span style="font-size: 32px;" class="material-icons-round">&#xe042;</span>
 		</div>
 	</div>
 	<!-- Välja program-meny -->
-	<div id="choicemenu" class="pausemenu hidden">
+	<div id="choicemenu" class="menu hidden">
 		<h2>nØllespelet 2021: nØllejump</h2>
 		<div>
 			Välkommen till nØllejump! I detta innovativa* och banbrytande* spel hjälper du Jennie-Jan Kraftvegan genom sitt första år på KTH.
@@ -128,10 +128,10 @@
 		<div>
 			Välj vilket program du vill spela:
 		</div>
-		<div id="ctfysButton" class="resumeButton">
+		<div id="ctfysButton" class="menuButton">
 			Teknisk Fysik <span style="font-size: 32px;" class="material-icons-round">&#xea4b;</span>
 		</div>
-		<div id="ctmatButton" class="resumeButton">
+		<div id="ctmatButton" class="menuButton">
 			Teknisk Matematik <span style="font-size: 32px;" class="material-icons-round">&#xe24a;</span>
 		</div>
 		<div class="footnote">*Enligt anonyma källor.</div>

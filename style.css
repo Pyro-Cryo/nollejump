@@ -81,7 +81,7 @@ body.dark {
 		color: #df3c48;
 	}
 
-.pausemenu {
+.menu {
 	background-color: rgba(12, 3, 4, 0.8);
 	position: fixed;
 	top: 0;
@@ -95,25 +95,25 @@ body.dark {
 	color: white;
 }
 
-	.pausemenu > div {
+	.menu > div {
 		width: 80%;
 		max-width: 600px;
 		margin: 0.5em 0;
 	}
 
-	.pausemenu > ul {
+	.menu > ul {
 		width: 80%;
 		max-width: 600px;
 		margin: 0.5em 0;
 	}
 
-	.pausemenu > h2 {
+	.menu > h2 {
 		width: 80%;
 		margin: 0.5em 0;
 		text-align: center;
 	}
 
-	.pausemenu > .footnote {
+	.menu > .footnote {
 		font-size: 10px;
 		position: fixed;
 		bottom: 0;
@@ -122,7 +122,7 @@ body.dark {
 		margin-right: 0.5em;
 	}
 
-.resumeButton {
+.menuButton {
 	text-align: center;
 	font-size: 24px;
 	display: flex;
@@ -132,14 +132,14 @@ body.dark {
 	padding: 5px 5px 5px 15px;
 	border-radius: 10px;
 }
-	.resumeButton:hover {
+	.menuButton:hover {
 		background-color: #df3c48;
 	}
-	.resumeButton:active {
+	.menuButton:active {
 		color: #dfb5b8;
 	}
 
-	.resumeButton > span {
+	.menuButton > span {
 		margin-left: 0.5ex;
 		padding-right: 0.4ex;
 	}

@@ -111,6 +111,7 @@ class JumpController extends Controller {
 		super.onAssetsLoaded();
 		this.clearOnDraw = false;
 		this.setMessage(`Laddat klart`);
+		this.currentMusic = Resource.getAsset(music);
 		this.startDrawLoop();
 		this.loadState();
 		this.spawnPlayer();
@@ -147,7 +148,6 @@ class JumpController extends Controller {
 			this.spawnPlayer();
 			this.startLevel();
 			document.getElementById("deathmenu").classList.add("hidden");
-			this.currentMusic = Resource.getAsset(music);
 			this.currentMusic.currentTime = 0;
 			this.currentMusic.play();
 			e.preventDefault();
@@ -166,7 +166,6 @@ class JumpController extends Controller {
 					this.gameArea.resetDrawOffset();
 					this.spawnPlayer();
 					this.startLevel();
-					this.currentMusic = Resource.getAsset(music);
 					this.currentMusic.currentTime = 0;
 					if (!this.isPaused) { // Dödsmenyn är uppe
 						document.getElementById("deathmenu").classList.add("hidden");
@@ -205,9 +204,9 @@ class JumpController extends Controller {
 			if (e.code === "Escape") {
 				if (!this.isPaused) {
 					let noneOpen = true;
-					const pauseMenus = document.getElementsByClassName("pausemenu");
-					for (let i = 0; i < pauseMenus.length; i++)
-						noneOpen &= pauseMenus.item(i).classList.contains("hidden");
+					const menus = document.getElementsByClassName("menu");
+					for (let i = 0; i < menus.length; i++)
+						noneOpen &= menus.item(i).classList.contains("hidden");
 					if (noneOpen) {
 						document.getElementById("playButton").click();
 						e.preventDefault();
@@ -382,7 +381,7 @@ class JumpController extends Controller {
 		document.getElementById("deathmenuScore").innerText = ScoreReporter.currentScore(false);
 
 		this.currentMusic.pause();
-		this.currentMusic = null;
+		this.currentMusic.currentTime = 0;
 		ScoreReporter.report(false);
 	}
 
@@ -401,7 +400,6 @@ class JumpController extends Controller {
 				this.gameArea.resetDrawOffset();
 				this.spawnPlayer();
 				this.startLevel();
-				this.currentMusic = Resource.getAsset(music);
 				this.currentMusic.currentTime = 0;
 			});
 		}, 2000);
