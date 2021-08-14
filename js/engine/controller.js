@@ -90,7 +90,7 @@ class Controller {
 
     onAssetLoadUpdate(progress, total) {}
     onAssetsLoaded() {}
-    onAssetsLoadFailure() {}
+    onAssetsLoadFailure(reason) {}
 
     onDifficultyChange(e) {}
 

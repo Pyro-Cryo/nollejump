@@ -137,6 +137,10 @@ class DynamicPlatform extends Platform {
 
 	static get image() { return Resource.getAsset(platformImgs.blue); }
 
+	get height() {
+		return super.height * 3;
+	}
+
 	constructor(x,y,vx,vy){
 		super(x,y);
 

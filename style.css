@@ -2,6 +2,7 @@ body {
 	margin: 0;
 	font-family: Nunito, sans-serif;
 	user-select: none;
+	overflow: hidden;
 }
 body.dark {
 	background-color: rgb(12, 3, 4);
@@ -12,12 +13,16 @@ body.dark {
 }
 
 #gameboard {
-	border: 1px solid black;
+	border: 1px solid #aaaaaa;
+	border-top: none;
 	transform-origin: center top;
+	position: absolute;
+	left: 50%;
+	transition: transform 0.3s ease-in-out;
 }
 #gameboardContainer {
-	text-align: center;
 	width: 100%;
+	position: relative;
 }
 #topbar {
 	width: 100%;

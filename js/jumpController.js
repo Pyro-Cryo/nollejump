@@ -47,7 +47,7 @@ class JumpController extends Controller {
 		this.stateProperties = ["ctfys", "levelIndex", "stats"];
 		this._screenWrap = true;
 		this.barHeight = 64;
-		this.margin = 16;
+		this.margin = 0;
 		this.flipX = false;
 	}
 
@@ -98,9 +98,7 @@ class JumpController extends Controller {
 	}
 
 	startDrawLoop() {
-		// Usch fy skriv aldrig sån här kod igen
-		this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2); // Första tar bort scrollbar
-		this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2); // Andra sätter rätt värden
+		this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2);
 		window.addEventListener("resize", () => this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2));
 		super.startDrawLoop();
 	}
@@ -282,17 +280,8 @@ class JumpController extends Controller {
 		const hScale = maxHeightPx / JumpController.HEIGHT_PX;
 		const scale = Math.min(wScale, hScale);
 
-		// Varifrån kommer de magiska siffrorna? Det du!
-		// TODO: kan nog fixas med en overflow: visible på body eller liknande
-		if (maxWidthPx < JumpController.WIDTH_PX - 30) {
-			const leftpad = marginHorizontal + Math.max(maxWidthPx - 300, 0) / 2;
-			// transform-origin: left borde egentligen inte lira med this.flipX?
-			this.gameArea.canvas.style = `transform: scale(${this.flipX ? (-scale) + ", " + scale : scale}); position: absolute; left: ${leftpad}px; transform-origin: left top;`;
-			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px; position: relative;`;
-		} else {
-			this.gameArea.canvas.style = `transform: scale(${this.flipX ? (-scale) + ", " + scale : scale});`;
-			this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px;`;
-		}
+		this.gameArea.canvas.style = `transform: translateX(-50%) scale(${this.flipX ? (-scale) + ", " + scale : scale});`;
+		this.canvasContainer.style = `height: ${scale * JumpController.HEIGHT_PX}px;`;
 	}
 
 	loadState() {
@@ -350,6 +339,10 @@ class JumpController extends Controller {
 	spawnPlayer() {
 		// Täck botten med plattformar så man inte instadör
 		this.enemies = [];
+		if (this.flipX) {
+			this.flipX = false;
+			this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2);
+		}
 		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 100);
 		const platWidth = Platform.image.width * Platform.scale / this.gameArea.unitWidth;
 		const startingPlatforms = new Region()
