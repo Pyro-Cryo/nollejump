@@ -9,16 +9,20 @@ const music = Resource.addAsset(
 	"audio/myrstacken.mp3",
 	LoopableAudioWithTail,
 	audio => {
-		audio.volume = 0.2;
-		audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
+		try {
+			audio.volume = 0.2;
+			audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
 
-		audio.onLoop = () => {
-			audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
-				+ (audio.currentTime - audio.length)
-				+ (audio.currentTime - audio.currentTimeLast);
-			
-			audio.play();
-		};
+			audio.onLoop = () => {
+				audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
+					+ (audio.currentTime - audio.length)
+					+ (audio.currentTime - audio.currentTimeLast);
+				
+				audio.play();
+			};
+		} catch (e) {
+			alert(e);
+		}
 		return audio;
 	});
 class JumpController extends Controller {
