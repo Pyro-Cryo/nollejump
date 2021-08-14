@@ -5,12 +5,13 @@ let _JumpController_STORAGE_PREFIX = "nollejump_";
 const MUSIC_BPM = 60;// 151;
 const INTRO_BEATS = 86.5;// 237;
 const LOOP_BEATS = 37;// 140;
+const MUSIC_VOLUME = 0.2;
 const music = Resource.addAsset(
 	"audio/myrstacken.mp3",
 	LoopableAudioWithTail,
 	audio => {
 		try {
-			audio.volume = 0.2;
+			audio.volume = MUSIC_VOLUME;
 			audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
 
 			audio.onLoop = () => {
@@ -49,6 +50,7 @@ class JumpController extends Controller {
 		this.barHeight = 64;
 		this.margin = 0;
 		this.flipX = false;
+		this.muted = !!window.localStorage.getItem(JumpController.STORAGE_PREFIX + "mute");
 	}
 
 	set screenWrap(value) {
@@ -112,6 +114,11 @@ class JumpController extends Controller {
 		this.clearOnDraw = false;
 		this.setMessage(`Laddat klart`);
 		this.currentMusic = Resource.getAsset(music);
+		if (this.muted) {
+			this.currentMusic.volume = 0;
+			document.getElementById("muteButton").classList.add("hidden");
+			document.getElementById("unmuteButton").classList.remove("hidden");
+		}
 		this.startDrawLoop();
 		this.loadState();
 		this.spawnPlayer();
@@ -190,6 +197,24 @@ class JumpController extends Controller {
 			this.saveState();
 			this.togglePause();
 			document.getElementById("choicemenu").classList.add("hidden");
+			e.preventDefault();
+		}, true);
+
+		// Mute / unmute
+		document.getElementById("muteButton").addEventListener("click", e => {
+			this.currentMusic.volume = 0;
+			this.mute = true;
+			window.localStorage.setItem(JumpController.STORAGE_PREFIX + "mute", this.mute);
+			document.getElementById("muteButton").classList.add("hidden");
+			document.getElementById("unmuteButton").classList.remove("hidden");
+			e.preventDefault();
+		}, true);
+		document.getElementById("unmuteButton").addEventListener("click", e => {
+			this.currentMusic.volume = MUSIC_VOLUME;
+			this.mute = false;
+			window.localStorage.setItem(JumpController.STORAGE_PREFIX + "mute", this.mute);
+			document.getElementById("unmuteButton").classList.add("hidden");
+			document.getElementById("muteButton").classList.remove("hidden");
 			e.preventDefault();
 		}, true);
 
@@ -480,7 +505,7 @@ class JumpController extends Controller {
 			else
 				tidbits.push(`det tog dig ${maxDeaths[0]} försök att klara ${Level.levels.get(maxDeaths[1])(true).name}`);
 		} else
-			tidbits.push("du inte hoppat av något än");
+			tidbits.push("du inte hoppat av någon kurs än");
 
 		if (this.levelIndex > 0) {
 			const courses = this.ctfys ? Level.ctfysLevels : Level.ctmatLevels; // skippar tutorialen men den är inte jätteintressant
