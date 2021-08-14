@@ -63,7 +63,9 @@ class Controller {
 
         this.constructor._instances.push(this);
 
-        Resource.loadAssets(this.onAssetLoadUpdate.bind(this)).then(this.onAssetsLoaded.bind(this));
+        Resource.loadAssets(this.onAssetLoadUpdate.bind(this))
+            .then(this.onAssetsLoaded.bind(this))
+            .catch(this.onAssetsLoadFailure.bind(this));
     }
 
     set fastForwardFactor(value) {
@@ -88,6 +90,7 @@ class Controller {
 
     onAssetLoadUpdate(progress, total) {}
     onAssetsLoaded() {}
+    onAssetsLoadFailure() {}
 
     onDifficultyChange(e) {}
 

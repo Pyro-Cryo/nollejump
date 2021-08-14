@@ -25,6 +25,7 @@ const music = Resource.addAsset(
 		}
 		return audio;
 	});
+
 class JumpController extends Controller {
 	static get WIDTH_PX() { return _JumpController_WIDTH_PX;}
 	static set WIDTH_PX(value) { _JumpController_WIDTH_PX = value;}
@@ -121,6 +122,17 @@ class JumpController extends Controller {
 			document.getElementById("choicemenu").classList.remove("hidden");
 		else
 			this.onPause();
+	}
+
+	onAssetsLoadFailure(reason) {
+		console.error(reason);
+		if (reason instanceof Response)
+			alert(`Spelet kunde inte laddas:\n${reason.status} ${reason.statusText}\n${reason.text()}`);
+		else
+			alert(`Spelet kunde inte laddas:\nHittade inte (eller kunde inte tolka) ${reason.path[0].src}`);
+		setInterval(() => this.setMessage("Spelet är trasigt :("), 6000);
+		setTimeout(() => setInterval(() => this.setMessage("Hör av dig till utvecklarna eller Cyberföhs"), 6000), 3000);
+		setTimeout(() => this.setMessage("Spelet är trasigt :("), 1000);
 	}
 
 	setupElements() {

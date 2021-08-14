@@ -32,7 +32,7 @@ class Resource {
 			if (onErr)
 				promise = promise.catch(onErr);
 
-			promise.finally(() => {
+			promise = promise.finally(() => {
 				progress++;
 				if (onUpdate)
 					onUpdate(progress, items.length);
@@ -61,7 +61,7 @@ class Resource {
 						resolve(response.json());
 					else
 						reject(response);
-				}).catch(reason => reject(reason));
+				});
 			});
 		else if (type === String)
 			promise = new Promise((resolve, reject) => {
@@ -70,7 +70,7 @@ class Resource {
 						resolve(response.text());
 					else
 						reject(response);
-				}).catch(reason => reject(reason));
+				});
 			});
 		else
 			promise = new Promise((resolve, reject) => {
@@ -83,7 +83,7 @@ class Resource {
 					item.addEventListener('load', () => resolve(item));
 				item.addEventListener('error', reject);
 				item.src = path;
-			}).catch(reason => reject(reason));
+			});
 
 		if (map)
 			promise = promise.then(item => this._applyMap(item, map));
