@@ -75,7 +75,14 @@ class Resource {
 		else
 			promise = new Promise((resolve, reject) => {
 				try {
+					if (type !== Image) {
+						alert("Försöker hämta " + path);
+					}
 					const item = new type();
+					if (type !== Image) {
+						alert("Skapade objekt");
+						alert("Kommer det funka? " + (item instanceof Audio));
+					}
 					if (item instanceof Audio) {
 						item.addEventListener('canplaythrough', () => resolve(item));
 						item.preload = true;
@@ -84,6 +91,8 @@ class Resource {
 						item.addEventListener('load', () => resolve(item));
 					item.addEventListener('error', reject);
 					item.src = path;
+					if (type !== Image)
+						alert("Nu är det bara att vänta på att den läses in");
 				} catch (e) {
 					reject(e);
 				}
@@ -159,7 +168,6 @@ class Resource {
 					assetSpec[0], // path
 					assetSpec[1][0], // type
 					item => { // map
-						alert(item.src + " laddade okej");
 						if (assetSpec[1][1])
 							item = this._applyMap(item, assetSpec[1][1])
 						this._loadedAssets.set(assetSpec[0], item);
