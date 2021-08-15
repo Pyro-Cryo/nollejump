@@ -65,7 +65,7 @@ class ScoreReporter {
                 console.error("Oväntad respons vid poänginrapportering:", response);
                 if (onFail) onFail(response);
             }
-        }, reason => {
+        }).catch(reason => {
             console.error("Kunde inte rapportera in poängen:", reason);
             if (onFail) onFail(reason);
         });

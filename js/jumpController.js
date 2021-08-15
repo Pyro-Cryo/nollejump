@@ -416,7 +416,7 @@ class JumpController extends Controller {
 		setTimeout(() => {
 			// TODO: snyggare vinstskärm
 			alert(`Du har guidat Jennie-Jan genom hela sitt första år på KTH, och tjänat ihop ${ScoreReporter.currentScore(true)} poäng. Grattis!`);
-			ScoreReporter.report(true, () => {
+			let reset = () => {
 				this.toggleFastForward();
 				this.clearState();
 				this.loadState(); // Laddar defaultstate
@@ -426,7 +426,15 @@ class JumpController extends Controller {
 				this.spawnPlayer();
 				this.startLevel();
 				this.currentMusic.currentTime = 0;
+			};
+			let report;
+			report = () => ScoreReporter.report(true, reset, (reason) => {
+				if (confirm("Kunde inte rapportera in poängen\n" + JSON.stringify(reason) + "\n\nFörsök rapportera in igen? (Annars börjar spelet om)"))
+					report();
+				else
+					reset();
 			});
+			report();
 		}, 2000);
 	}
 
