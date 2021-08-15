@@ -98,6 +98,21 @@ class DiscreteMovingPlatform extends BasicMovingPlatform {
 	}
 }
 
+class ScrollingPlatform extends Platform {
+	static get image() { return Resource.getAsset(platformImgs.green); }
+	constructor(x, y, speed = 100) {
+		super(x, y);
+		this.speed = speed;
+	}
+	update(delta) {
+		super.update(delta);
+		this.x += this.speed * delta / 1000;
+
+		if (controller.screenWrap)
+			screenWrap(this);
+	}
+}
+
 class FakePlatform extends Platform {
 	static get image() { return Resource.getAsset(platformImgs.broken); }
 

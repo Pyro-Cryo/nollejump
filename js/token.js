@@ -22,6 +22,15 @@ class Token extends GameObject {
 			this.x = this.trackedObj.x + this.xOffset;
 			this.y = this.trackedObj.y + this.yOffset;
 		}
+
+		if (controller.screenWrap)
+			screenWrap(this);
+	}
+
+	draw(gameArea) {
+		super.draw(gameArea);
+		if (controller.screenWrap)
+			drawScreenWrap(gameArea, this, super.draw.bind(this));
 	}
 }
 

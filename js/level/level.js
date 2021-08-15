@@ -16,6 +16,7 @@ let _Level_ctfysLevels = [
 ];
 let _Level_ctmatLevels = [
 	"DD1301", // Datorintro
+	"SF1672",
 	// "test",
 	// "SF1673", // Envarre
 	// "DD1331", // Gruprog
@@ -78,7 +79,7 @@ class Level {
 	}
 
 	tokenPickup(type) {
-		console.log("Plockade upp token: " + type.name);
+		// console.log("Plockade upp token: " + type.name);
 		const wasCompleted = this.completed;
 		switch (type) {
 			case Homework:
