@@ -25,7 +25,7 @@ class ScoreReporter {
         return Math.floor(score);
     }
 
-    static report(won, onSuccess = null) {
+    static report(won, onSuccess = null, onFail = null) {
         const url = new URL(window.location.href);
         const token = url.searchParams.get("token");
         const userId = url.searchParams.get("userId");
@@ -41,11 +41,11 @@ class ScoreReporter {
             return;
         }
         // Räkna ut poäng
-        let score = this.currentScore(won);
+        const score = this.currentScore(won);
         console.log("Rapporterar poäng:", score);
 
         // Rapportera in individuell poäng
-        data = { "nollejump_score": score };
+        const data = { "nollejump_score": score };
         fetch(
             `${ENDPOINT_USER}${this.apiSettings.userId}`,
             {
@@ -58,13 +58,16 @@ class ScoreReporter {
             }
         ).then(response => {
             if (response.status >= 200 && response.status < 300) {
-                console.log("Rapporterade in individuell poäng:", score);
+                console.log("Rapporterade in poäng:", score);
                 if (onSuccess) onSuccess();
             }
-            else
-                console.warn("Oväntad respons vid individuell poänginrapportering:", response);
+            else {
+                console.error("Oväntad respons vid poänginrapportering:", response);
+                if (onFail) onFail(response);
+            }
         }, reason => {
-            console.error("Kunde inte rapportera in individuella poängen:", reason);
+            console.error("Kunde inte rapportera in poängen:", reason);
+            if (onFail) onFail(reason);
         });
     }
 }
