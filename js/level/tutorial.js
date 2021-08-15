@@ -277,7 +277,7 @@ Level.levels.set("test", infoOnly => {
 
 	const powerups = new Region()
 		// .wait(start.length)
-		.spawn(JumpBoostToken, 5, (elapsed, spawnHistory, level) => {
+		.spawn(ImmortalToken, 5, (elapsed, spawnHistory, level) => {
 			for (let i = spawnHistory.length - 1; i >= 0; i--) {
 				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
 					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];

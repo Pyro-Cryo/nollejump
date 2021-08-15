@@ -93,7 +93,7 @@ class JumpPlayer extends Player {
 	}
 
 	spaceJump() {
-		if(this.physics.vy < 0 && this.spaceJumpCooldown <= 0) {
+		if(this.physics.vy < 0 && this.spaceJumpCooldown <= 0 && !this.isDying) {
 			this.physics.bounceObject(new PhysicsNull());
 			this.spaceJumpCooldown += this.spaceJumpCDTime;
 		}
