@@ -199,5 +199,4 @@ class DynamicPlatform extends Platform {
 		super.onPlayerBounce(player);
 		this.physics.vy -= player.physics.bounce_speed/2;
 	}
-
 }

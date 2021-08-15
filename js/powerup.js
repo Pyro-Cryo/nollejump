@@ -45,7 +45,7 @@ class DisposedToken extends GameObject {
 	constructor(object, powerup) {
 		super(object.x - 4, object.y - 4, powerup.image, powerup.angle-Math.PI/8, powerup.scale);
 		this.physics = new StandardPhysics(this);
-		this.physics.setSpeed(object.physics.vx - 4, object.physics.vy - 4);
+		this.physics.setSpeed(object.physics.vx - 4*4, object.physics.vy - 4*4);
 	}
 
 	update(delta) {
@@ -54,13 +54,15 @@ class DisposedToken extends GameObject {
 	}
 }
 
-// const appleImg = Resource.addAsset("img/fruit/apple.png");
+const ovveimg = Resource.addAsset("img/ovve.png");
 class Immortal extends PowerUp {
 
-	// static get image() { return Resource.getAsset(appleImg); }
-	// static get scale() { return 0.1; }
-	static get cooldown() { return 5000; }
-	static get prettyName() { return "Osårbarhet"; }
+	static get image() { return Resource.getAsset(ovveimg); }
+	static get scale() { return 0.25; }
+	static get imgOffset() { return [0, -25]; }
+	static get drawBefore() { return true; }
+	static get cooldown() { return 7500; }
+	static get prettyName() { return "Skyddsdräkt"; }
 
 	init(player) {
 		super.init(player);
@@ -77,8 +79,10 @@ class Immortal extends PowerUp {
 		player.powers["shield"] = false;
 		super.remove(player);
 	}
+}
 
-	draw(gameArea) {}
+class ImmortalToken extends PowerupToken {
+	static get powerup() { return Immortal; }
 }
 
 const bananashoesimg = Resource.addAsset("img/bananashoes.png");
