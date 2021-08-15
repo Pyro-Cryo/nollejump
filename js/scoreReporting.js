@@ -2,7 +2,6 @@ const SCORE_MAX = 2000;
 const SCORE_MIN_ON_WIN = 1000;
 const SCORE_REDUCTION_PER_DEATH = 50;
 const SCORE_PARTIAL_MAX = 800;
-const ENDPOINT_TEAM = "https://f.kth.se/cyberfohs/problemstatus/";
 const ENDPOINT_USER = "https://f.kth.se/cyberfohs/user/";
 let ApiSettings = null;
 
@@ -26,15 +25,13 @@ class ScoreReporter {
         return Math.floor(score);
     }
 
-    static report(won, onSuccess = null) {
+    static report(won, onSuccess = null, onFail = null) {
         const url = new URL(window.location.href);
         const token = url.searchParams.get("token");
-        const problemStatusId = url.searchParams.get("problemStatusId");
         const userId = url.searchParams.get("userId");
-        if (!this.apiSettings && token !== null && problemStatusId !== null)
+        if (!this.apiSettings && token !== null)
             this.apiSettings = {
                 token: token,
-                problemStatusId: problemStatusId,
                 userId: userId
             };
         
@@ -44,37 +41,11 @@ class ScoreReporter {
             return;
         }
         // Räkna ut poäng
-        let score = this.currentScore(won);
+        const score = this.currentScore(won);
         console.log("Rapporterar poäng:", score);
-        
-        // Skicka in för laget
-        let data = { "score": score, "solved": true };
-        fetch(
-            `${ENDPOINT_TEAM}${this.apiSettings.problemStatusId}`,
-            {
-                method: "PATCH",
-                body: JSON.stringify(data),
-                headers: new Headers({
-                    "Authorization": `Token ${this.apiSettings.token}`,
-                    "Content-Type": "application/json",
-                }),
-                // mode: "no-cors" ???
-                // credentials: "include" ???
-            }
-        ).then(response => {
-            if (response.status >= 200 && response.status < 300) {
-                console.log("Rapporterade in lagpoäng:", score);
-                if (onSuccess)
-                    onSuccess();
-            }
-            else
-                console.warn("Oväntad respons vid lagpoänginrapportering:", response);
-        }, reason => {
-            console.error("Kunde inte rapportera in lagpoängen:", reason);
-        });
 
         // Rapportera in individuell poäng
-        data = { "nollejump_score": score };
+        const data = { "nollejump_score": score };
         fetch(
             `${ENDPOINT_USER}${this.apiSettings.userId}`,
             {
@@ -87,12 +58,16 @@ class ScoreReporter {
             }
         ).then(response => {
             if (response.status >= 200 && response.status < 300) {
-                console.log("Rapporterade in individuell poäng:", score);
+                console.log("Rapporterade in poäng:", score);
+                if (onSuccess) onSuccess();
             }
-            else
-                console.warn("Oväntad respons vid individuell poänginrapportering:", response);
+            else {
+                console.error("Oväntad respons vid poänginrapportering:", response);
+                if (onFail) onFail(response);
+            }
         }, reason => {
-            console.error("Kunde inte rapportera in individuella poängen:", reason);
+            console.error("Kunde inte rapportera in poängen:", reason);
+            if (onFail) onFail(reason);
         });
     }
 }

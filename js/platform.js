@@ -127,7 +127,6 @@ class GhostPlatform extends GameObject {
 		this.cdtimer -= delta;
 
 		if (controller.gameArea.isInFrame(this.x, this.y) && this.cdtimer <= 0){
-			
 			let platform = new this.constructor.innerPlatform(
 				this.x,
 				controller.gameArea.canvasToGridY(960, true),

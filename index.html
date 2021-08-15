@@ -15,9 +15,11 @@
 		//if (window.location.hostname && window.location.hostname !== "localhost") {
 			window.onerror = function(message, sourcefile, lineno, colno, error) {
 				alert("Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno);
-				const el = document.createElement("div");
-				el.innerText = "Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno;
-				document.body.appendChild(el);
+				setTimeout(() => {
+					const el = document.createElement("div");
+					el.innerText = "Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno;
+					document.body.appendChild(el);
+				}, 2000);
 				return true;
 			};
 		}
