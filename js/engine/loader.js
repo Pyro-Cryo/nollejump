@@ -75,24 +75,30 @@ class Resource {
 		else
 			promise = new Promise((resolve, reject) => {
 				try {
-					if (type !== Image) {
-						alert("Försöker hämta " + path);
-					}
 					const item = new type();
-					if (type !== Image) {
-						alert("Skapade objekt");
-						alert("Kommer det funka? " + (item instanceof Audio));
-					}
 					if (item instanceof Audio) {
-						item.addEventListener('canplaythrough', () => resolve(item));
+						let needsResolving = true;
+						item.addEventListener('canplaythrough', () => {
+							if (needsResolving) {
+								needsResolving = false;
+								resolve(item);
+							}
+						});
 						item.preload = true;
+						const interval = setInterval(() => {
+							if (item.readyState === 4 && needsResolving) {
+								needsResolving = false;
+								resolve(item);
+							}
+							if (!needsResolving) {
+								clearInterval(interval);
+							}
+						})
 					}
 					else
 						item.addEventListener('load', () => resolve(item));
 					item.addEventListener('error', reject);
 					item.src = path;
-					if (type !== Image)
-						alert("Nu är det bara att vänta på att den läses in");
 				} catch (e) {
 					reject(e);
 				}

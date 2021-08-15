@@ -11,7 +11,6 @@
 	<link rel="icon" type="image/png" href="img/fadderietslogga.png" />
 
 	<script type="text/javascript">
-		alert("hej");
 		if (true) {
 		//if (window.location.hostname && window.location.hostname !== "localhost") {
 			window.onerror = function(message, sourcefile, lineno, colno, error) {
@@ -145,12 +144,9 @@
 	</div>
 	<script type="text/javascript">
 		let controller;
-		alert("nu ska vi börja ladda");
 		window.addEventListener("load", () => {
-			alert("laddat statiska grejer")
 			JumpController.loadStatusGraph()
 				.then(statusGraph => {
-					alert("laddat statusgraf");
 					controller = new JumpController(statusGraph);
 				}).catch(reason => alert(JSON.stringify(reason)));
 		});

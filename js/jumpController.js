@@ -10,20 +10,16 @@ const music = Resource.addAsset(
 	"audio/myrstacken.mp3",
 	LoopableAudioWithTail,
 	audio => {
-		try {
-			audio.volume = MUSIC_VOLUME;
-			audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
+		audio.volume = MUSIC_VOLUME;
+		audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
 
-			audio.onLoop = () => {
-				audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
-					+ (audio.currentTime - audio.length)
-					+ (audio.currentTime - audio.currentTimeLast);
-				
-				audio.play();
-			};
-		} catch (e) {
-			alert(e);
-		}
+		audio.onLoop = () => {
+			audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
+				+ (audio.currentTime - audio.length)
+				+ (audio.currentTime - audio.currentTimeLast);
+			
+			audio.play();
+		};
 		return audio;
 	});
 
@@ -76,7 +72,6 @@ class JumpController extends Controller {
 	// Hämtar inte denna med övriga assets pga att den failar om man testar utan att hosta en server lokalt
 	static async loadStatusGraph() {
 		try {
-			alert("ladda statusrgaf");
 			const response = await Resource.load(
 				"https://docs.google.com/spreadsheets/d/e/2PACX-1vSZ-xcmOYMcJKxy8RkIlD3yqccYAm1Ogr4TsPMQqL2P7UXX1YtbVTN2KAuTqvLq2bY_nBVBihJDJwD7/pub?gid=1414378941&single=true&output=csv",
 				String);
@@ -85,11 +80,9 @@ class JumpController extends Controller {
 				s.length >= 2 && s[0] === '"' && s[s.length - 1] === '"' ? s.substr(1, s.length - 2) : s
 			);
 			console.log("Hämtade statusgrafen");
-			alert("det gick bra")
 			return statusGraph;
 			
 		} catch (response) {
-			alert("det sket sig");
 			// console.log(response);
 			// console.log("Using default status graph:", this.defaultStatusGraph);
 			if (response instanceof TypeError && response.message == "Failed to fetch")
@@ -113,7 +106,6 @@ class JumpController extends Controller {
 	}
 
 	onAssetsLoaded() {
-		alert("laddat allt!");
 		super.onAssetsLoaded();
 		this.clearOnDraw = false;
 		this.setMessage(`Laddat klart`);
@@ -135,7 +127,6 @@ class JumpController extends Controller {
 	}
 
 	onAssetsLoadFailure(reason) {
-		alert("fan");
 		console.error(reason);
 		if (reason instanceof Response)
 			alert(`Spelet kunde inte laddas:\n${reason.status} ${reason.statusText}\n${reason.text()}`);
