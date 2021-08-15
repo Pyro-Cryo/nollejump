@@ -25,7 +25,7 @@ class ScoreReporter {
         return Math.floor(score);
     }
 
-    static report(won, onSuccess = null, onFail = null) {
+    static report(won, onSuccess = null, onFail = null, onNoParams = null) {
         const url = new URL(window.location.href);
         const token = url.searchParams.get("token");
         const userId = url.searchParams.get("userId");
@@ -38,6 +38,7 @@ class ScoreReporter {
         // alert("API-inställningar: " + JSON.stringify(this.apiSettings));
         if (!this.apiSettings) {
             console.warn("API-parametrarna är inte definierade, så kan inte rapportera in poängen.");
+            if (onNoParams) onNoParams();
             return;
         }
         // Räkna ut poäng
@@ -65,7 +66,7 @@ class ScoreReporter {
                 console.error("Oväntad respons vid poänginrapportering:", response);
                 if (onFail) onFail(response);
             }
-        }, reason => {
+        }).catch(reason => {
             console.error("Kunde inte rapportera in poängen:", reason);
             if (onFail) onFail(reason);
         });

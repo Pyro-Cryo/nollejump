@@ -74,15 +74,42 @@ class Resource {
 			});
 		else
 			promise = new Promise((resolve, reject) => {
-				const item = new type();
-				if (item instanceof Audio) {
-					item.addEventListener('canplaythrough', () => resolve(item));
-					item.preload = true;
+				try {
+					const item = new type();
+					if (item instanceof Audio) {
+						let needsResolving = true;
+						item.addEventListener('canplaythrough', () => {
+							if (needsResolving) {
+								needsResolving = false;
+								resolve(item);
+							}
+						});
+						item.preload = true;
+						const interval = setInterval(() => {
+							if (item.readyState === 4 && needsResolving) {
+								needsResolving = false;
+								resolve(item);
+							}
+							if (!needsResolving) {
+								clearInterval(interval);
+							}
+						}, 1000);
+
+						setTimeout(() => {
+							// iOS vill inte läsa in saker, yolo
+							resolve(item);
+							needsResolving = false;
+						}, 5000);
+					}
+					else
+						item.addEventListener('load', () => resolve(item));
+					item.addEventListener('error', reject);
+					item.src = path;
+					if (item instanceof Audio)
+						item.load();
+				} catch (e) {
+					reject(e);
 				}
-				else
-					item.addEventListener('load', () => resolve(item));
-				item.addEventListener('error', reject);
-				item.src = path;
 			});
 
 		if (map)
@@ -159,6 +186,11 @@ class Resource {
 							item = this._applyMap(item, assetSpec[1][1])
 						this._loadedAssets.set(assetSpec[0], item);
 						return item;
+					},
+					error => {
+						alert("Fel för " + assetSpec[0]);
+						alert(error);
+						throw error;
 					}
 				])
 				.filter(assetSpec => !this._loadedAssets.has(assetSpec[0]));

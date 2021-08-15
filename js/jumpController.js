@@ -10,20 +10,16 @@ const music = Resource.addAsset(
 	"audio/myrstacken.mp3",
 	LoopableAudioWithTail,
 	audio => {
-		try {
-			audio.volume = MUSIC_VOLUME;
-			audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
+		audio.volume = MUSIC_VOLUME;
+		audio.length = (INTRO_BEATS + LOOP_BEATS) * 60 / MUSIC_BPM;
 
-			audio.onLoop = () => {
-				audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
-					+ (audio.currentTime - audio.length)
-					+ (audio.currentTime - audio.currentTimeLast);
-				
-				audio.play();
-			};
-		} catch (e) {
-			alert(e);
-		}
+		audio.onLoop = () => {
+			audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
+				+ (audio.currentTime - audio.length)
+				+ (audio.currentTime - audio.currentTimeLast);
+			
+			audio.play();
+		};
 		return audio;
 	});
 
@@ -134,8 +130,10 @@ class JumpController extends Controller {
 		console.error(reason);
 		if (reason instanceof Response)
 			alert(`Spelet kunde inte laddas:\n${reason.status} ${reason.statusText}\n${reason.text()}`);
-		else
+		else if (reason instanceof Event) 
 			alert(`Spelet kunde inte laddas:\nHittade inte (eller kunde inte tolka) ${reason.path[0].src}`);
+		else
+			alert("Okänt fel vid laddning av spelet.\n" + JSON.stringify(reason));
 		setInterval(() => this.setMessage("Spelet är trasigt :("), 6000);
 		setTimeout(() => setInterval(() => this.setMessage("Hör av dig till utvecklarna eller Cyberföhs"), 6000), 3000);
 		setTimeout(() => this.setMessage("Spelet är trasigt :("), 1000);
@@ -417,7 +415,7 @@ class JumpController extends Controller {
 		setTimeout(() => {
 			// TODO: snyggare vinstskärm
 			alert(`Du har guidat Jennie-Jan genom hela sitt första år på KTH, och tjänat ihop ${ScoreReporter.currentScore(true)} poäng. Grattis!`);
-			ScoreReporter.report(true, () => {
+			let reset = () => {
 				this.toggleFastForward();
 				this.clearState();
 				this.loadState(); // Laddar defaultstate
@@ -426,8 +424,18 @@ class JumpController extends Controller {
 				this.gameArea.resetDrawOffset();
 				this.spawnPlayer();
 				this.startLevel();
+				super.onPause();
 				this.currentMusic.currentTime = 0;
-			});
+				document.getElementById("choicemenu").classList.remove("hidden");
+			};
+			let report;
+			report = () => ScoreReporter.report(true, reset, (reason) => {
+				if (confirm("Kunde inte rapportera in poängen\n" + JSON.stringify(reason) + "\n\nFörsök rapportera in igen? (Annars börjar spelet om)"))
+					report();
+				else
+					reset();
+			}, reset);
+			report();
 		}, 2000);
 	}
 

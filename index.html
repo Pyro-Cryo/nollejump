@@ -16,9 +16,7 @@
 			window.onerror = function(message, sourcefile, lineno, colno, error) {
 				alert("Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno);
 				setTimeout(() => {
-					const el = document.createElement("div");
-					el.innerText = "Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno;
-					document.body.appendChild(el);
+					document.body.innerHTML = "Message: " + message + " - Source: " + sourcefile + " Line: " + lineno + ":" + colno; 
 				}, 2000);
 				return true;
 			};
@@ -150,7 +148,7 @@
 			JumpController.loadStatusGraph()
 				.then(statusGraph => {
 					controller = new JumpController(statusGraph);
-				});
+				}).catch(reason => alert(JSON.stringify(reason)));
 		});
 	</script>
 </body>
