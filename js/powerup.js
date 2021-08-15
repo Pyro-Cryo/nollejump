@@ -6,7 +6,6 @@ class PowerUp extends BaseEffect {
 	static get angle() { return 0; }
 	static get prettyName() { return "Powerup"; }
 
-
 	remove(object) {
 		super.remove(object);
 		new DisposedToken(object, this);
@@ -66,16 +65,10 @@ class Immortal extends PowerUp {
 
 	init(player) {
 		super.init(player);
-		// if (player.lives !== -1){
-		// 	this.lives = player.lives;
-	 // 		player.lives = -1;
-		// }
 		player.powers["shield"] = true;
 	}
 
 	remove(player) {
-		// if (player.lives == -1)
-		// 	player.lives = this.lives;
 		player.powers["shield"] = false;
 		super.remove(player);
 	}
@@ -145,7 +138,7 @@ class Rocket extends PowerUp {
 			let keys = Array.from(musicnotesimgs.keys());
 			let img = Resource.getAsset(musicnotesimgs.get(keys[Math.floor(Math.random()*keys.length)]));
 			let a = new GameObject(player.x, player.y, img, 
-				(Math.random()-1/2)*Math.PI/8, 0.6*(1-0.5*Math.random()));
+				(Math.random()-1/2)*30, 0.6*(1-0.5*Math.random()));
 			if (Math.random() < 1/2)
 				a.mirror = true;
 			a.physics = new StandardPhysics(a);
