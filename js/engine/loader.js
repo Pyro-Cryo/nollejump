@@ -81,19 +81,23 @@ class Resource {
 						item.addEventListener('canplaythrough', () => {
 							if (needsResolving) {
 								needsResolving = false;
+								alert("klar via playthrough");
 								resolve(item);
 							}
 						});
 						item.preload = true;
 						const interval = setInterval(() => {
+							alert("Ready state: " + item.readyState);
 							if (item.readyState === 4 && needsResolving) {
 								needsResolving = false;
+								alert("klar!");
 								resolve(item);
 							}
 							if (!needsResolving) {
 								clearInterval(interval);
 							}
 						}, 1000);
+						alert("lyssnar på inläsningen av " + path);
 					}
 					else
 						item.addEventListener('load', () => resolve(item));
