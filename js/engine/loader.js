@@ -93,7 +93,7 @@ class Resource {
 							if (!needsResolving) {
 								clearInterval(interval);
 							}
-						})
+						}, 1000);
 					}
 					else
 						item.addEventListener('load', () => resolve(item));
