@@ -311,7 +311,7 @@ Level.levels.set("test", infoOnly => {
 	const looping = regular
 		.interleave(moving)
 		.interleave(fake)
-		.interleave(dynamic)
+		// .interleave(dynamic)
 		.interleave(enemies)
 		.interleave(tokens)
 		.interleave(powerups);

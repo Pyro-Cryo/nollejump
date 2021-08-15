@@ -11,7 +11,7 @@ class Enemy extends EffectObject {
      * @param {JumpPlayer} player 
      */
     onCollision(player) {
-        player.damage();
+        player.onEnemyCollision(this);
     }
     
     onShot(pellet) {

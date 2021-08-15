@@ -137,6 +137,8 @@ class PrerenderedObject {
 }
 
 class GameObject extends PrerenderedObject {
+		// Access through to physics object
+
 	constructor(x, y, image = null, angle = null, scale = null, register = true) {
 		super(image, angle, scale);
 		this.x = x;
@@ -151,6 +153,11 @@ class GameObject extends PrerenderedObject {
 			Controller.instance.registerObject(this);
 	}
 
+	get vx() { return this.physics.vx; }
+	set vx(v) { this.physics.vx = v; }
+	get vy() { return this.physics.vy; }
+	set vy(v) { this.physics.vy = v; }
+	
 	collisionCheckRectangular(other) {
 		return Math.abs(this.x - other.x) <= (this.width + other.width) / 2 && Math.abs(this.y - other.y) <= (this.height + other.height) / 2;
 	}
@@ -232,6 +239,7 @@ class EffectObject extends GameObject {
 }
 
 class BaseEffect extends PrerenderedObject {
+	static get stackable() { return false; }
 	static get maxInvocations() { return 10; }
 	static get image() { return null; }
 	static get scale() { return 1; }

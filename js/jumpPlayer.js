@@ -76,9 +76,16 @@ class JumpPlayer extends Player {
 		controller.registerObject(this, false, true);
 
 		this.lives = 1;
+
+		this.powers = {
+			"shoes": false, 
+			"shield": false,
+		};
+
 	}
 
 	standardBounce(object) {
+		this.y = object.y + object.height/2 + this.height/2;
 		if (object === null) 
 			this.physics.bounceObject(new PhysicsNull());
 		else 
@@ -125,7 +132,24 @@ class JumpPlayer extends Player {
 	damage() {
 		if (this.lives !== -1 && --this.lives == 0)
 			this.die();
+	}
 
+	onEnemyCollision(enemy){
+
+		if (this.powers["shield"]) 
+			return;
+		if (this.powers["shoes"] && this.vy < 0 && this.lastY >= enemy.y){
+
+			this.standardBounce(enemy);
+			this.effects.forEach(function(obj){
+				console.log(obj.constructor, JumpBoost.constructor);
+				if (obj.constructor == JumpBoost.constructor)
+					obj.remove(this);
+			});
+			return;
+		}
+
+		this.damage();
 	}
 
 	die() {
@@ -198,7 +222,6 @@ class StandardPhysics extends Physics {
 
 		this.max_vx = 100;
 		this.max_vy = 300;
-
 	}
 }
 
@@ -211,15 +234,13 @@ class PlayerPhysics extends StandardPhysics {
 		this.proportional_decay_x = 0.55;
 	}
 
-
 	bounceObject(other) {
 		if (controller.currentLevel.code in controller.stats.bounces)
 			controller.stats.bounces[controller.currentLevel.code]++;
 		else
 			controller.stats.bounces[controller.currentLevel.code] = 1;
 
-
-		this.vy = this.bounce_speed + other.vy;
+		this.vy = this.bounce_speed + other.vy/3;
 		// this.vx += this.bounce_speed * Math.sin(other.angle);
 	}
 

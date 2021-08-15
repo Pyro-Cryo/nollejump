@@ -64,15 +64,17 @@ class Immortal extends PowerUp {
 
 	init(player) {
 		super.init(player);
-		if (player.lives !== -1){
-			this.lives = player.lives;
-	 		player.lives = -1;
-		}
+		// if (player.lives !== -1){
+		// 	this.lives = player.lives;
+	 // 		player.lives = -1;
+		// }
+		player.powers["shield"] = true;
 	}
 
 	remove(player) {
-		if (player.lives == -1)
-			player.lives = this.lives;
+		// if (player.lives == -1)
+		// 	player.lives = this.lives;
+		player.powers["shield"] = false;
 		super.remove(player);
 	}
 
@@ -94,11 +96,13 @@ class JumpBoost extends PowerUp {
  		this.prev = Object.assign({}, player.physics);
  		player.physics.bounce_speed *= 1.25;
  		player.physics.gy *= 0.9;
+ 		player.powers["shoes"] = true;
 	}
 
 	remove(player) {
 		player.physics.bounce_speed = this.prev.bounce_speed;
 		player.physics.gy = this.prev.gy;
+		player.powers["shoes"] = false;
 		super.remove(player);
 	}
 }
