@@ -74,15 +74,19 @@ class Resource {
 			});
 		else
 			promise = new Promise((resolve, reject) => {
-				const item = new type();
-				if (item instanceof Audio) {
-					item.addEventListener('canplaythrough', () => resolve(item));
-					item.preload = true;
+				try {
+					const item = new type();
+					if (item instanceof Audio) {
+						item.addEventListener('canplaythrough', () => resolve(item));
+						item.preload = true;
+					}
+					else
+						item.addEventListener('load', () => resolve(item));
+					item.addEventListener('error', reject);
+					item.src = path;
+				} catch (e) {
+					reject(e);
 				}
-				else
-					item.addEventListener('load', () => resolve(item));
-				item.addEventListener('error', reject);
-				item.src = path;
 			});
 
 		if (map)
@@ -155,10 +159,16 @@ class Resource {
 					assetSpec[0], // path
 					assetSpec[1][0], // type
 					item => { // map
+						alert(item.src + " laddade okej");
 						if (assetSpec[1][1])
 							item = this._applyMap(item, assetSpec[1][1])
 						this._loadedAssets.set(assetSpec[0], item);
 						return item;
+					},
+					error => {
+						alert("Fel för " + assetSpec[0]);
+						alert(error);
+						throw error;
 					}
 				])
 				.filter(assetSpec => !this._loadedAssets.has(assetSpec[0]));
