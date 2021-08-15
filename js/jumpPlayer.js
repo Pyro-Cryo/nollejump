@@ -176,9 +176,6 @@ class StandardPhysics extends Physics {
 
 		this.gy = -18;
 
-		this.linear_decay_x = 0.7;
-		this.proportional_decay_x = 0.55;
-
 		this.max_vx = 100;
 		this.max_vy = 300;
 
@@ -190,6 +187,8 @@ class PlayerPhysics extends StandardPhysics {
 	constructor(object){
 		super(object);
 		this.bounce_speed = 125;
+		this.linear_decay_x = 0.7;
+		this.proportional_decay_x = 0.55;
 	}
 
 
