@@ -423,7 +423,9 @@ class JumpController extends Controller {
 				this.gameArea.resetDrawOffset();
 				this.spawnPlayer();
 				this.startLevel();
+				super.onPause();
 				this.currentMusic.currentTime = 0;
+				document.getElementById("choicemenu").classList.remove("hidden");
 			};
 			let report;
 			report = () => ScoreReporter.report(true, reset, (reason) => {
@@ -431,7 +433,7 @@ class JumpController extends Controller {
 					report();
 				else
 					reset();
-			});
+			}, reset);
 			report();
 		}, 2000);
 	}

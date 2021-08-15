@@ -91,8 +91,10 @@ Level.levels.set("SF1672", (infoOnly) => {
 			.spawn(KS, 1, (e, spawnHistory, l) => {
 				let lastScrollingPlatform;
 				for (let i = spawnHistory.length - 1; i >= 0; i--) {
-					if (spawnHistory[i].object instanceof ScrollingPlatform)
+					if (spawnHistory[i].object instanceof ScrollingPlatform) {
 						lastScrollingPlatform = spawnHistory[i];
+						break;
+					}
 				}
 				return [
 					0,
@@ -102,13 +104,33 @@ Level.levels.set("SF1672", (infoOnly) => {
 			}).immediately()
 	);
 
-	tentaRegion.wait(spacing).spawn(Platform, 10, (e, sH, level) => [
-		Math.random() * controller.gameArea.gridWidth,
-		level.yCurrent + (Math.random() * 2 - 1) * displacementY
-	]).spaced(spacing).interleave(new Region().wait(spacing).spawn(OFFlipScreen, 1, (e, sH, level) => [
-		controller.gameArea.gridWidth / 2,
-		level.yCurrent
-	]).immediately());
+	tentaRegion
+		.wait(spacing)
+		.spawn(ScrollingPlatform, 10, (e, sH, level) => [
+			Math.random() * controller.gameArea.gridWidth,
+			level.yCurrent + (Math.random() * 2 - 1) * displacementY
+		]).spaced(spacing)
+		.interleave(new Region()
+			.wait(spacing * 2)
+			.spawn(BasicMovingPlatform, 5, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent + (Math.random() * 2 - 1) * displacementY,
+				Math.random() * 200 + 100,
+				Math.random() + 0.5
+			]).spaced(spacing * 2)
+		)
+		.interleave(new Region()
+			.wait(spacing)
+			.spawn(OFFlipScreen, 1, (e, sH, level) => [
+				controller.gameArea.gridWidth / 2,
+				level.yCurrent
+			]).immediately())
+		.interleave(new Region()
+			.wait(spacing * 7)
+			.spawn(Tenta, 1, (e, sH, level) => [
+				controller.gameArea.gridWidth / 2,
+				level.yCurrent
+			]).immediately());
 
 
 	return level;

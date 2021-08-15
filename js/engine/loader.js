@@ -86,7 +86,6 @@ class Resource {
 						});
 						item.preload = true;
 						const interval = setInterval(() => {
-							alert("Ready state: " + item.readyState);
 							if (item.readyState === 4 && needsResolving) {
 								needsResolving = false;
 								resolve(item);
