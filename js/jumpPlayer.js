@@ -1,6 +1,7 @@
 let _JumpPlayer_ACTION_GO_LEFT = 1;
 let _JumpPlayer_ACTION_GO_RIGHT = 2;
 let _JumpPlayer_ACTION_SHOOT = 3;
+let _JumpPlayer_ACTION_SPACEJUMP = 4;
 let _JumpPlayer_SCREENWRAP_TRACKING = [
 	Player.CAMERA_TRACKING_INFRAME,
 	400, // Margin top
@@ -41,7 +42,8 @@ class JumpPlayer extends Player {
 				["ArrowLeft", JumpPlayer.ACTION_GO_LEFT],
 				["KeyD", JumpPlayer.ACTION_GO_RIGHT],
 				["ArrowRight", JumpPlayer.ACTION_GO_RIGHT],
-				["Space", JumpPlayer.ACTION_SHOOT]
+				["Space", JumpPlayer.ACTION_SHOOT],
+				[null, JumpPlayer.ACTION_SPACEJUMP]
 			]),
 			controller.screenWrap ? JumpPlayer.SCREENWRAP_TRACKING : JumpPlayer.NON_SCREENWRAP_TRACKING,
 			null,
@@ -58,6 +60,10 @@ class JumpPlayer extends Player {
 
 		this.shootCooldown = 0;
 		this.shootCooldownTime = 250;
+
+		this.spaceJumpCooldown = 0;
+		this.spaceJumpCDTime = 500;
+
 		controller.gameArea.canvas.addEventListener("click", e => {
 			if (this.deviceTiltAvailable) {
 				this.shoot();
@@ -73,14 +79,24 @@ class JumpPlayer extends Player {
 	}
 
 	standardBounce(object) {
-		this.physics.bounceObject(object.physics);
+		if (object === null) 
+			this.physics.bounceObject(new PhysicsNull());
+		else 
+			this.physics.bounceObject(object.physics);
+	}
+
+	spaceJump() {
+		if(this.physics.vy < 0 && this.spaceJumpCooldown <= 0) {
+			this.physics.bounceObject(new PhysicsNull());
+			this.spaceJumpCooldown += this.spaceJumpCDTime;
+		}
 	}
 
 	shoot() {
 		if (!this.shootCooldown) {
 			const t = (this.y - controller.gameArea.bottomEdgeInGrid) / controller.gameArea.gridHeight;
-			let xSpeed = (Math.random() - 0.5) * 0.6;
-			let ySpeed = 2 + t * (1.2 - 2);
+			let xSpeed = ((Math.random() - 0.5) * 0.6) * 80 + this.physics.vx;
+			let ySpeed = (2 + t * (1.2 - 2)) * 80 + this.physics.vy * (this.physics.vy > 0 ? 1.5 : 0);
 			if (this.angle)
 				[xSpeed, ySpeed] = [xSpeed * Math.cos(this.angle) + ySpeed * Math.sin(this.angle), -xSpeed * Math.sin(this.angle) + ySpeed * Math.cos(this.angle)];
 			if (this.isDying) {
@@ -141,6 +157,9 @@ class JumpPlayer extends Player {
 
 			if (this.isPressed.get(JumpPlayer.ACTION_SHOOT))
 				this.shoot();
+
+			if (this.isPressed.get(JumpPlayer.ACTION_SPACEJUMP))
+				this.spaceJump();
 		}
 
 		
@@ -158,6 +177,7 @@ class JumpPlayer extends Player {
 		this.lastY = this.y;
 
 		this.shootCooldown = Math.max(0, this.shootCooldown - delta);
+		this.spaceJumpCooldown = Math.max(0, this.spaceJumpCooldown - delta);
 	}
 
 	draw(gameArea) {

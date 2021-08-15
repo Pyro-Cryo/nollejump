@@ -368,6 +368,7 @@ class JumpController extends Controller {
 			this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2);
 		}
 		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 100);
+		// controller.delayedRenderObjects.push(this.player);
 		const platWidth = Platform.image.width * Platform.scale / this.gameArea.unitWidth;
 		const startingPlatforms = new Region()
 			.spawn(
@@ -671,12 +672,15 @@ class cheat {
 	}
 
 	static get jumpshoot() {
-		const shoot = controller.player.shoot.bind(controller.player);
-		controller.player.shoot = () => {
-			shoot();
-			if (controller.player.physics.vy < 0)
-				controller.player.standardBounce();
-		};
+
+		controller.player.keyActionMap.set("Space", JumpPlayer.ACTION_SPACEJUMP);
+
+		// const shoot = controller.player.shoot.bind(controller.player);
+		// controller.player.shoot = () => {
+		// 	shoot();
+		// 	if (controller.player.physics.vy < 0)
+		// 		controller.player.standardBounce(null);
+		// };
 	}
 
 	static get darkmode() {

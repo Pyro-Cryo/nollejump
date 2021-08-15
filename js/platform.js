@@ -27,7 +27,7 @@ class Platform extends EffectObject {
 	 */
 	onCollision(player) {
 		// If the player was above us and is going down
-		if (player.physics.vy <= this.physics.vy && player.lastY - player.height / 2 >= this.y)
+		if (player.physics.vy <= this.physics.vy && player.lastY - player.height / 2 >= this.y + this.height/2)
 			this.onPlayerBounce(player);
 		else
 			this.onPlayerPass(player);
@@ -172,6 +172,13 @@ class DynamicPlatform extends Platform {
 		super.despawnCheck();
 	}
 
+	onCollision(player) {
+		// If the player was above us and is going down
+		if (player.physics.vy <= this.physics.vy && player.lastY - player.height / 2 >= this.y - this.height/2)
+			this.onPlayerBounce(player);
+		else
+			this.onPlayerPass(player);
+	}
 
 	onPlayerBounce(player) {
 		super.onPlayerBounce(player);

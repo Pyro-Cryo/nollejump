@@ -6,6 +6,11 @@ class PowerUp extends BaseEffect {
 	static get angle() { return 0; }
 	static get prettyName() { return "Powerup"; }
 
+
+	remove(object) {
+		super.remove(object);
+		new DisposedToken(object, this);
+	}
 }
 
 class PowerupToken extends GameObject {
@@ -20,6 +25,11 @@ class PowerupToken extends GameObject {
 		controller.player.addCollidible(this);
 	}
 
+	update(delta){
+		super.update(delta);
+		despawnIfBelowBottom(this);
+	}
+
 	onCollision(player) {
 		if (this.constructor.powerup.name in controller.stats.powerups)
 			controller.stats.powerups[this.constructor.powerup.prettyName]++;
@@ -27,6 +37,20 @@ class PowerupToken extends GameObject {
 			controller.stats.powerups[this.constructor.powerup.prettyName] = 1;
 		player.addEffect(new this.constructor.powerup());
 		this.despawn();
+	}
+}
+
+class DisposedToken extends GameObject {
+
+	constructor(object, powerup) {
+		super(object.x - 4, object.y - 4, powerup.image, powerup.angle-Math.PI/8, powerup.scale);
+		this.physics = new StandardPhysics(this);
+		this.physics.setSpeed(object.physics.vx - 4, object.physics.vy - 4);
+	}
+
+	update(delta) {
+		super.update(delta);
+		despawnIfBelowBottom(this);
 	}
 }
 
@@ -55,23 +79,26 @@ class Immortal extends PowerUp {
 	draw(gameArea) {}
 }
 
-
-const aubimg = Resource.addAsset("img/fruit/aubergine.png");
+const bananashoesimg = Resource.addAsset("img/bananashoes.png");
 class JumpBoost extends PowerUp {
 
-	static get image() { return Resource.getAsset(aubimg); }
-	static get scale() { return 0.2; }
-	static get cooldown() { return 5000; }
-	static get prettyName() { return "Hoppboost"; }
+	static get image() { return Resource.getAsset(bananashoesimg); }
+	static get scale() { return 0.3; }
+	static get prettyName() { return "Hopp-boost"; }
+	static get imgOffset() { return [0, -25]; }
+	static get drawBefore() { return true; }
+	static get cooldown() { return 20000; }
 
 	init(player) {
 		super.init(player);
  		this.prev = Object.assign({}, player.physics);
- 		player.physics.bounce_speed *= 1.5;
+ 		player.physics.bounce_speed *= 1.25;
+ 		player.physics.gy *= 0.9;
 	}
 
 	remove(player) {
 		player.physics.bounce_speed = this.prev.bounce_speed;
+		player.physics.gy = this.prev.gy;
 		super.remove(player);
 	}
 }
@@ -113,3 +140,30 @@ class Rocket extends PowerUp {
 class RocketToken extends PowerupToken {
 	static get powerup() { return Rocket; }
 }
+
+const wingsimg = Resource.addAsset("img/wings.png");
+class JumpShoot extends PowerUp {
+	static get image() { return Resource.getAsset(wingsimg); }
+	static get scale() { return 0.17; }
+	static get cooldown() { return 10000; }
+	static get prettyName() { return "Vingar"; }
+	static get imgOffset() { return [0, 0]; }
+	static get drawBefore() { return true; }
+
+	init(player) {
+		super.init(player);
+
+		controller.player.keyActionMap.set("Space", JumpPlayer.ACTION_SPACEJUMP);
+		controller.player.isPressed.set(JumpPlayer.ACTION_SHOOT, false);
+	}
+
+	remove(player) {
+		controller.player.keyActionMap.set("Space", JumpPlayer.ACTION_SHOOT);
+		controller.player.isPressed.set(JumpPlayer.ACTION_SPACEJUMP, false);
+		super.remove(player);
+	}
+}
+class JumpShootToken extends PowerupToken {
+	static get powerup() { return JumpShoot; }
+}
+

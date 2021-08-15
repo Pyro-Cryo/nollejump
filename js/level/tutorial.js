@@ -276,22 +276,36 @@ Level.levels.set("test", infoOnly => {
 		}).over(regular.length * 4 / 5);
 
 	const powerups = new Region()
-		.wait(start.length)
-		.spawn(RocketToken, 1, (elapsed, spawnHistory, level) => {
+		// .wait(start.length)
+		.spawn(JumpBoostToken, 5, (elapsed, spawnHistory, level) => {
 			for (let i = spawnHistory.length - 1; i >= 0; i--) {
 				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
 					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
 			}
 			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent];
-		}).immediately()
-		.wait(start.length)
-		.spawn(RocketToken, 1, (elapsed, spawnHistory, level) => {
-			for (let i = spawnHistory.length - 1; i >= 0; i--) {
-				if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
-					return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
-			}
-			return [Math.random() * controller.gameArea.gridWidth, level.yCurrent];
-		}).immediately();
+		}).over(regular.length * 4 / 5);
+		// .interleave(
+		// 	new Region()
+		// 	.wait(start.length+50)
+		// 	.spawn(JumpShootToken, 5, (elapsed, spawnHistory, level) => {
+		// 		for (let i = spawnHistory.length - 1; i >= 0; i--) {
+		// 			if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
+		// 				return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
+		// 		}
+		// 		return [Math.random() * controller.gameArea.gridWidth, level.yCurrent];
+		// 	}).over(regular.length * 4 / 5)
+		// )
+		// .interleave(
+		// 	new Region()
+		// 	.wait(start.length+100)
+		// 	.spawn(JumpBoostToken, 5, (elapsed, spawnHistory, level) => {
+		// 		for (let i = spawnHistory.length - 1; i >= 0; i--) {
+		// 			if (spawnHistory[i].object instanceof Platform && !(spawnHistory[i].object instanceof BasicMovingPlatform))
+		// 				return [spawnHistory[i].xSpawn, spawnHistory[i].ySpawn + 10];
+		// 		}
+		// 		return [Math.random() * controller.gameArea.gridWidth, level.yCurrent];
+		// 	}).over(regular.length * 4 / 5)
+		// );
 
 	
 	const looping = regular

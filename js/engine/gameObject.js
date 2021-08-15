@@ -199,11 +199,18 @@ class EffectObject extends GameObject {
 	}
 
 	draw(gameArea) {
+		let index = 0;
+		this.effects.forEach(function (obj) {
+			if (obj.constructor.drawBefore) obj.draw(this, gameArea, index);
+			index++;
+		}.bind(this));
+
 		super.draw(gameArea);
 		
-		var index = 0;
+		index = 0;
 		this.effects.forEach(function (obj) {
-			index = obj.draw(this, gameArea, index);
+			if (!obj.constructor.drawBefore) obj.draw(this, gameArea, index);
+			index++;
 		}.bind(this));
 	}
 
@@ -231,6 +238,7 @@ class BaseEffect extends PrerenderedObject {
 	// px offset från parent object för att rita img. null för default värde.
 	static get imgOffset() { return [null, null]; }
 	static get cooldown() { return 1000; }
+	static get drawBefore() { return false; }
 
 	constructor() {
 		super(null, 0, 1);
@@ -266,7 +274,6 @@ class BaseEffect extends PrerenderedObject {
 		let y = object.y + (this.imgOffset[1] === null ? -0.5 : this.imgOffset[1]);
 
 		super.draw(gameArea, x, y);
-		return index + 1;
 	}
 
 	apply(object) {}
