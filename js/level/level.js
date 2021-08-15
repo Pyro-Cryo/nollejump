@@ -15,7 +15,7 @@ let _Level_ctfysLevels = [
 	"SK1105", // Expfys
 ];
 let _Level_ctmatLevels = [
-	"SF1674",
+	"SA1006",
 	// "DD1301", // Datorintro
 	// "SF1673", // Envarre
 	// "DD1331", // Gruprog
