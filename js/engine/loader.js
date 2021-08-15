@@ -76,7 +76,10 @@ class Resource {
 			promise = new Promise((resolve, reject) => {
 				try {
 					const item = new type();
+					if (type !== Image)
+						alert("Hämtar " + path);
 					if (item instanceof Audio) {
+						alert("Det bör funka");
 						let needsResolving = true;
 						item.addEventListener('canplaythrough', () => {
 							if (needsResolving) {
