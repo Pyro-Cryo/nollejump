@@ -111,13 +111,15 @@ class JumpBoostToken extends PowerupToken {
 	static get powerup() { return JumpBoost; };
 }
 
-const orangeimg = Resource.addAsset("img/fruit/orange.png");
+const albumimg = Resource.addAsset("img/album.png");
+const musicnotesimgs = new Map(["a", "b", "c", "d", "e", "f"]
+	.map(file => [file, Resource.addAsset(`img/note_${file}.png`)]));
 class Rocket extends PowerUp {
 
-	static get image() { return Resource.getAsset(orangeimg); }
-	static get scale() { return 0.1; }
-	static get cooldown() { return 2200; }
-	static get prettyName() { return "Raket"; }
+	static get image() { return Resource.getAsset(albumimg); }
+	static get scale() { return 0.25; }
+	static get cooldown() { return 2500; }
+	static get prettyName() { return "Raket-hit"; }
 
 	init(player) {
 		super.init(player);
@@ -128,10 +130,27 @@ class Rocket extends PowerUp {
  		player.physics.gy = 0;
  		if(player.physics.vy < 0)
  			player.physics.vy = 0;
+ 		this.exhaustcooldown = 0;
 	}
 
 	update(player, delta) {
 		player.physics.accelerate(0, 20, delta);
+		this.exhaustcooldown += delta;
+
+		if (this.exhaustcooldown >= 150 && Math.random() < 1/5) {
+			let keys = Array.from(musicnotesimgs.keys());
+			let img = Resource.getAsset(musicnotesimgs.get(keys[Math.floor(Math.random()*keys.length)]));
+			let a = new GameObject(player.x, player.y, img, 
+				(Math.random()-1/2)*Math.PI/8, 0.6*(1-0.5*Math.random()));
+			if (Math.random() < 1/2)
+				a.mirror = true;
+			a.physics = new StandardPhysics(a);
+			a.physics.setSpeed(player.vx + 50 * (Math.random() - 1/2), player.vy - 130 * (1-0.2*Math.random()));
+			a.old_update = a.update;
+			// Det här eftersom gameobjects inte despawnar per default om de är utanför skärmen
+			a.update = function(dt){ this.old_update(dt); despawnIfBelowBottom(this); }.bind(a);
+			this.exhaustcooldown = 0;
+		}
 		super.update(player, delta);
 	}
 
