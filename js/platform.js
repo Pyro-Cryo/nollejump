@@ -120,7 +120,7 @@ class GhostPlatform extends GameObject {
 
 		if (controller.gameArea.isInFrame(this.x, this.y)){
 			console.log("Spawning dynamic platform");
-			let platform = new this.innerPlatform(
+			let platform = new this.constructor.innerPlatform(
 				this.x,
 				controller.gameArea.canvasToGridY(960, true),
 				0,
