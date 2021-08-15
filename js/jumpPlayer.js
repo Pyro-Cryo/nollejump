@@ -103,7 +103,7 @@ class JumpPlayer extends Player {
 		if (!this.shootCooldown) {
 			const t = (this.y - controller.gameArea.bottomEdgeInGrid) / controller.gameArea.gridHeight;
 			let xSpeed = ((Math.random() - 0.5) * 0.6) * 80 + this.physics.vx;
-			let ySpeed = (2 + t * (1.2 - 2)) * 80 + this.physics.vy * (this.physics.vy > 0 ? 1.5 : 0);
+			let ySpeed = (2 + t * (1.2 - 2)) * 80 + this.physics.vy * (this.physics.vy > 0 ? 0.8 : 0);
 			if (this.angle)
 				[xSpeed, ySpeed] = [xSpeed * Math.cos(this.angle) + ySpeed * Math.sin(this.angle), -xSpeed * Math.sin(this.angle) + ySpeed * Math.cos(this.angle)];
 			if (this.isDying) {

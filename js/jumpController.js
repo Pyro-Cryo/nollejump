@@ -359,14 +359,12 @@ class JumpController extends Controller {
 	}
 
 	spawnPlayer() {
-		// Täck botten med plattformar så man inte instadör
+		if (this.enemies)
+			this.enemies.forEach(e => e.despawn());
 		this.enemies = [];
-		if (this.flipX) {
-			this.flipX = false;
-			this.setCanvasDimensions(this.barHeight, this.margin, this.margin / 2);
-		}
 		this.player = new JumpPlayer(this.gameArea.gridWidth / 2, 100);
 		// controller.delayedRenderObjects.push(this.player);
+		// Täck botten med plattformar så man inte instadör
 		const platWidth = Platform.image.width * Platform.scale / this.gameArea.unitWidth;
 		const startingPlatforms = new Region()
 			.spawn(

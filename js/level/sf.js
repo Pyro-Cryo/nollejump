@@ -149,8 +149,55 @@ Level.levels.set("SF1674", (infoOnly) => {
 	);
 	if (infoOnly)
 		return level;
+	
+	const spacing = 280;
+	const initialSpacing = 200;
+	const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
 
-	// ...
+	const startRegion = level.defineRegion("start");
+	const loopRegion = level.defineRegion("loop");
+	const endRegion = level.defineRegion("end");
+	level.initialRegion(startRegion);
+
+	startRegion.follower(loopRegion);
+	loopRegion.follower(loopRegion);
+	loopRegion.follower(endRegion, 1000, l => controller.enemies.filter(e => e instanceof SFFlappyBird).length === 0);
+	endRegion.follower(endRegion);
+
+	startRegion.spawn(Platform, 10, (e, sH, level) => [
+		controller.gameArea.gridWidth / 2,
+		level.yCurrent
+	]).spaced(initialSpacing)
+	.interleave(new Region()
+		.wait(initialSpacing * 8)
+		.spawn(SFFlappyBird, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth / 2,
+			level.yCurrent
+		]).immediately()
+	);
+	
+	let i = 0;
+	for (let x = 50 + platWidth / 2; x < controller.gameArea.gridWidth; x += 2 * platWidth) {
+		loopRegion.interleave(new Region()
+			.wait(i % 2 ? spacing : spacing * 2)
+			.spawn(Platform, 1, (e, sH, level) => [x, level.yCurrent])
+			.spawn(Platform, 1, (e, sH, level) => [x + platWidth, level.yCurrent])
+			.immediately()
+		);
+		i++;
+	}
+
+	endRegion.spawn(Platform, 10, (e, sH, level) => [
+		controller.gameArea.gridWidth / 2,
+		level.yCurrent
+	]).spaced(initialSpacing)
+	.interleave(new Region()
+		.wait(initialSpacing * 1.1)
+		.spawn(Tenta, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth / 2,
+			level.yCurrent
+		]).immediately()
+	);
 
 	return level;
 });

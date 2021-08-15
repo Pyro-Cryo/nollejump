@@ -17,6 +17,7 @@ class Pellet extends GameObject {
 
     update(delta) {
         super.update(delta);
+        this.angle += this.angleVelocity * delta;
 
         for (const enemy of controller.enemies) {
             if (collisionCheckScreenWrap(this, enemy)) {
