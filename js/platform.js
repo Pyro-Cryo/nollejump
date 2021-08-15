@@ -114,20 +114,29 @@ class GhostPlatform extends GameObject {
 
 	static get innerPlatform() { return DynamicPlatform; }
 	static get image() { return this.innerPlatform.image; }
+	static get cooldown() { return 2000; }
+
+	constructor(x,y){
+		super(x,y);
+		this.cdtimer = 0;
+	}
 
 	update(delta){
 		super.update(delta);
 
-		if (controller.gameArea.isInFrame(this.x, this.y)){
-			console.log("Spawning dynamic platform");
-			let platform = new this.innerPlatform(
+		this.cdtimer -= delta;
+
+		if (controller.gameArea.isInFrame(this.x, this.y) && this.cdtimer <= 0){
+			
+			let platform = new this.constructor.innerPlatform(
 				this.x,
 				controller.gameArea.canvasToGridY(960, true),
-				0,
-				controller.player.physics.bounce_speed
+				(Math.random()-1/2) * Math.abs(this.x - controller.gameArea.gridWidth/2)/2,
+				controller.player.physics.bounce_speed * (1.1-0.3*Math.random())
 			);
-			this.despawn();
+			this.cdtimer += this.constructor.cooldown;
 		}
+
 		despawnIfBelowBottom(this);
 	}
 
@@ -152,6 +161,7 @@ class DynamicPlatform extends Platform {
 		this.physics = new StandardPhysics(this);
 		this.physics.gy /= 2;
 		this.physics.setSpeed(vx, vy);
+
 	}
 
 	despawnCheck(){
