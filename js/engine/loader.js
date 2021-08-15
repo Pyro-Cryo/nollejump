@@ -76,15 +76,11 @@ class Resource {
 			promise = new Promise((resolve, reject) => {
 				try {
 					const item = new type();
-					if (type !== Image)
-						alert("Hämtar " + path);
 					if (item instanceof Audio) {
-						alert("Det bör funka");
 						let needsResolving = true;
 						item.addEventListener('canplaythrough', () => {
 							if (needsResolving) {
 								needsResolving = false;
-								alert("klar via playthrough");
 								resolve(item);
 							}
 						});
@@ -93,19 +89,25 @@ class Resource {
 							alert("Ready state: " + item.readyState);
 							if (item.readyState === 4 && needsResolving) {
 								needsResolving = false;
-								alert("klar!");
 								resolve(item);
 							}
 							if (!needsResolving) {
 								clearInterval(interval);
 							}
 						}, 1000);
-						alert("lyssnar på inläsningen av " + path);
+
+						setTimeout(() => {
+							// iOS vill inte läsa in saker, yolo
+							resolve(item);
+							needsResolving = false;
+						}, 5000);
 					}
 					else
 						item.addEventListener('load', () => resolve(item));
 					item.addEventListener('error', reject);
 					item.src = path;
+					if (item instanceof Audio)
+						item.load();
 				} catch (e) {
 					reject(e);
 				}
