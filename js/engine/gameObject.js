@@ -19,6 +19,7 @@ class PrerenderedObject {
 		this.scale = scale === null ? this.constructor.scale : scale;
 		this.angleDeltaDegrees = angleDeltaDegrees === null ? this.constructor.angleDeltaDegrees : angleDeltaDegrees;
 		this._mirror = false;
+		this.alpha = 1;
 		// this.mirror = false;
 
 		this._imageDirty = true;
@@ -120,6 +121,8 @@ class PrerenderedObject {
 
 		this.imagecontext.translate(this.imagecache.width / 2, this.imagecache.height / 2);
 		this.imagecontext.rotate(this.angle);
+		if (this.alpha !== 1)
+			this.imagecontext.globalAlpha = this.alpha;
 
 		// if (this.mirror) {
 		// 	this.imagecontext.translate(this.imagecache.width, 0);

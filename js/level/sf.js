@@ -13,7 +13,28 @@ Level.levels.set("SF1673", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	// ...
+	const spacing = 100;
+	const loop = level.defineRegion("loop");
+	const tenta = level.defineRegion("tenta");
+	level.initialRegion(loop);
+
+	loop.follower(loop, 2);
+	loop.follower(tenta, 1, level => level.tentaCurrent < level.tentaNeeded);
+	tenta.follower(loop);
+
+	loop.wait(spacing * 2).spawn(CloakingPlatform, 20, (e, sH, level) => [
+		Math.random() * controller.gameArea.gridWidth,
+		level.yCurrent
+	]).spaced(spacing);
+
+	tenta.spawn(Tenta, 1, (e, sH, level) => [
+		Math.random() * controller.gameArea.gridWidth,
+		level.yCurrent
+	]).immediately()
+		.wait(spacing * 2).spawn(ScrollingCloakingPlatform, 10, (e, sH, level) => [
+		Math.random() * controller.gameArea.gridWidth,
+		level.yCurrent
+	]).spaced(spacing);
 
 	return level;
 });
