@@ -3,11 +3,11 @@ let _Level_tutorial = null;
 let _Level_levels = new Map();
 let _Level_ctfysLevels = [
 	"DD1301", // Datorintro
-	"test",
 	"SF1673", // Envarre
 	"DD1331", // Gruprog
 	"SI1121", // Termo
 	"SF1672", // Linalg
+	"Placeholder:", // TODO: ta bort
 	"SK1104", // Klassfys
 	"SF1674", // Flervarre
 	"SG1112", // Mek 1
@@ -15,18 +15,18 @@ let _Level_ctfysLevels = [
 	"SK1105", // Expfys
 ];
 let _Level_ctmatLevels = [
-	"SF1674",
-	// "DD1301", // Datorintro
-	// "SF1673", // Envarre
-	// "DD1331", // Gruprog
-	// "SA1006", // Ingenjörsfärdigheter
-	// "SF1672", // Linalg
-	// "SF1918", // Sannstat, OBS annan kurskod
-	// "SF1674", // Flervarre
-	// "DD1320", // Tildat
-	// "SF1550", // Numme
-	// "DD1396", // Parallellprogrammering
-	// "SG1115", // Partikeldynamik
+	"DD1301", // Datorintro
+	"SF1673", // Envarre
+	"DD1331", // Gruprog
+	"SA1006", // Ingenjörsfärdigheter
+	"SF1672", // Linalg
+	"Placeholder:", // TODO: ta bort
+	"SF1918", // Sannstat, OBS annan kurskod
+	"SF1674", // Flervarre
+	"DD1320", // Tildat
+	"SF1550", // Numme
+	"DD1396", // Parallellprogrammering
+	"SG1115", // Partikeldynamik
 ];
 let _Level_win = null;
 
