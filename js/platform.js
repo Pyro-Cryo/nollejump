@@ -1,5 +1,5 @@
 const platformImgs = Object.fromEntries([
-	"normal", "green", "broken", "blue", "teal"
+	"normal", "green", "broken", "blue", "teal", "violet"
 ].map(file => [file, Resource.addAsset(`img/platforms/${file}.png`)]));
 class Platform extends EffectObject {
 	static get image() { return Resource.getAsset(platformImgs.normal); }
@@ -233,5 +233,62 @@ class CompanionCubePlatform extends Platform {
 			[Math.random() * controller.gameArea.gridWidth, this.y + this.yIncrease + this.yIncreaseVariation * (Math.random() * 2 - 1)]
 		];
 		this.t = 0;
+	}
+}
+
+class CloakingPlatform extends Platform {
+	static get image() { return Resource.getAsset(platformImgs.violet); }
+	constructor(x, y) {
+		super(x, y);
+		this.cloakLimit = 0.6;
+		this.uncloakLimit = 0.5;
+		this.t = 0;
+		this.alphaPath = null;
+		this.alphaSpeed = 1 / 250;
+	}
+
+	update(delta) {
+		super.update(delta);
+		const t = (this.y - controller.gameArea.bottomEdgeInGrid) / controller.gameArea.gridHeight;
+		const oldAlpha = this.alpha;
+		if (this.alphaPath) {
+			if (this.t === 1) {
+				this.alphaPath = null;
+				this.alpha = 0;
+			} else {
+				this.alpha = Splines.interpolateLinear(this.t, this.alphaPath)[0];
+				this.t = Math.min(1, this.t + this.alphaSpeed * delta);
+			}
+		} else {
+			if (t > this.cloakLimit)
+				this.alpha = 1;
+			else if (t < this.uncloakLimit)
+				this.alpha = 0;
+			else
+				this.alpha = (t - this.uncloakLimit) / (this.cloakLimit - this.uncloakLimit);
+		}
+		if (this.alpha !== oldAlpha)
+			this._imageDirty = true;
+	}
+
+	onPlayerBounce(player) {
+		super.onPlayerBounce(player);
+		this.alphaPath = [[0], [1], [0]];
+		this.t = 0;
+	}
+}
+
+class ScrollingCloakingPlatform extends CloakingPlatform {
+	static get image() { return Resource.getAsset(platformImgs.violet); }
+	constructor(x, y, speed = 100) {
+		super(x, y);
+		this.speed = speed;
+	}
+	update(delta) {
+		super.update(delta);
+		this.x += this.speed * delta / 1000;
+
+		if (controller.screenWrap)
+			screenWrap(this);
 	}
 }
