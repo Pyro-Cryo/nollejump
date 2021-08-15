@@ -134,8 +134,11 @@ class JumpController extends Controller {
 		console.error(reason);
 		if (reason instanceof Response)
 			alert(`Spelet kunde inte laddas:\n${reason.status} ${reason.statusText}\n${reason.text()}`);
-		else
+		else if (reason instanceof Event) 
 			alert(`Spelet kunde inte laddas:\nHittade inte (eller kunde inte tolka) ${reason.path[0].src}`);
+		else {
+			alert("Okänt fel vid laddning av spelet.\n" + JSON.stringify(reason));
+		}
 		setInterval(() => this.setMessage("Spelet är trasigt :("), 6000);
 		setTimeout(() => setInterval(() => this.setMessage("Hör av dig till utvecklarna eller Cyberföhs"), 6000), 3000);
 		setTimeout(() => this.setMessage("Spelet är trasigt :("), 1000);
