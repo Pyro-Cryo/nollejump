@@ -1,5 +1,5 @@
 const platformImgs = Object.fromEntries([
-	"normal", "green", "broken", "blue"
+	"normal", "green", "broken", "blue", "teal"
 ].map(file => [file, Resource.addAsset(`img/platforms/${file}.png`)]));
 class Platform extends EffectObject {
 	static get image() { return Resource.getAsset(platformImgs.normal); }
@@ -198,5 +198,40 @@ class DynamicPlatform extends Platform {
 	onPlayerBounce(player) {
 		super.onPlayerBounce(player);
 		this.physics.vy -= player.physics.bounce_speed/2;
+	}
+}
+
+class CompanionCubePlatform extends Platform {
+	static get image() { return Resource.getAsset(platformImgs.teal); }
+	static get scale() { return 0.25; }
+	constructor(x, y) {
+		super(x, y);
+		this.t = 1;
+		this.path = null;
+		this.speed = 1 / 1000;
+		this.yIncrease = 150;
+		this.yIncreaseVariation = 50;
+	}
+
+	update(delta) {
+		super.update(delta);
+		if (this.path) {
+			this.t = Math.min(1, this.t + this.speed * delta);
+			[this.x, this.y] = Splines.interpolateLinear(this.t, this.path);
+			if (this.t === 1)
+				this.path = null;
+		}
+
+		if (controller.screenWrap)
+			screenWrap(this);
+	}
+
+	onPlayerBounce(player) {
+		super.onPlayerBounce(player);
+		this.path = [
+			[this.x, this.y],
+			[Math.random() * controller.gameArea.gridWidth, this.y + this.yIncrease + this.yIncreaseVariation * (Math.random() * 2 - 1)]
+		];
+		this.t = 0;
 	}
 }
