@@ -28,6 +28,8 @@ class JumpPlayer extends Player {
 	static set ACTION_GO_RIGHT(value) { _JumpPlayer_ACTION_GO_RIGHT = value;}
 	static get ACTION_SHOOT() { return _JumpPlayer_ACTION_SHOOT;}
 	static set ACTION_SHOOT(value) { _JumpPlayer_ACTION_SHOOT = value;}
+	static get ACTION_SPACEJUMP() { return _JumpPlayer_ACTION_SPACEJUMP;}
+	static set ACTION_SPACEJUMP(value) { _JumpPlayer_ACTION_SPACEJUMP = value;}
 	static get SCREENWRAP_TRACKING() { return _JumpPlayer_SCREENWRAP_TRACKING;}
 	static set SCREENWRAP_TRACKING(value) { _JumpPlayer_SCREENWRAP_TRACKING = value;}
 	static get NON_SCREENWRAP_TRACKING() { return _JumpPlayer_NON_SCREENWRAP_TRACKING;}
@@ -66,7 +68,10 @@ class JumpPlayer extends Player {
 
 		controller.gameArea.canvas.addEventListener("click", e => {
 			if (this.deviceTiltAvailable) {
-				this.shoot();
+				if (this.keyActionMap.get("Space") === JumpPlayer.ACTION_SHOOT)
+					this.shoot();
+				else
+					this.spaceJump();
 				e.preventDefault();
 			}
 		}, true);
