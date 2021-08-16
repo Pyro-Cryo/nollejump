@@ -708,8 +708,16 @@ class cheat {
 			draw: gameArea => null
 		});
 	}
-
-	static get mute() {
-		Resource.getAsset(music).volume = 0;
+	
+	static get testDistribution() {
+		const sums = new Map();
+		for (let i = 0; i < 300; i++) {
+			const name = controller.currentLevel.currentRegion.getRandomFollower().name;
+			if (sums.has(name))
+				sums.set(name, sums.get(name) + 1);
+			else
+				sums.set(name, 1);
+		}
+		return sums;
 	}
 };

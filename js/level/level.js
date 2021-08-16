@@ -59,6 +59,8 @@ class Level {
 
 		this.yOnLevelStart = null;
 		this.yLast = null;
+		this.regionHistory = [];
+		this.disqualifyingFactor = 1.33;
 	}
 
 	get yCurrent() {
@@ -112,6 +114,7 @@ class Level {
 		this.yLast = this.yOnLevelStart - prespawnDistance;
 		this.currentRegion = this.initial.clone();
 		console.log(`Ny level: ${this.code} - ${this.name}`);
+		this.regionHistory.push(this.currentRegion.name);
 	}
 
 	/**
@@ -134,8 +137,10 @@ class Level {
 			else while (res.done && res.remainingDelta > 0) {
 				this.previousElapsed += this.currentRegion.elapsed;
 				this.currentRegion = res.followingRegion.clone();
-				if (this.currentRegion.name)
+				if (this.currentRegion.name) {
 					console.log("Ny region: " + this.currentRegion.name);
+					this.regionHistory.push(this.currentRegion.name);
+				}
 				res = this.currentRegion.next(res.remainingDelta);
 				if (this.onNewRegion)
 					this.onNewRegion();
@@ -243,9 +248,29 @@ class Region extends ArgableSequence {
 	 * Ger en random följande region med hänsyn till vikter och conditions.
 	 */
 	getRandomFollower() {
-		const availableFollowers = this.followers.filter(obj => obj.condition === null || obj.condition(this.level));
+		let availableFollowers = this.followers.filter(obj => obj.condition === null || obj.condition(this.level));
 		if (availableFollowers.length === 0)
 			return null;
+		// Om man får "för många" (vikten + 33%) av samma i rad, garantera en annan
+		if (availableFollowers.length > 1) {
+			let repeated = null;
+			for (let i = 0; i < this.level.regionHistory.length; i++) {
+				const name = this.level.regionHistory[this.level.regionHistory.length - 1 - i];
+				if (repeated === null) {
+					repeated = availableFollowers.find(obj => obj.region.name === name);
+					if (repeated)
+						continue;
+					else
+						break;
+				}
+				if (name !== repeated.region.name)
+					break;
+				if (i > repeated.weight * this.level.disqualifyingFactor) {
+					availableFollowers = availableFollowers.filter(obj => obj !== repeated);
+					break;
+				}
+			}
+		}
 
 		const normWeightCumSum = availableFollowers
 			.reduce((res, obj, index) => {
