@@ -1,5 +1,5 @@
 const platformImgs = Object.fromEntries([
-	"normal", "green", "broken", "blue", "teal", "violet"
+	"normal", "green", "broken", "blue", "teal", "violet", "red", "gold"
 ].map(file => [file, Resource.addAsset(`img/platforms/${file}.png`)]));
 class Platform extends EffectObject {
 	static get image() { return Resource.getAsset(platformImgs.normal); }
@@ -290,5 +290,52 @@ class ScrollingCloakingPlatform extends CloakingPlatform {
 
 		if (controller.screenWrap)
 			screenWrap(this);
+	}
+}
+
+class MagneticPlatform extends Platform {
+	static get image() { return Resource.getAsset(platformImgs.gold); }
+	static get scale() { return 0.22; }
+
+	get height() {
+		return super.height * 2;
+	}
+
+	constructor(x, y, repulsive=false, range=null) {
+		super(x, y);
+		this.repulsive = repulsive;
+		if (this.repulsive)
+			this.image = Resource.getAsset(platformImgs.red);
+		this.range = range || controller.gameArea.gridWidth / 2;
+		this.maxSpeed = 60 / this.range;
+	}
+
+	update(delta) {
+		super.update(delta);
+
+		if (controller.player && this.y + this.height >= controller.gameArea.bottomEdgeInGrid) {
+			const yDist = controller.player.y - this.y;
+			let xDist = controller.player.x - this.x;
+			if (Math.abs(xDist) > Math.abs(xDist - controller.gameArea.gridWidth))
+				xDist = xDist - controller.gameArea.gridWidth;
+			let t = 1 - (xDist * xDist + yDist * yDist) / (this.range * this.range);
+			if (t > 0) {
+				t = Math.pow(t, 3 / 4);
+				const theta = Math.atan2(yDist, xDist) + (this.repulsive ? Math.PI : 0);
+				this.x += this.maxSpeed * t * delta * Math.cos(theta);
+				this.y += this.maxSpeed * t * delta * Math.sin(theta);
+			}
+		}
+		
+		if (controller.screenWrap)
+			screenWrap(this);
+	}
+
+	onCollision(player) {
+		// If the player was above us and is going down
+		if (player.physics.vy <= 0 && player.lastY - player.height / 2 >= this.y - this.height / 2)
+			this.onPlayerBounce(player);
+		else
+			this.onPlayerPass(player);
 	}
 }

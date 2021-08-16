@@ -20,9 +20,9 @@ let _Level_ctmatLevels = [
 	"DD1331", // Gruprog
 	"SA1006", // Ingenjörsfärdigheter
 	"SF1672", // Linalg
-	"Placeholder:", // TODO: ta bort
 	"SF1918", // Sannstat, OBS annan kurskod
 	"SF1674", // Flervarre
+	"Placeholder:", // TODO: ta bort
 	"DD1320", // Tildat
 	"SF1550", // Numme
 	"DD1396", // Parallellprogrammering
