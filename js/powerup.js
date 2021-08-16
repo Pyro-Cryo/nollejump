@@ -121,7 +121,8 @@ class Rocket extends PowerUp {
 	init(player) {
 		super.init(player);
 
-		player.addEffect(new Immortal());
+		// player.addEffect(new Immortal());
+		player.powers["shield"] = true;
 
  		this.prev = Object.assign({}, player.physics);
  		player.physics.gy = 0;
@@ -153,6 +154,7 @@ class Rocket extends PowerUp {
 
 	remove(player) {
 		player.physics.gy = this.prev.gy;
+		player.powers["shield"] = false;
 		super.remove(player);
 	}
 }
@@ -165,7 +167,7 @@ const wingsimg = Resource.addAsset("img/wings.png");
 class JumpShoot extends PowerUp {
 	static get image() { return Resource.getAsset(wingsimg); }
 	static get scale() { return 0.17; }
-	static get cooldown() { return 10000; }
+	static get cooldown() { return 7500; }
 	static get prettyName() { return "Vingar"; }
 	static get imgOffset() { return [0, 0]; }
 	static get drawBefore() { return true; }

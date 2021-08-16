@@ -80,34 +80,34 @@ Level.levels.set("SA1006", (infoOnly) => {
 			.spaced(1000));
 
 	const regular = level.defineRegion("kaozzz")
-		.spawn(BasicMovingPlatform, 100, (elapsed, spawnHistory, level) => [
+		.spawn(BasicMovingPlatform, 10, (elapsed, spawnHistory, level) => [
 		Math.random() * controller.gameArea.gridWidth,
 		level.yCurrent + Math.random() * 100
 	]).spaced(100)
 	.interleave(new Region()
 		.wait(50)
-		.spawn(ScrollingPlatform, 100, (e,s,l) => [
+		.spawn(ScrollingPlatform, 10, (e,s,l) => [
 			Math.random() * controller.gameArea.gridWidth,
 			l.yCurrent + Math.random() * 100,
 			]).spaced(100)
 		)
 	.interleave(new Region()
 		.wait(50)
-		.spawn(DiscreteMovingPlatform, 100, (e,s,l) => [
+		.spawn(DiscreteMovingPlatform, 10, (e,s,l) => [
 			Math.random() * controller.gameArea.gridWidth,
 			l.yCurrent + Math.random() * 100,
 			]).spaced(100)
 		)
 	.interleave(new Region()
 		.wait(50)
-		.spawn(FakePlatform, 100, (e,s,l) => [
+		.spawn(FakePlatform, 10, (e,s,l) => [
 			Math.random() * controller.gameArea.gridWidth,
 			l.yCurrent + Math.random() * 100,
 			]).spaced(100)
 		)
 	.interleave(new Region()
 		.wait(50)
-		.spawn(Homework, 400, (e,s,l) => [
+		.spawn(Homework, 40, (e,s,l) => [
 			Math.random() * controller.gameArea.gridWidth,
 			l.yCurrent + Math.random() * 100,
 			]).spaced(100/4)
@@ -115,6 +115,7 @@ Level.levels.set("SA1006", (infoOnly) => {
 
 	level.initialRegion(start);
 	start.follower(ramp);
-	ramp.follower(regular)
+	ramp.follower(regular);
+	regular.follower(regular, 1, level => level.homeworkCurrent < 100)
 	return level;
 });
