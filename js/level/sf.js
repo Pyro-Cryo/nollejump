@@ -13,31 +13,153 @@ Level.levels.set("SF1673", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	const spacing = 100;
-	const loop = level.defineRegion("loop");
+	const font = "32px Nunito, sans-serif";
+	const textCol = "#222222";
+	const spacing = 200;
+	const fohsBounce = level.defineRegion("fohsBounce");
+	const platBounce = level.defineRegion("platBounce");
+	const flight = level.defineRegion("flight");
+	const normal = level.defineRegion("normal");
 	const tenta = level.defineRegion("tenta");
-	level.initialRegion(loop);
+	level.initialRegion(normal);
 
-	loop.follower(loop, 2);
-	loop.follower(tenta, 1, level => level.tentaCurrent < level.tentaNeeded);
-	tenta.follower(loop);
+	normal.wait(spacing).spawn(Platform, 12, (e, sH, level) => [
+		controller.gameArea.gridWidth * (Math.floor(Math.random() * 3) + 1) / 4,
+		level.yCurrent
+	]).spaced(spacing);
 
-	loop.wait(spacing * 2)
-		.spawn(CloakingPlatform, 20, (e, sH, level) => [
-			Math.random() * controller.gameArea.gridWidth,
-			level.yCurrent
-		]).spaced(spacing);
-
-	tenta.wait(spacing / 2)
-		.spawn(Tenta, 1, (e, sH, level) => [
-			Math.random() * controller.gameArea.gridWidth,
+	fohsBounce.wait(spacing)
+		.spawn(TFHardhat, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth * (Math.floor(Math.random() * 3) + 1) / 4,
 			level.yCurrent
 		]).immediately()
-		.wait(spacing * 3 / 2)
-		.spawn(ScrollingCloakingPlatform, 10, (e, sH, level) => [
-			Math.random() * controller.gameArea.gridWidth,
+		.wait(spacing * 3)
+		.spawn(SFHardhat, 1, (e, spawnHistory, level) => {
+			let i = (Math.floor(Math.random() * 3) + 1);
+			while (i === Math.round(4 * spawnHistory[spawnHistory.length - 1].xSpawn / controller.gameArea.gridWidth))
+				i = (Math.floor(Math.random() * 3) + 1);
+
+			return [
+				controller.gameArea.gridWidth * i / 4,
+				level.yCurrent
+			];
+		}).immediately()
+		.spawn(JumpBoostToken, 1, (e, spawnHistory, level) => [
+			spawnHistory[spawnHistory.length - 1].xSpawn,
+			level.yCurrent + 60
+		]).immediately()
+		.wait(spacing * 3)
+		.spawn(OFHardhat, 1, (e, spawnHistory, level) => {
+			const iLatest = Math.round(4 * spawnHistory[spawnHistory.length - 1].xSpawn / controller.gameArea.gridWidth);
+			const iSecondLatest = Math.round(4 * spawnHistory[spawnHistory.length - 3].xSpawn / controller.gameArea.gridWidth);
+			const i = 1 + 2 + 3 - iLatest - iSecondLatest;
+
+			return [
+				controller.gameArea.gridWidth * i / 4,
+				level.yCurrent
+			];
+		}).immediately()
+		.spawn(JumpBoostToken, 1, (e, spawnHistory, level) => [
+			spawnHistory[spawnHistory.length - 1].xSpawn,
+			level.yCurrent + 60
+		]).immediately()
+		.wait(spacing * 2);
+
+	platBounce.wait(spacing)
+		.spawn(Platform, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth * (Math.floor(Math.random() * 3) + 1) / 4,
 			level.yCurrent
-		]).spaced(spacing);
+		]).immediately()
+		.spawn(JumpBoostToken, 1, (e, spawnHistory, level) => [
+			spawnHistory[spawnHistory.length - 1].xSpawn,
+			level.yCurrent + 30
+		]).immediately()
+		.wait(spacing * 3)
+		.spawn(Platform, 1, (e, spawnHistory, level) => {
+			let i = (Math.floor(Math.random() * 3) + 1);
+			while (i === Math.round(4 * spawnHistory[spawnHistory.length - 1].xSpawn / controller.gameArea.gridWidth))
+				i = (Math.floor(Math.random() * 3) + 1);
+
+			return [
+				controller.gameArea.gridWidth * i / 4,
+				level.yCurrent
+			];
+		}).immediately()
+		.wait(spacing * 3)
+		.spawn(Platform, 1, (e, spawnHistory, level) => {
+			const iLatest = Math.round(4 * spawnHistory[spawnHistory.length - 1].xSpawn / controller.gameArea.gridWidth);
+			const iSecondLatest = Math.round(4 * spawnHistory[spawnHistory.length - 2].xSpawn / controller.gameArea.gridWidth);
+			const i = 1 + 2 + 3 - iLatest - iSecondLatest;
+
+			return [
+				controller.gameArea.gridWidth * i / 4,
+				level.yCurrent
+			];
+		}).immediately()
+		.wait(spacing * 2);
+
+	flight.wait(spacing)
+		.spawn(Platform, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth * (Math.floor(Math.random() * 3) + 1) / 4,
+			level.yCurrent
+		]).immediately()
+		.spawn(JumpShootToken, 1, (e, spawnHistory, level) => [
+			spawnHistory[spawnHistory.length - 1].xSpawn,
+			level.yCurrent + 30
+		]).immediately()
+		.wait(60);
+
+	const firstFlight = level.defineRegion("firstFlight").append(flight.clone())
+		.spawn(Hint, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth / 2, level.yCurrent + 80, "Med vingar hoppar du", font, textCol
+		]).spawn(Hint, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth / 2, level.yCurrent + 40, "istället för att skjuta", font, textCol
+		]).immediately();
+	const fohsInTheWay = new Region()
+		.wait(spacing * 3)
+		.spawn(TFPassive, 1, (e, sH, level) => [
+			controller.gameArea.gridWidth * (Math.floor(Math.random() * 3) + 1) / 4,
+			level.yCurrent
+		]).immediately()
+		.wait(spacing * 2)
+		.spawn(SFPassive, 1, (e, spawnHistory, level) => {
+			let i = (Math.floor(Math.random() * 3) + 1);
+			while (i === Math.round(4 * spawnHistory[spawnHistory.length - 1].xSpawn / controller.gameArea.gridWidth))
+				i = (Math.floor(Math.random() * 3) + 1);
+
+			return [
+				controller.gameArea.gridWidth * i / 4,
+				level.yCurrent
+			];
+		}).immediately()
+		.wait(spacing * 2)
+		.spawn(OFPassive, 1, (e, spawnHistory, level) => {
+			const iLatest = Math.round(4 * spawnHistory[spawnHistory.length - 1].xSpawn / controller.gameArea.gridWidth);
+			const iSecondLatest = Math.round(4 * spawnHistory[spawnHistory.length - 2].xSpawn / controller.gameArea.gridWidth);
+			const i = 1 + 2 + 3 - iLatest - iSecondLatest;
+
+			return [
+				controller.gameArea.gridWidth * i / 4,
+				level.yCurrent
+			];
+		}).immediately();
+	flight.append(fohsInTheWay.clone()).append(fohsInTheWay.clone());
+	firstFlight.append(fohsInTheWay.clone()).append(fohsInTheWay.clone());
+
+	tenta.spawn(Tenta, 1, (e, sH, level) => [
+		controller.gameArea.gridWidth * (Math.floor(Math.random() * 4) + 0.5) / 4,
+		level.yCurrent + spacing * 5
+	]).immediately().wait(10);
+
+	normal.follower(firstFlight, 1, level => level.regionHistory.findIndex(name => name === firstFlight.name) === -1);
+	normal.follower(flight, 1, level => level.regionHistory.findIndex(name => name === firstFlight.name) !== -1);
+	normal.follower(platBounce);
+	flight.follower(normal);
+	firstFlight.follower(normal);
+	platBounce.follower(fohsBounce);
+	fohsBounce.follower(normal);
+	normal.follower(tenta, 4, level => level.regionHistory.findIndex(name => name === fohsBounce.name) !== -1 && level.regionHistory.findIndex(name => name === firstFlight.name) !== -1);
+	tenta.follower(flight);
 
 	return level;
 });
@@ -241,7 +363,31 @@ Level.levels.set("SF1922", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	// ...
+	const spacing = 100;
+	const loop = level.defineRegion("loop");
+	const tenta = level.defineRegion("tenta");
+	level.initialRegion(loop);
+
+	loop.follower(loop, 2);
+	loop.follower(tenta, 1, level => level.tentaCurrent < level.tentaNeeded);
+	tenta.follower(loop);
+
+	loop.wait(spacing * 2)
+		.spawn(CloakingPlatform, 20, (e, sH, level) => [
+			Math.random() * controller.gameArea.gridWidth,
+			level.yCurrent
+		]).spaced(spacing);
+
+	tenta.wait(spacing / 2)
+		.spawn(Tenta, 1, (e, sH, level) => [
+			Math.random() * controller.gameArea.gridWidth,
+			level.yCurrent
+		]).immediately()
+		.wait(spacing * 3 / 2)
+		.spawn(ScrollingCloakingPlatform, 10, (e, sH, level) => [
+			Math.random() * controller.gameArea.gridWidth,
+			level.yCurrent
+		]).spaced(spacing);
 
 	return level;
 });

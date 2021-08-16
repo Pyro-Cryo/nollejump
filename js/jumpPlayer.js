@@ -146,11 +146,9 @@ class JumpPlayer extends Player {
 		if (this.powers["shoes"] && this.vy < 0 && this.lastY >= enemy.y){
 
 			this.standardBounce(enemy);
-			this.effects.forEach(function(obj){
-				console.log(obj.constructor, JumpBoost.constructor);
-				if (obj.constructor == JumpBoost.constructor)
-					obj.remove(this);
-			});
+			const toRemove = [];
+			this.effects.forEach(obj => obj instanceof JumpBoost ? toRemove.push(obj) : null);
+			toRemove.forEach(obj => obj.remove(this));
 			return;
 		}
 
