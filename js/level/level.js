@@ -7,9 +7,9 @@ let _Level_ctfysLevels = [
 	"DD1331", // Gruprog
 	"SI1121", // Termo
 	"SF1672", // Linalg
-	"Placeholder:", // TODO: ta bort
 	"SK1104", // Klassfys
 	"SF1674", // Flervarre
+	"Placeholder:", // TODO: ta bort
 	"SG1112", // Mek 1
 	"SF1922", // Sannstat
 	"SK1105", // Expfys
