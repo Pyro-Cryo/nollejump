@@ -60,14 +60,14 @@ Level.levels.set("Placeholder:", infoOnly => {
     empty.follower(empty);
 
     let i = 0; 
-    initial.wait(120).spawn(Platform, 9, (e, sH, level) => [(i++ + 0.5) * 50, level.yCurrent + 20 * (i % 2)]).immediately();
+    initial.wait(120).spawn(Platform, 12, (e, sH, level) => [(i++ + 0.5) * 50, level.yCurrent + 20 * (i % 2)]).immediately();
     initial.wait(500).spawn(Hint, 1, (e, sH, level) => [
         controller.gameArea.gridWidth / 2, level.yCurrent, "Vi har tyvärr inte hunnit", font, textCol
     ]).spawn(Hint, 1, (e, sH, level) => [
         controller.gameArea.gridWidth / 2, level.yCurrent - 40, "göra fler banor än", font, textCol
     ]).spawn(Hint, 1, (e, sH, level) => [
         controller.gameArea.gridWidth / 2, level.yCurrent - 80, "Kolla igen senare under veckan!", font, textCol
-    ]).immediately();
+    ]).immediately().call(() => ScoreReporter.report(false));
 
     empty.wait(controller.gameArea.gridHeight * 10);
     level.initialRegion(initial);

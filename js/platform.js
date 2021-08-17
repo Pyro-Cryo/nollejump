@@ -228,9 +228,14 @@ class CompanionCubePlatform extends Platform {
 
 	onPlayerBounce(player) {
 		super.onPlayerBounce(player);
+		let additionalIncrease = 0;
+		player.effects.forEach(obj =>  {
+			if (obj instanceof JumpBoost)
+				additionalIncrease = this.yIncrease;
+		});
 		this.path = [
 			[this.x, this.y],
-			[Math.random() * controller.gameArea.gridWidth, this.y + this.yIncrease + this.yIncreaseVariation * (Math.random() * 2 - 1)]
+			[Math.random() * controller.gameArea.gridWidth, this.y + this.yIncrease + additionalIncrease + this.yIncreaseVariation * (Math.random() * 2 - 1)]
 		];
 		this.t = 0;
 	}
