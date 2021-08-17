@@ -394,7 +394,7 @@ Level.levels.set("SF1922", (infoOnly) => {
 Level.levels.set("SF1918", (infoOnly) => {
 	// Sannstat (CTMAT)
 	// Kopiera bara fysiks
-	const level = Level.levels.get(SF1922)(infoOnly);
+	const level = Level.levels.get("SF1922")(infoOnly);
 	level.code = "SF1918";
 	return level;
 });
