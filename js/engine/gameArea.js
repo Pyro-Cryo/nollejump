@@ -312,6 +312,21 @@ class GameArea {
         this.context.fillStyle = fillStyle;
     }
 
+    line(_x0, _y0, _x1, _y1, linewidth=1, color="black", considerOffset=true){
+        this.context.beginPath();
+        this.context.strokeStyle = color;
+        this.context.lineWidth = linewidth;
+        this.context.moveTo(
+            this.gridToCanvasX(_x0, considerOffset),
+            this.gridToCanvasY(_y0, considerOffset)
+            );
+        this.context.lineTo(
+            this.gridToCanvasX(_x1, considerOffset),
+            this.gridToCanvasY(_y1, considerOffset)
+            );
+        this.context.stroke();
+    }
+
     /**
      * Draw some text
      * @param {number} _x Horizontal position in grid coords
