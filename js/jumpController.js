@@ -720,4 +720,13 @@ class cheat {
 		}
 		return sums;
 	}
+
+	static get skipLevel() {
+		if (controller.player) {
+			controller.stats.distance += controller.currentLevel.totalElapsed;
+			controller.levelIndex++;
+			controller.saveState();
+			controller.startLevel(controller.currentLevel.yCurrent);
+		}
+	}
 };
