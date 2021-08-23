@@ -215,13 +215,13 @@ class JumpPlayer extends Player {
 	}
 }
 
-
+const GRAVITY = -18;
 class StandardPhysics extends Physics {
 
 	constructor(object) {
 		super(object);
 
-		this.gy = -18;
+		this.gy = GRAVITY;
 
 		this.max_vx = 100;
 		this.max_vy = 300;

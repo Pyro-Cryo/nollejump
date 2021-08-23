@@ -729,4 +729,16 @@ class cheat {
 			controller.startLevel(controller.currentLevel.yCurrent);
 		}
 	}
+
+	static get test() {
+		for (let i = -1; i <= 1; i++) {
+			for (let j = -1; j <= 1; j++) {
+				new VectorFieldArrow(
+					controller.gameArea.gridWidth / 2,
+					controller.gameArea.topEdgeInGrid - 30 * (i + 2 + 3 * (j + 2)),
+					Math.abs(GRAVITY) * i,
+					10 * Math.abs(GRAVITY) * j);
+			}
+		}
+	}
 };

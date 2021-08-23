@@ -306,7 +306,7 @@ class MagneticPlatform extends Platform {
 		return super.height * 2;
 	}
 
-	constructor(x, y, repulsive=false, range=null) {
+	constructor(x, y, repulsive = false, range = null) {
 		super(x, y);
 		this.repulsive = repulsive;
 		if (this.repulsive)
@@ -342,5 +342,52 @@ class MagneticPlatform extends Platform {
 			this.onPlayerBounce(player);
 		else
 			this.onPlayerPass(player);
+	}
+}
+
+class VectorFieldArrow extends GameObject {
+	constructor(x, y, xForce, yForce) {
+		super(x, y, null, Math.atan2(-yForce, xForce));
+		this.xForce = xForce;
+		this.yForce = yForce;
+		this.totalForce = Math.sqrt(xForce * xForce + yForce * yForce);
+		this.color = Background.toColor(Splines.interpolateLinear(
+			Math.min(1, Math.max(0, (this.yForce + 5 * Math.abs(GRAVITY)) / Math.abs(10 * GRAVITY))),
+			[
+				[255, 50, 50],
+				[50, 50, 50],
+				[100, 200, 50]
+			]));
+	}
+
+	prerender() {
+		if (this.image)
+			this.image.getContext("2d").clearRect(0, 0, this.image.width, this.image.height);
+		else
+			this.image = document.createElement("canvas");
+		this.image.width = 48;
+		this.image.height = 16;
+		let ctx = this.image.getContext("2d");
+		ctx.fillStyle = this.color;
+		ctx.strokeStyle = this.color;
+		ctx.lineWidth = 3;
+		
+		ctx.beginPath();
+		if (this.totalForce === 0) {
+			ctx.arc(this.image.width / 2, this.image.height / 2, 3, 0, 2 * Math.PI);
+			ctx.fill();
+		} else {
+			const x = Math.max(7, Math.min(22, 22 * this.totalForce / Math.abs(6 * GRAVITY)));
+			ctx.moveTo(this.image.width / 2 - x, this.image.height / 2);
+			ctx.lineTo(this.image.width / 2 + x - ctx.lineWidth, this.image.height / 2);
+			ctx.stroke();
+			ctx.moveTo(this.image.width / 2 + x - 10, this.image.height * 0.9);
+			ctx.lineTo(this.image.width / 2 + x + 4 - ctx.lineWidth, this.image.height / 2);
+			ctx.lineTo(this.image.width / 2 + x - 10, this.image.height * 0.1);
+			ctx.closePath();
+			ctx.fill();
+		}
+
+		super.prerender();
 	}
 }
