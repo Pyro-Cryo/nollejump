@@ -22,8 +22,8 @@ let _Level_ctmatLevels = [
 	"SF1672", // Linalg
 	"SF1918", // Sannstat, OBS annan kurskod
 	"SF1674", // Flervarre
-	"DD1320", // Tildat
 	"Placeholder:", // TODO: ta bort
+	"DD1320", // Tildat
 	"SF1550", // Numme
 	"DD1396", // Parallellprogrammering
 	"SG1115", // Partikeldynamik
