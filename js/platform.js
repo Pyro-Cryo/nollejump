@@ -349,13 +349,13 @@ class VectorFieldArrow extends GameObject {
 	get width() { return 48; }
 	get height() { return 48; }
 
-	constructor(x, y, xAcc, yAcc) {
+	constructor(x, y, xAcc, yAcc, compensateGravity = true) {
 		super(x, y, null, Math.atan2(-yAcc, xAcc));
 		this.xAcc = xAcc;
 		this.yAcc = yAcc;
 		this.totalAcc = Math.sqrt(xAcc * xAcc + yAcc * yAcc);
 		this.color = Background.toColor(Splines.interpolateLinear(
-			Math.min(1, Math.max(0, (this.yAcc + 5 * Math.abs(GRAVITY)) / Math.abs(10 * GRAVITY))),
+			Math.min(1, Math.max(0, (this.yAcc + 2 * Math.abs(GRAVITY)) / Math.abs(4 * GRAVITY))),
 			[
 				[255, 50, 50],
 				[50, 50, 50],
@@ -364,6 +364,7 @@ class VectorFieldArrow extends GameObject {
 
 		if (controller.player)
 			controller.player.addCollidible(this);
+		this.compensateGravity = compensateGravity;
 	}
 
 	prerender() {
@@ -383,7 +384,7 @@ class VectorFieldArrow extends GameObject {
 			ctx.arc(this.image.width / 2, this.image.height / 2, 3, 0, 2 * Math.PI);
 			ctx.fill();
 		} else {
-			const x = Math.max(7, Math.min(22, 22 * this.totalAcc / Math.abs(6 * GRAVITY)));
+			const x = Math.max(7, Math.min(22, 22 * this.totalAcc / Math.abs(4 * GRAVITY)));
 			ctx.moveTo(this.image.width / 2 - x, this.image.height / 2);
 			ctx.lineTo(this.image.width / 2 + x - ctx.lineWidth, this.image.height / 2);
 			ctx.stroke();
@@ -398,7 +399,11 @@ class VectorFieldArrow extends GameObject {
 	}
 
 	onCollision(player) {
-		player.physics.tempAcc(this.xAcc, this.yAcc);
+		player.physics.tempAcc(this.xAcc, this.compensateGravity * -GRAVITY + this.yAcc);
+	}
+
+	update(delta) {
+		despawnIfBelowBottom(this);
 	}
 }
 
