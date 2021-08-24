@@ -245,7 +245,20 @@ Level.levels.set("DD1320", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	// ...
+	let width = controller.gameArea.gridWidth;
+	let spacing = 250;
+	const start = level.defineRegion("Start");
+
+	start.wait(spacing).spawn(GraphPlatform, 10, (e,h,l) => [
+		Math.random()*width,
+		level.yCurrent,
+		(h.length > 0 ? h[h.length-1].object : null)
+	]).spaced(spacing);
+
+	level.initialRegion(start);
+	start.follower(start);
+
+
 
 	return level;
 });

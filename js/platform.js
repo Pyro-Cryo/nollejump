@@ -401,3 +401,60 @@ class VectorFieldArrow extends GameObject {
 		player.physics.tempAcc(this.xAcc, this.yAcc);
 	}
 }
+
+class GraphPlatform extends Platform {
+
+	constructor(x,y,parent){
+		super(x,y);
+
+		this.parent = parent;
+		this.revealed = false;
+		if (this.parent === null)
+			this.revealed = true;
+		else{
+			if (this.parent.children.length == 0)
+				// we are the continuation node
+				this.spawnSiblings(this.parent, controller.gameArea.gridWidth);
+			this.parent.children.push(this);
+		}
+		this.children = [];
+	}
+
+	spawnSiblings(parent, screenwidth){
+		while (Math.random() < 1/2){
+			let x = Math.random()*screenwidth;
+			let y = this.y + (Math.random()-1/2)*100;
+			let p = new this.constructor(x,y,this.parent);
+			p.revealed = true;
+		}
+	}
+
+	onPlayerBounce(player){
+		if (!this.revealed)
+			return;
+
+		this.children.forEach(child => child.reveal());
+		super.onPlayerBounce(player);
+	}
+
+	reveal(){
+		if (this.revealed)
+			return;
+		this.revealed = true;
+		this.spawnSiblings();
+	}
+
+	despawnCheck(){
+		if (this.children.some(child => {return controller.gameArea.isInFrame(child.x, child.y)}))
+			return;
+		super.despawnCheck();		
+	}
+
+	draw(gameArea){
+		if (!this.revealed)
+			return;
+
+		super.draw(gameArea);
+		this.children.forEach(child => {if (child.revealed) gameArea.line(this.x, this.y, child.x, child.y, 2)});
+	}
+}
