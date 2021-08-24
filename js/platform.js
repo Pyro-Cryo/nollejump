@@ -416,13 +416,13 @@ class GraphPlatform extends Platform {
 			this.parent.children.push(this);
 		
 		this.children = [];
-		this.tokens = [];
+		// this.tokens = [];
 		this.toSpawn = siblings; // Yes
 
 
 		// tillgängliga  x-koordinater
 		const screenwidth = controller.gameArea.gridWidth;
-		const slots = Math.floor(screenwidth/(this.width+1))+1;
+		const slots = Math.floor(screenwidth/this.width)+1;
 		let pos = [];
 		for (var i = 0; i < slots/2-1; i++) {
 			let x = Math.floor(screenwidth * (i+1/2)/(slots/2-1));
@@ -442,9 +442,6 @@ class GraphPlatform extends Platform {
 
 	spawnSiblings(parent){
 
-		// if (Math.random() < 1/3)
-		// 	return;
-
 		for (var i = 0; i < this.pos.length;i++) {
 			let x = this.pos.pop();
 			let y = this.y + (Math.random()-0.4)*90;
@@ -454,7 +451,8 @@ class GraphPlatform extends Platform {
 			if (this.toSpawn.length > 0){
 				let t = this.toSpawn.pop();
 				let token = new t(0, 25, p);
-				token.level = controller.currentLevel;
+				if (token instanceof Token)
+					token.level = controller.currentLevel;
 				// p.tokens.push(token);
 			}
 
@@ -525,5 +523,4 @@ class MovingGraphPlatform extends GraphPlatform {
 		if (controller.screenWrap)
 			screenWrap(this);
 	}
-
 }

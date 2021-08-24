@@ -261,6 +261,34 @@ Level.levels.set("DD1320", (infoOnly) => {
 		[Homework]
 		]).immediately();
 
+	start.wait(spacing)
+		.spawn(MovingGraphPlatform, 6, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object
+			]).spaced(spacing)
+		.wait(spacing)
+		.spawn(MovingGraphPlatform, 1, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object,
+			ImmortalToken
+			]).immediately()
+		.wait(spacing)
+		.spawn(GraphPlatform, 6, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object
+			]).spaced(spacing)
+		.wait(spacing)
+		.spawn(MovingGraphPlatform, 1, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object,
+			TFPassive
+			]).immediately();
+
+
 	level.initialRegion(start);
 	start.follower(start);
 
