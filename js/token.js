@@ -1,7 +1,6 @@
 class Token extends GameObject {
-	constructor(x, y, trackedObj = null) {
-		super(x, y);
-		controller.player.addCollidible(this);
+	constructor(x, y, trackedObj = null, register = true) {
+		super(x, y, null, null, null, register);
 		this.level = null; // Assignas av regionen som spawnar objektet
 		this.trackedObj = trackedObj;
 		this.xOffset = x;
@@ -25,12 +24,20 @@ class Token extends GameObject {
 
 		if (controller.screenWrap)
 			screenWrap(this);
+
+		// Så inte Ingenjörsfärdigheter smälter min cpu
+		despawnIfBelowBottom(this); 
 	}
 
 	draw(gameArea) {
 		super.draw(gameArea);
 		if (controller.screenWrap)
 			drawScreenWrap(gameArea, this, super.draw.bind(this));
+	}
+
+	register() {
+		super.register();
+		controller.player.addCollidible(this);
 	}
 }
 

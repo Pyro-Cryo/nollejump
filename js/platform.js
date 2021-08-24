@@ -404,36 +404,76 @@ class VectorFieldArrow extends GameObject {
 
 class GraphPlatform extends Platform {
 
-	constructor(x,y,parent){
+	constructor(x,y,parent,siblings=[]){
 		super(x,y);
 
 		this.parent = parent;
 		this.revealed = false;
+		this.bounced = false;
 		if (this.parent === null)
 			this.revealed = true;
-		else{
-			if (this.parent.children.length == 0)
-				// we are the continuation node
-				this.spawnSiblings(this.parent, controller.gameArea.gridWidth);
+		else
 			this.parent.children.push(this);
-		}
+		
 		this.children = [];
+		this.tokens = [];
+		this.toSpawn = siblings; // Yes
+
+
+		// tillgängliga  x-koordinater
+		const screenwidth = controller.gameArea.gridWidth;
+		const slots = Math.floor(screenwidth/(this.width+1))+1;
+		let pos = [];
+		for (var i = 0; i < slots/2-1; i++) {
+			let x = Math.floor(screenwidth * (i+1/2)/(slots/2-1));
+			// Ta bort vår egen pos så ingen platform spawnar direkt ovanför oss
+			if (Math.abs(x - this.x) <= screenwidth*2/slots)
+				continue;
+			pos.push(x);
+		}
+
+		// Shuffle by sorting randomly.
+		this.pos = pos.sort((a,b) => Math.random()-1/2);
+
+		if (siblings.length > pos.length)
+			throw Exception("Cannot have this many children");
+
 	}
 
-	spawnSiblings(parent, screenwidth){
-		while (Math.random() < 1/2){
-			let x = Math.random()*screenwidth;
-			let y = this.y + (Math.random()-1/2)*100;
+	spawnSiblings(parent){
+
+		// if (Math.random() < 1/3)
+		// 	return;
+
+		for (var i = 0; i < this.pos.length;i++) {
+			let x = this.pos.pop();
+			let y = this.y + (Math.random()-0.4)*90;
 			let p = new this.constructor(x,y,this.parent);
 			p.revealed = true;
+
+			if (this.toSpawn.length > 0){
+				let t = this.toSpawn.pop();
+				let token = new t(0, 25, p);
+				token.level = controller.currentLevel;
+				// p.tokens.push(token);
+			}
+
+			// Se till så att alla våra tokens placeras ut nånstans
+			if (this.toSpawn.length > 0 || Math.random() < 1/2)
+				break;
 		}
 	}
+
 
 	onPlayerBounce(player){
 		if (!this.revealed)
 			return;
 
-		this.children.forEach(child => child.reveal());
+		if (!this.bounced)
+			this.children.forEach(child => {if (child.reveal) child.reveal()});
+			// this.tokens.forEach(token => { if (!token.id) token.register()});
+			this.bounced = true;
+
 		super.onPlayerBounce(player);
 	}
 
@@ -441,7 +481,7 @@ class GraphPlatform extends Platform {
 		if (this.revealed)
 			return;
 		this.revealed = true;
-		this.spawnSiblings();
+		this.spawnSiblings(this.parent);
 	}
 
 	despawnCheck(){
@@ -455,6 +495,35 @@ class GraphPlatform extends Platform {
 			return;
 
 		super.draw(gameArea);
-		this.children.forEach(child => {if (child.revealed) gameArea.line(this.x, this.y, child.x, child.y, 2)});
+		this.children.forEach(child => {if (child.revealed === undefined || child.revealed) gameArea.line(this.x, this.y, child.x, child.y, 2)});
 	}
+}
+
+class MovingGraphPlatform extends GraphPlatform {
+
+	static get image() { return BasicMovingPlatform.image; }
+
+	constructor(x, y, parent, siblings=[], amplitude = 100, speed = 1) {
+		super(x, y, parent, siblings);
+		this.path = [
+			[x, y],
+			[x + amplitude, y],
+			[x, y],
+			[x - amplitude, y],
+			[x, y]
+		];
+		this.speed = speed / 1000; // Path steps / ms
+		this.t = 0;
+		this.interpolation = t => Splines.interpolateLinear(t, this.path);
+	}
+
+	update(delta) {
+		super.update(delta);
+		this.t = (this.t + delta * this.speed / (this.path.length - 1)) % 1;
+		[this.x, this.y] = this.interpolation(this.t);
+
+		if (controller.screenWrap)
+			screenWrap(this);
+	}
+
 }

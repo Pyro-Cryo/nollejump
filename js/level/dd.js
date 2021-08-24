@@ -254,6 +254,12 @@ Level.levels.set("DD1320", (infoOnly) => {
 		level.yCurrent,
 		(h.length > 0 ? h[h.length-1].object : null)
 	]).spaced(spacing);
+	start.wait(spacing).spawn(MovingGraphPlatform, 1, (e,h,l)=> [
+		Math.random()*width,
+		level.yCurrent,
+		h[h.length-1].object,
+		[Homework]
+		]).immediately();
 
 	level.initialRegion(start);
 	start.follower(start);

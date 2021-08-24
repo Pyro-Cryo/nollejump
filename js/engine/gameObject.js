@@ -153,7 +153,7 @@ class GameObject extends PrerenderedObject {
 		this.despawnTimer = -1;
 
 		if (register)
-			Controller.instance.registerObject(this);
+			this.register();
 	}
 
 	get vx() { return this.physics.vx; }
@@ -185,6 +185,10 @@ class GameObject extends PrerenderedObject {
 	 */
 	draw(gameArea) {
 		super.draw(gameArea, this.x, this.y);
+	}
+
+	register() {
+		Controller.instance.registerObject(this);
 	}
 
 	despawn() {

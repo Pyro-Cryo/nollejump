@@ -482,6 +482,7 @@ class JumpController extends Controller {
 			"durian också kallas stinkfrukt, och är förbjuden i bland annat Singapores tunnelbana",
 			"blåbärsris täcker ungefär 11 % av Sveriges yta",
 			"jordgubbar inte är bär, utan fruktförband med nötter",
+			"Mikael Lyth fyller år idag",
 		];
 		const tidbits = [];
 
