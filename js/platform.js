@@ -346,18 +346,24 @@ class MagneticPlatform extends Platform {
 }
 
 class VectorFieldArrow extends GameObject {
-	constructor(x, y, xForce, yForce) {
-		super(x, y, null, Math.atan2(-yForce, xForce));
-		this.xForce = xForce;
-		this.yForce = yForce;
-		this.totalForce = Math.sqrt(xForce * xForce + yForce * yForce);
+	get width() { return 48; }
+	get height() { return 48; }
+
+	constructor(x, y, xAcc, yAcc) {
+		super(x, y, null, Math.atan2(-yAcc, xAcc));
+		this.xAcc = xAcc;
+		this.yAcc = yAcc;
+		this.totalAcc = Math.sqrt(xAcc * xAcc + yAcc * yAcc);
 		this.color = Background.toColor(Splines.interpolateLinear(
-			Math.min(1, Math.max(0, (this.yForce + 5 * Math.abs(GRAVITY)) / Math.abs(10 * GRAVITY))),
+			Math.min(1, Math.max(0, (this.yAcc + 5 * Math.abs(GRAVITY)) / Math.abs(10 * GRAVITY))),
 			[
 				[255, 50, 50],
 				[50, 50, 50],
 				[100, 200, 50]
 			]));
+
+		if (controller.player)
+			controller.player.addCollidible(this);
 	}
 
 	prerender() {
@@ -373,11 +379,11 @@ class VectorFieldArrow extends GameObject {
 		ctx.lineWidth = 3;
 		
 		ctx.beginPath();
-		if (this.totalForce === 0) {
+		if (this.totalAcc === 0) {
 			ctx.arc(this.image.width / 2, this.image.height / 2, 3, 0, 2 * Math.PI);
 			ctx.fill();
 		} else {
-			const x = Math.max(7, Math.min(22, 22 * this.totalForce / Math.abs(6 * GRAVITY)));
+			const x = Math.max(7, Math.min(22, 22 * this.totalAcc / Math.abs(6 * GRAVITY)));
 			ctx.moveTo(this.image.width / 2 - x, this.image.height / 2);
 			ctx.lineTo(this.image.width / 2 + x - ctx.lineWidth, this.image.height / 2);
 			ctx.stroke();
@@ -389,5 +395,9 @@ class VectorFieldArrow extends GameObject {
 		}
 
 		super.prerender();
+	}
+
+	onCollision(player) {
+		player.physics.tempAcc(this.xAcc, this.yAcc);
 	}
 }
