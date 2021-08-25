@@ -19,6 +19,10 @@ class PowerupToken extends GameObject {
 	static get scale() { return this.powerup.scale; }
 	static get angle() { return this.powerup.angle; }
 
+	constructor(x,y,register = true){
+		super(x,y,null, null, null, register);
+	}
+
 	update(delta){
 		super.update(delta);
 		despawnIfBelowBottom(this);
@@ -57,7 +61,7 @@ const ovveimg = Resource.addAsset("img/ovve.png");
 class Immortal extends PowerUp {
 
 	static get image() { return Resource.getAsset(ovveimg); }
-	static get scale() { return 0.25; }
+	static get scale() { return 0.24; }
 	static get imgOffset() { return [0, -25]; }
 	static get drawBefore() { return true; }
 	static get cooldown() { return 7500; }

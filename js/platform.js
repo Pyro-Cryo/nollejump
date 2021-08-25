@@ -416,16 +416,15 @@ class GraphPlatform extends Platform {
 			this.parent.children.push(this);
 		
 		this.children = [];
-		// this.tokens = [];
+		this.tokens = [];
 		this.toSpawn = siblings; // Yes
-
 
 		// tillgängliga  x-koordinater
 		const screenwidth = controller.gameArea.gridWidth;
 		const slots = Math.floor(screenwidth/this.width)+1;
 		let pos = [];
-		for (var i = 0; i < slots/2-1; i++) {
-			let x = Math.floor(screenwidth * (i+1/2)/(slots/2-1));
+		for (var i = 0; i < slots/2+1; i++) {
+			let x = Math.floor(screenwidth * (i+1/2)/(slots/2+1));
 			// Ta bort vår egen pos så ingen platform spawnar direkt ovanför oss
 			if (Math.abs(x - this.x) <= screenwidth*2/slots)
 				continue;
@@ -442,22 +441,30 @@ class GraphPlatform extends Platform {
 
 	spawnSiblings(parent){
 
-		for (var i = 0; i < this.pos.length;i++) {
+		for (var i = 0; i < this.pos.length; i++) {
 			let x = this.pos.pop();
 			let y = this.y + (Math.random()-0.4)*90;
 			let p = new this.constructor(x,y,this.parent);
 			p.revealed = true;
 
+
+			// Tror det är bäst att Helmer aldrig läser den här delen
+			// av koden....
 			if (this.toSpawn.length > 0){
 				let t = this.toSpawn.pop();
-				let token = new t(0, 25, p);
-				if (token instanceof Token)
+				let token = null;
+				if (t.prototype instanceof Token){
+					token = new t(p.pos.pop(), p.y + 300+Math.random()*100, null, false);
 					token.level = controller.currentLevel;
-				// p.tokens.push(token);
+				}
+				else {
+					token = new t(p.pos.pop(), p.y + 300+Math.random()*100, false);
+				}
+				p.tokens.push(token);
 			}
 
 			// Se till så att alla våra tokens placeras ut nånstans
-			if (this.toSpawn.length > 0 || Math.random() < 1/2)
+			if (this.toSpawn.length == 0 && Math.random() < 1/2)
 				break;
 		}
 	}
@@ -467,10 +474,11 @@ class GraphPlatform extends Platform {
 		if (!this.revealed)
 			return;
 
-		if (!this.bounced)
+		if (!this.bounced){
 			this.children.forEach(child => {if (child.reveal) child.reveal()});
-			// this.tokens.forEach(token => { if (!token.id) token.register()});
+			this.tokens.forEach(token => { if (!token.id) token.register()});
 			this.bounced = true;
+		}
 
 		super.onPlayerBounce(player);
 	}
@@ -488,12 +496,14 @@ class GraphPlatform extends Platform {
 		super.despawnCheck();		
 	}
 
+
 	draw(gameArea){
 		if (!this.revealed)
 			return;
 
 		super.draw(gameArea);
 		this.children.forEach(child => {if (child.revealed === undefined || child.revealed) gameArea.line(this.x, this.y, child.x, child.y, 2)});
+		this.tokens.forEach(t => { if (t.id) gameArea.line(this.x, this.y, t.x, t.y, 2)});
 	}
 }
 
