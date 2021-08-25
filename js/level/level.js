@@ -9,7 +9,6 @@ let _Level_ctfysLevels = [
 	"SF1672", // Linalg
 	"SK1104", // Klassfys
 	"SF1674", // Flervarre
-	"Placeholder:", // TODO: ta bort
 	"SG1112", // Mek 1
 	"SF1922", // Sannstat
 	"SK1105", // Expfys
@@ -22,9 +21,9 @@ let _Level_ctmatLevels = [
 	"SF1672", // Linalg
 	"SF1918", // Sannstat, OBS annan kurskod
 	"SF1674", // Flervarre
-	"Placeholder:", // TODO: ta bort
 	"DD1320", // Tildat
 	"SF1550", // Numme
+	"Placeholder:", // TODO: ta bort
 	"DD1396", // Parallellprogrammering
 	"SG1115", // Partikeldynamik
 ];

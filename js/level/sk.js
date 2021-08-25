@@ -115,14 +115,118 @@ Level.levels.set("SK1105", (infoOnly) => {
 			"name": "Experimentell fysik",
 			"hp": 4
 		},
-		6, // Homework-tokens
+		2, // Homework-tokens
 		2, // KS-tokens
 		0  // Tenta-tokens
 	);
 	if (infoOnly)
 		return level;
 
-	// ...
+	const colSpacing = controller.gameArea.gridHeight;
+	const nRows = 10;
+	const spacing = colSpacing * 2 / nRows;
+	const stationary = level.defineRegion("stationary");
+	const colMove = level.defineRegion("colMove");
+	const modulatedColMove = level.defineRegion("modulatedColMove");
+	const modulatedRow = level.defineRegion("modulatedRow");
+	const movingRow = level.defineRegion("movingRow");
+	const fullOnDisco = level.defineRegion("fullOnDisco");
+
+	stationary.wait(spacing)
+		.spawn(LaserRow, nRows, (e, sH, level) => [
+			0,
+			level.yCurrent
+		]).spaced(spacing).interleave(
+			new Region().wait(spacing)
+			.spawn(LaserColumn, 2, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent
+			]).spaced(colSpacing));
+
+	colMove.wait(spacing)
+		.spawn(LaserRow, nRows, (e, sH, level) => [
+			0,
+			level.yCurrent
+		]).spaced(spacing).interleave(
+			new Region().wait(spacing)
+			.spawn(LaserColumn, 2, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent,
+				"movingX"
+			]).spaced(colSpacing))
+			.interleave(new Region()
+			.wait(spacing * nRows / 2)
+			.spawn(Homework, 1, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent + 20
+			]).immediately());
+
+	modulatedColMove.wait(spacing)
+		.spawn(LaserRow, nRows, (e, sH, level) => [
+			0,
+			level.yCurrent
+		]).spaced(spacing).interleave(
+			new Region().wait(spacing)
+			.spawn(LaserColumn, 3, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent,
+				"modulatedMoveX"
+			]).spaced(colSpacing * 2 / 3));
+	
+	modulatedRow.wait(spacing)
+		.spawn(LaserRow, nRows, (e, sH, level) => [
+			0,
+			level.yCurrent,
+			"modulated"
+		]).spaced(spacing).interleave(
+			new Region().wait(spacing)
+			.spawn(LaserColumn, 2, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent
+			]).spaced(colSpacing));
+	
+	movingRow.wait(spacing)
+		.spawn(LaserRow, nRows, (e, sH, level) => [
+			0,
+			level.yCurrent,
+			"movingY"
+		]).spaced(spacing).interleave(
+			new Region().wait(spacing)
+			.spawn(LaserColumn, 2, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent
+			]).spaced(colSpacing));
+	
+	fullOnDisco.wait(spacing)
+		.spawn(LaserRow, nRows, (e, sH, level) => [
+			0,
+			level.yCurrent,
+			"modulated"
+		]).spaced(spacing).interleave(
+			new Region().wait(spacing)
+			.spawn(LaserColumn, 3, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent,
+				"modulatedMoveX"
+			]).spaced(colSpacing))
+		.interleave(new Region()
+			.wait(spacing * nRows / 2)
+			.spawn(KS, 1, (e, sH, level) => [
+				Math.random() * controller.gameArea.gridWidth,
+				level.yCurrent + 20
+			]).immediately());
+
+	level.initialRegion(stationary);
+
+	stationary.follower(colMove);
+	
+	colMove.follower(modulatedRow);
+	modulatedRow.follower(modulatedColMove);
+	modulatedColMove.follower(colMove, 1, level => level.homeworkCurrent < level.homeworkNeeded);
+	modulatedColMove.follower(movingRow, 1, level => level.homeworkCurrent === level.homeworkNeeded);
+
+	movingRow.follower(fullOnDisco);
+	fullOnDisco.follower(modulatedColMove);
 
 	return level;
 });

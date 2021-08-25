@@ -463,3 +463,153 @@ class GraphPlatform extends Platform {
 		this.children.forEach(child => {if (child.revealed) gameArea.line(this.x, this.y, child.x, child.y, 2)});
 	}
 }
+
+// Ja, de här skulle bara ärvt från varann...
+class LaserColumn extends GameObject {
+	static get image() { return null; }
+	static get scale() { return Platform.scale; }
+	get width() { return 251 * this.scale; }
+	get height() { return controller.gameArea.gridHeight / 8; }
+
+	constructor(x, y, path = null, speed = 1, color = [100, 200, 50, 0.4]) {
+		super(x, y);
+		this.color = color && Background.toColor(color);
+
+		this.path = LASER_DEFAULT_PATHS[path] || path;
+		if (this.path instanceof Function)
+			this.path = this.path(this);
+		this.speed = speed / 1000; // Path steps / ms
+		this.t = 0;
+		this.trueScale = this.scale;
+	}
+
+	draw(gameArea, screenWrap = true) {
+		if (this.color && gameArea.isInFrame(this.x, this.y, this.width, this.height, false)) {
+			gameArea.rect(this.x, gameArea.bottomEdgeInGrid + gameArea.gridHeight / 2, this.width, gameArea.gridHeight, this.color);
+		}
+		
+		if (screenWrap)
+			drawScreenWrap(gameArea, this, (gA) => this.draw(gA, false));
+	}
+
+	update(delta) {
+		super.update(delta);
+		if (this.path) {
+			this.t = (this.t + delta * this.speed / (this.path.length - 1)) % 1;
+			[this.x, this.y, this.trueScale] = Splines.interpolateLinear(this.t, this.path);
+		}
+
+		const distUntilOut = this.y + this.height / 2 - controller.gameArea.bottomEdgeInGrid;
+		const distIn = controller.gameArea.topEdgeInGrid - (this.y - this.height / 2);
+		let scaleFadeMultiplier;
+		if (distIn < this.height)
+			scaleFadeMultiplier = distIn / this.height;
+		else
+			scaleFadeMultiplier = distUntilOut / this.height;
+		this.scale = this.trueScale * Math.max(0, Math.min(1, scaleFadeMultiplier));
+
+		if (controller.screenWrap)
+			screenWrap(this);
+
+		if (this.y < controller.gameArea.bottomEdgeInGrid - controller.gameArea.gridHeight)
+			this.despawn();
+	}
+}
+
+class LaserRow extends GameObject {
+	static get image() { return null; }
+	static get scale() { return Platform.scale; }
+	get width() { return controller.gameArea.gridWidth; }
+	get height() { return 34 * this.scale; }
+
+	constructor(x, y, path = null, speed = 1, color = [100, 200, 50, 0.5]) {
+		super(x, y);
+		this.color = color && Background.toColor(color);
+
+		this.path = LASER_DEFAULT_PATHS[path] || path;
+		if (this.path instanceof Function)
+			this.path = this.path(this);
+		this.speed = speed / 1000; // Path steps / ms
+		this.t = 0;
+		
+		if (controller.player)
+			controller.player.addCollidible(this);
+	}
+
+	onCollision(player) {
+		if (!this.scale || this.y + this.height < controller.gameArea.bottomEdgeInGrid)
+			return;
+		for (const object of controller.objects) {
+			// Must also intersect with a column
+			if (!(object instanceof LaserColumn))
+				continue;
+			if (!object.scale || !controller.gameArea.isInFrame(object.x, object.y, object.width, object.height))
+				continue;
+			if (!(Math.abs(controller.player.x - object.x) <= (controller.player.width + object.width) / 2
+			|| Math.abs(controller.player.x - object.x) >= controller.gameArea.gridWidth - (controller.player.width + object.width) / 2))
+				continue;
+			// If the player was above us and is going down
+			if (player.physics.vy <= this.physics.vy && player.lastY - player.height / 2 >= this.y) {
+				player.y = this.y + this.height / 2 + player.height / 2;
+				player.standardBounce(this);
+				break;
+			}
+		}
+	}
+
+	update(delta) {
+		super.update(delta);
+		if (this.path) {
+			this.t = (this.t + delta * this.speed / (this.path.length - 1)) % 1;
+			[this.x, this.y, this.scale] = Splines.interpolateLinear(this.t, this.path);
+		}
+
+		if (controller.screenWrap)
+			screenWrap(this);
+		
+		if (this.y < controller.gameArea.bottomEdgeInGrid - controller.gameArea.gridHeight)
+			this.despawn();
+	}
+
+	draw(gameArea) {
+		if (this.color && gameArea.isInFrame(this.x, this.y, this.width, this.height, false)) {
+			gameArea.rect(gameArea.gridWidth / 2, this.y, gameArea.gridWidth, this.height, this.color);
+		}
+	}
+}
+
+const LASER_DEFAULT_PATHS = {
+	movingX: obj => [
+		[obj.x, obj.y, obj.scale],
+		[obj.x + 100, obj.y, obj.scale],
+		[obj.x, obj.y, obj.scale],
+		[obj.x - 100, obj.y, obj.scale],
+		[obj.x, obj.y, obj.scale]
+	],
+	movingY: obj => [
+		[obj.x, obj.y, obj.scale],
+		[obj.x, obj.y + 100, obj.scale],
+		[obj.x, obj.y, obj.scale],
+		[obj.x, obj.y - 100, obj.scale],
+		[obj.x, obj.y, obj.scale]
+	],
+	modulated: obj => [
+		[obj.x, obj.y, obj.scale],
+		[obj.x, obj.y, 0],
+		[obj.x, obj.y, 0],
+		[obj.x, obj.y, obj.scale],
+		[obj.x, obj.y, obj.scale * 2],
+		[obj.x, obj.y, obj.scale]
+	],
+	modulatedMoveX: obj => [
+		[obj.x, obj.y, obj.scale],
+		[obj.x + 100, obj.y, obj.scale * 0.5],
+		[obj.x + 200, obj.y, 0],
+		[obj.x + 100, obj.y, obj.scale * 0.5],
+		[obj.x, obj.y, obj.scale],
+		[obj.x - 100, obj.y, obj.scale * 1.5],
+		[obj.x - 200, obj.y, obj.scale * 2],
+		[obj.x - 100, obj.y, obj.scale * 1.5],
+		[obj.x, obj.y, obj.scale]
+	]
+};
