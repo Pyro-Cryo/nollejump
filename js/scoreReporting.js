@@ -1,7 +1,7 @@
 const SCORE_MAX = 2000;
-const SCORE_MIN_ON_WIN = 1000;
-const SCORE_REDUCTION_PER_DEATH = 50;
-const SCORE_PARTIAL_MAX = 800;
+const SCORE_MIN_ON_WIN = 1200;
+const SCORE_REDUCTION_PER_DEATH = 32;
+const SCORE_PARTIAL_MAX = 1000;
 const ENDPOINT_USER = "https://f.kth.se/cyberfohs/user/";
 let ApiSettings = null;
 

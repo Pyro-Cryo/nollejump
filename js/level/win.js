@@ -15,7 +15,7 @@ Level.win = infoOnly => {
 
     const platWidth = Platform.image.width * Platform.scale / controller.gameArea.unitWidth;
     const region = level.defineRegion();
-    region.wait(200);
+    region.wait(100);
     for (let step = 0; step < 3; step++) {
         for (let x = platWidth * 0.55; x < controller.gameArea.gridWidth - platWidth * 0.55; x += platWidth)
             region.spawn(Platform, 1, (e, sH, level) => [x, level.yCurrent]);
