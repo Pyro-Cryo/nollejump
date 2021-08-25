@@ -232,6 +232,7 @@ class MirrorPlayer extends JumpPlayer {
 	}
 
 	die() {
+		super.die();
 		controller.player.die();
 	}
 

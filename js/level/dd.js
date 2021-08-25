@@ -377,11 +377,12 @@ Level.levels.set("DD1396", (infoOnly) => {
 		width - controller.player.x,
 		controller.player.y
 		]).immediately();
+
 	for (var i = 0; i < 4; i++) {
 		region.interleave(new Region() 
 			.wait(spacing)
 			.spawn(Platform, 10, (e,h,l) => [
-				width/2 + (i - 1.5)*width,
+				width/2 + (i - 1.5),
 				level.yCurrent
 				]).spaced(spacing));
 	}
