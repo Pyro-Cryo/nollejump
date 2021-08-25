@@ -413,7 +413,77 @@ Level.levels.set("SF1550", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	// ...
+	const spacing = 250;
+	const arrowSide = 48;
+	const nArrowsWidth = Math.floor(controller.gameArea.gridWidth / arrowSide);
+	const fieldOffset = (controller.gameArea.gridWidth - arrowSide * nArrowsWidth) / 2;
+	const spawnField = (region, field, height) => {
+		height = height || 1;
+		for (let j = 0; j < nArrowsWidth * height; j++) {
+			for (let i = 0; i < nArrowsWidth; i++) {
+				// xField, yField in the range [-2, 2]
+				const xField = 4 * (i / (nArrowsWidth - 1) - 0.5);
+				const yField = 4 * (j / (Math.floor(nArrowsWidth * height) - 1) - 0.5);
+				const [dx, dy] = field(xField, yField);
+				region.spawn(VectorFieldArrow, 1, (e, sH, level) => [
+					fieldOffset + (i + 0.5) * arrowSide,
+					level.yCurrent,
+					dx * Math.abs(GRAVITY),
+					dy * Math.abs(GRAVITY),
+					0.2
+				]);
+			}
+			region.immediately().wait(arrowSide);
+		}
+	};
+	
+	const platformIsh = level.defineRegion("platform");
+	platformIsh.wait(spacing);
+	spawnField(platformIsh, (x, y) => [
+		0,
+		2 * (x > 0.25)
+	], 0.2);
+
+	const vortex = level.defineRegion("vortex");
+	vortex.wait(spacing);
+	spawnField(vortex, (x, y) => [-y/2, x]);
+	vortex.interleave(new Region()
+		.wait(spacing + (nArrowsWidth - 1) / 2 * arrowSide)
+		.spawn(Homework, 1, (e, sH, level) => [controller.gameArea.gridWidth / 2, level.yCurrent])
+		.immediately());
+
+	const spirals = level.defineRegion("spirals");
+	spirals.wait(spacing);
+	spawnField(spirals, (x, y) => [
+		2 * Math.sin(x + y),
+		2 * Math.cos(x - y)
+	], Math.PI / 2);
+	spirals.interleave(new Region()
+		.wait(spacing)
+		.spawn(Tenta, 1, (e, sH, level) => [controller.gameArea.gridWidth / 2, level.yCurrent])
+		.immediately());
+	
+	const moses = level.defineRegion("moses");
+	moses.wait(spacing);
+	spawnField(moses, (x, y) => [0, x / Math.max(0.5, Math.abs(y))]);
+
+	const plume = level.defineRegion("plume");
+	plume.wait(spacing);
+	spawnField(plume, (x, y) => [Math.sin(x), 1.5 * Math.cos(x)]);
+	
+	const narrowPlume = level.defineRegion("narrowPlume");
+	narrowPlume.wait(spacing);
+	spawnField(narrowPlume, (x, y) => [Math.sin(y), 1.5 * Math.cos(2.5 * x)]);
+
+	level.initialRegion(platformIsh);
+
+	platformIsh.follower(vortex);
+	vortex.follower(moses);
+	moses.follower(plume);
+	plume.follower(platformIsh, 1, level => level.homeworkCurrent < level.homeworkNeeded);
+	plume.follower(narrowPlume, 1, level => level.homeworkCurrent === level.homeworkNeeded);
+	narrowPlume.follower(spirals);
+	spirals.follower(plume);
 
 	return level;
 });
