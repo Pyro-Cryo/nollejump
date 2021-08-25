@@ -366,7 +366,28 @@ Level.levels.set("DD1396", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	// ...
+	let width = controller.gameArea.gridWidth;
+	let spacing = 250;
+	const start = level.defineRegion("DFS");
+
+
+	// Än så länge trasigt
+	const region = level.defineRegion("region");
+	region.spawn(MirrorPlayer, 1, (e,h,l) => [
+		width - controller.player.x,
+		controller.player.y
+		]).immediately();
+	for (var i = 0; i < 4; i++) {
+		region.interleave(new Region() 
+			.wait(spacing)
+			.spawn(Platform, 10, (e,h,l) => [
+				width/2 + (i - 1.5)*width,
+				level.yCurrent
+				]).spaced(spacing));
+	}
+
+	level.initialRegion(region);
+	region.follower(region);
 
 	return level;
 });
