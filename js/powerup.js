@@ -19,9 +19,8 @@ class PowerupToken extends GameObject {
 	static get scale() { return this.powerup.scale; }
 	static get angle() { return this.powerup.angle; }
 
-	constructor(x, y){
-		super(x, y); 
-		controller.player.addCollidible(this);
+	constructor(x,y,register = true){
+		super(x,y,null, null, null, register);
 	}
 
 	update(delta){
@@ -36,6 +35,11 @@ class PowerupToken extends GameObject {
 			controller.stats.powerups[this.constructor.powerup.prettyName] = 1;
 		player.addEffect(new this.constructor.powerup());
 		this.despawn();
+	}
+
+	register() {
+		super.register();
+		controller.player.addCollidible(this);
 	}
 }
 
@@ -57,7 +61,7 @@ const ovveimg = Resource.addAsset("img/ovve.png");
 class Immortal extends PowerUp {
 
 	static get image() { return Resource.getAsset(ovveimg); }
-	static get scale() { return 0.25; }
+	static get scale() { return 0.24; }
 	static get imgOffset() { return [0, -25]; }
 	static get drawBefore() { return true; }
 	static get cooldown() { return 7500; }
@@ -83,7 +87,7 @@ class JumpBoost extends PowerUp {
 
 	static get image() { return Resource.getAsset(bananashoesimg); }
 	static get scale() { return 0.3; }
-	static get prettyName() { return "Hopp-boost"; }
+	static get prettyName() { return "Hopp-skor"; }
 	static get imgOffset() { return [0, -25]; }
 	static get drawBefore() { return true; }
 	static get cooldown() { return 20000; }

@@ -1,8 +1,6 @@
 class Enemy extends EffectObject {
-    constructor(x, y) {
-        super(x, y);
-        controller.player.addCollidible(this);
-        controller.enemies.push(this);
+    constructor(x, y, register = true) {
+        super(x, y, null, null, null, register);
         this.health = 1;
     }
 
@@ -29,6 +27,12 @@ class Enemy extends EffectObject {
         if (this.y + this.height < controller.gameArea.bottomEdgeInGrid)
             this.despawn();
     }
+
+    register() {
+        super.register();
+        controller.player.addCollidible(this);
+        controller.enemies.push(this);
+    }
 }
 
 const tfImg = Resource.addAsset("img/tf.png");
@@ -36,8 +40,8 @@ const ofImg = Resource.addAsset("img/of.png");
 const sfImg = Resource.addAsset("img/sf.png");
 
 class Boss extends Enemy {
-    constructor(x, y) {
-        super(x, y);
+    constructor(x, y, register = true) {
+        super(x, y, register);
         this.hasEntered = false;
         this.hoverDistance = 100; // units
         this.hoverProgress = 0;

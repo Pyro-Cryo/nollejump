@@ -247,18 +247,108 @@ Level.levels.set("DD1320", (infoOnly) => {
 
 	let width = controller.gameArea.gridWidth;
 	let spacing = 250;
-	const start = level.defineRegion("Start");
+	const start = level.defineRegion("DFS");
 
-	start.wait(spacing).spawn(GraphPlatform, 10, (e,h,l) => [
+	start.wait(spacing).spawn(GraphPlatform, 5, (e,h,l) => [
 		Math.random()*width,
 		level.yCurrent,
 		(h.length > 0 ? h[h.length-1].object : null)
 	]).spaced(spacing);
+	start.wait(spacing).spawn(GraphPlatform, 1, (e,h,l)=> [
+		Math.random()*width,
+		level.yCurrent,
+		h[h.length-1].object,
+		[ImmortalToken, TFPassive, Homework]
+		]).immediately();
+
+	start.wait(spacing)
+		.spawn(MovingGraphPlatform, 3, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object
+			]).spaced(spacing)
+		.wait(spacing)
+		.spawn(MovingGraphPlatform, 1, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object,
+			[ImmortalToken, Homework]
+			]).immediately()
+		.wait(spacing)
+		.spawn(GraphPlatform, 6, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object
+			]).spaced(spacing)
+		.wait(spacing)
+		.spawn(MovingGraphPlatform, 1, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent,
+			h[h.length-1].object,
+			[TFPassive, KS]
+			]).immediately();
+
+	const middle = level.defineRegion("middle");
+	middle.wait(spacing)
+		.spawn(Platform, 3, (e,h,l) => [
+			(0.1 + Math.random()*0.8)*width,
+			level.yCurrent
+			]).spaced(spacing)
+		.wait(spacing)
+		.spawn(DiscreteMovingPlatform, 3, (e,h,l) => [
+			(0.1 + Math.random()*0.5)*width,
+			level.yCurrent
+			]).spaced(spacing)
+		.spawn(Homework, 1, (e,h,l) => [
+			0, 25, h[h.length-1].object
+			]).immediately();
+	middle.interleave(new Region()
+		.wait(spacing/2)
+		.spawn(FakePlatform, 5, (e,h,l) => [
+			Math.random()*width,
+			level.yCurrent])
+		.spaced(spacing));
+
+	const bfs = level.defineRegion("BFS");
+
+	const platforms = [GraphPlatform, MovingGraphPlatform];
+	const tokenorder = [
+		[ImmortalToken], 
+		[Homework], 
+		[SFPassive],
+		[Homework],
+		[TFPassive, ImmortalToken],
+		[OFPassive, KS],
+		];
+
+	for (var k = 0; k < 2; k ++){
+		for (var j = 0; j < platforms.length; j++) {
+			for (var i = 0; i < tokenorder.length; i++) {
+				let nplatforms = 2 + Math.floor(Math.random()*4);
+				bfs.wait(spacing)
+				.spawn(platforms[j], nplatforms, (e,h,l) => [
+					width * (0.1 + Math.random()*0.8),
+					level.yCurrent,
+					(h.length > 0 ? h[h.length-1].object : null)
+					])
+				.spaced(spacing)
+				.wait(spacing)
+				.spawn(platforms[j], 1, (e,h,l) => [
+					width * (0.1 + Math.random()*0.8),
+					level.yCurrent,
+					h[h.length-1].object,
+					tokenorder[i]
+					])
+				.spaced(spacing);
+			}
+		}
+	}
 
 	level.initialRegion(start);
-	start.follower(start);
-
-
+	start.follower(middle);
+	middle.follower(start, 1, level => level.homeworkCurrent == 0);
+	middle.follower(bfs, 1, level => level.homeworkCurrent > 0);
+	bfs.follower(middle);
 
 	return level;
 });
@@ -276,7 +366,29 @@ Level.levels.set("DD1396", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
-	// ...
+	let width = controller.gameArea.gridWidth;
+	let spacing = 250;
+	const start = level.defineRegion("DFS");
+
+
+	// Än så länge trasigt
+	const region = level.defineRegion("region");
+	region.spawn(MirrorPlayer, 1, (e,h,l) => [
+		width - controller.player.x,
+		controller.player.y
+		]).immediately();
+
+	for (var i = 0; i < 4; i++) {
+		region.interleave(new Region() 
+			.wait(spacing)
+			.spawn(Platform, 10, (e,h,l) => [
+				width/2 + (i - 1.5),
+				level.yCurrent
+				]).spaced(spacing));
+	}
+
+	level.initialRegion(region);
+	region.follower(region);
 
 	return level;
 });

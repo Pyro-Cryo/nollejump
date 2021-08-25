@@ -215,6 +215,29 @@ class JumpPlayer extends Player {
 	}
 }
 
+class MirrorPlayer extends JumpPlayer {
+
+	constructor(x,y) {
+		super(x,y);
+		this.collidibles = controller.player.collidibles;
+	}
+
+	update(delta) {
+		super.update(delta);
+		this.x = controller.gameArea.gridWidth - controller.player.x;
+	}
+
+	damage() {
+		controller.player.damage();
+	}
+
+	die() {
+		super.die();
+		controller.player.die();
+	}
+
+}
+
 const GRAVITY = -18;
 class StandardPhysics extends Physics {
 
