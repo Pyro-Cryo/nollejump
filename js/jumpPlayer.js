@@ -219,6 +219,8 @@ class MirrorPlayer extends JumpPlayer {
 
 	constructor(x,y) {
 		super(x,y);
+		this.vx = controller.player.vx;
+		this.vy = controller.player.vy;
 		this.collidibles = controller.player.collidibles;
 	}
 

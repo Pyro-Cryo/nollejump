@@ -368,26 +368,63 @@ Level.levels.set("DD1396", (infoOnly) => {
 
 	let width = controller.gameArea.gridWidth;
 	let spacing = 250;
-	const start = level.defineRegion("DFS");
+	const start = level.defineRegion("Lead in");
 
+	start.wait(spacing)
+		.spawn(Platform, 3, (e,h,l) => [
+			width/3-30,
+			level.yCurrent])
+		.spaced(spacing)
+		.wait(spacing)
+		.spawn(Platform, 5, (e,h,l) => [
+			50 + width*0.1 + (h.length-6)*width*0.8/5,
+			level.yCurrent
+		]).immediately()
+		.wait(spacing)
+		.spawn(Platform, 4, (e,h,l) => [
+			width/2-30,
+			level.yCurrent])
+		.spaced(spacing);
+
+	start.interleave(new Region()
+		.wait(spacing*5)
+		.spawn(Platform, 4, (e,h,l) => [
+			width/2+30,
+			level.yCurrent])
+		.spaced(spacing));
+
+	start.interleave(new Region()
+		.wait(spacing)
+		.spawn(Platform, 3, (e,h,l) => [
+			width *2/3+30,
+			level.yCurrent])
+		.spaced(spacing)
+		.wait(controller.gameArea.gridWidth + spacing * 3)
+		.spawn(MirrorPlayer, 1, () => {
+			return [controller.gameArea.gridWidth - controller.player.x,
+			controller.player.y]
+		}).immediately());
 
 	// Än så länge trasigt
 	const region = level.defineRegion("region");
-	region.spawn(MirrorPlayer, 1, (e,h,l) => [
-		width - controller.player.x,
-		controller.player.y
-		]).immediately();
 
-	for (var i = 0; i < 4; i++) {
-		region.interleave(new Region() 
-			.wait(spacing)
-			.spawn(Platform, 10, (e,h,l) => [
-				width/2 + (i - 1.5),
-				level.yCurrent
-				]).spaced(spacing));
-	}
+	let left = new Region();
+	left.spawn(Platform, 5, (e,h,l) => [
+		width/3 - width/5/(h.length + 1),
+		level.yCurrent
+		]).spaced(spacing);
 
-	level.initialRegion(region);
+	let right = new Region();
+	right.spawn(Platform, 5, (e,h,l) => [
+		width*2/3 + width/5/(h.length + 1),
+		level.yCurrent
+		]).spaced(spacing);
+
+	region.append(left);
+	region.interleave(right);
+
+	level.initialRegion(start);
+	start.follower(region);
 	region.follower(region);
 
 	return level;
