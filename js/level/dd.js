@@ -410,7 +410,7 @@ Level.levels.set("DD1396", (infoOnly) => {
 
 	let left = new Region();
 	left.spawn(Platform, 5, (e,h,l) => [
-		width/3 - width/5/(h.length + 1),
+		width/3 - width/5/(h.length + 2),
 		level.yCurrent
 		]).spaced(spacing);
 
