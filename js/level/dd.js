@@ -370,45 +370,45 @@ Level.levels.set("DD1396", (infoOnly) => {
 	const textCol = "#222222";
 
 	let width = controller.gameArea.gridWidth;
-	let spacing = 250;
+	let spacing = 260;
 	const fork = level.defineRegion("Fork");
 
 	fork.wait(spacing)
 
 		.spawn(Platform, 3, (e,h,l) => [
 			width/3-30,
-			level.yCurrent])
+			l.yCurrent])
 		.spaced(spacing)
 		.wait(spacing)
 		.spawn(Platform, 5, (e,h,l) => [
 			50 + width*0.1 + (h.length-6)*width*0.8/5,
-			level.yCurrent
+			l.yCurrent
 		]).immediately()
 		.wait(spacing/2)
 		.spawn(Hint, 1, (e,h,l) => [
 			width/2,
-			level.yCurrent,
+			l.yCurrent,
 			"player2 = player.fork();",
 			font, textCol
 			]).immediately()
 		.wait(spacing/2)
 		.spawn(Platform, 4, (e,h,l) => [
 			width/2-30,
-			level.yCurrent])
+			l.yCurrent])
 		.spaced(spacing);
 
 	fork.interleave(new Region()
 		.wait(spacing*5)
 		.spawn(Platform, 4, (e,h,l) => [
 			width/2+30,
-			level.yCurrent])
+			l.yCurrent])
 		.spaced(spacing));
 
 	fork.interleave(new Region()
 		.wait(spacing)
 		.spawn(Platform, 3, (e,h,l) => [
 			width *2/3+30,
-			level.yCurrent])
+			l.yCurrent])
 		.spaced(spacing)
 		.wait(controller.gameArea.gridWidth + spacing * 3)
 		.spawn(MirrorPlayer, 1, () => {
@@ -416,39 +416,78 @@ Level.levels.set("DD1396", (infoOnly) => {
 			controller.player.y]
 		}).immediately());
 
-	// Än så länge trasigt
 	const region = level.defineRegion("region");
-	let left = new Region();
-	let right = new Region();
 
-	for (var i = 0; i < 6; i++) {
-		let offset = Math.random()*width/2;
-		left.wait(spacing).spawn(Platform, 1, (e,h,l) => [
-			width/2 - offset,
-			level.yCurrent
-			]).immediately();
-		right.wait(spacing).spawn(Platform, 1, (e,h,l) => [
-			width/2 + offset,
-			level.yCurrent
-			]).immediately();
+	double_platform = function(spacing, n) {
+		let r = new Region();
+		let l = new Region();
+
+		for (var i = 0; i < n; i++) {
+			let offset = width/20 +  Math.random()*(width/2 - width/10);
+			l.wait(spacing).spawn(Platform, 1, (e,h,l) => [
+				width/2 - offset,
+				l.yCurrent
+				]).immediately();
+			r.wait(spacing).spawn(Platform, 1, (e,h,l) => [
+				width/2 + offset,
+				l.yCurrent
+				]).immediately();
+		}
+
+		r.interleave(l);
+		return r;
 	}
+
+	region.append(double_platform(spacing, 6));
 
 	const wings = level.defineRegion("doublejump");
 
 	wings.wait(spacing)
 		.spawn(Platform, 2, (e,h,l) => [
 		width/3 * (1+h.length),
-		level.yCurrent
+		l.yCurrent
 		]).immediately()
 		.spawn(JumpShootToken, 1, (e,h,l) => [
 			h[h.length-1].xSpawn,
 			h[h.length-1].ySpawn + 25
 			]).immediately()
 		.wait(spacing)
-		.spawn(Platform, 6, (e,h,l) => [
+		.spawn(Platform, 5, (e,h,l) => [
 			width * Math.random(),
-			level.yCurrent
-			]).spaced(spacing);
+			l.yCurrent
+			]).spaced(spacing)
+		.spawn(KS, 1, (e,h,l) => [
+			width - h[h.length-1].xSpawn,
+			l.yCurrent
+			]).immediately();
+
+	const monster = level.defineRegion("Unsymmetrical");
+	
+	monster.append(double_platform(spacing, 3));
+	let dx = width/20 +  Math.random()*(width/2 - width/10);
+		monster.spawn(Platform, 1, (e,h,l) => [
+			width/2 - dx,
+			l.yCurrent
+			]).immediately()
+		.spawn(Platform, 1, (e,h,l) => [
+			width/2 + dx,
+			l.yCurrent
+			]).immediately();
+	monster.spawn(ImmortalToken, 1, (e,h,l) => [
+			h[h.length-1].xSpawn,
+			h[h.length-1].ySpawn + 25
+		]).immediately();
+	monster.append(double_platform(spacing, Math.floor(3+3*Math.random())));
+	monster.spawn(KS, 1, (e,h,l) => [
+		h[h.length-1].xSpawn,
+		h[h.length-1].ySpawn + 20
+		]).immediately();
+	monster.spawn(OFPassive, 1, (e,h,l) => [
+		h[h.length-1].xSpawn,
+		h[h.length-1].ySpawn + 50
+		]).immediately();
+	monster.append(double_platform(spacing, 3));
+
 
 	const join = level.defineRegion("Join");
 	join.wait(spacing)
@@ -463,15 +502,23 @@ Level.levels.set("DD1396", (infoOnly) => {
 		level.yCurrent
 		]).spaced(spacing);
 
-	region.append(left);
-	region.interleave(right);
 
 	level.initialRegion(fork);
 	fork.follower(region);
-	region.follower(wings);
+
+	region.follower(region, 1, level => level.ksCurrent < 3);
+	region.follower(wings, 3, level => level.ksCurrent < 3);
+	region.follower(monster, 1, level => level.ksCurrent < 3);
+	region.follower(join, 1, level => level.ksCurrent >= 3);
 	
-	wings.follower(region);
-	wings.follower(join, 1, l => l.ksCurrent >= 3);
+	wings.follower(region, 2);
+	wings.follower(monster, 2, level => level.ksCurrent > 0);
+	wings.follower(wings, 1, level => level.ksCurrent < 3)
+	wings.follower(region, 1, l => l.ksCurrent >= 3);
+
+	monster.follower(region, 3);
+	monster.follower(monster, 1, level => level.ksCurrent < 3);
+	monster.follower(wings, 3, level => level.ksCurrent < 3);
 	
 	join.follower(join);
 
