@@ -227,6 +227,14 @@ class MirrorPlayer extends JumpPlayer {
 	update(delta) {
 		super.update(delta);
 		this.x = controller.gameArea.gridWidth - controller.player.x;
+
+		// Hack for att despwna oss när parallell-regionen är slut
+		if (controller.currentLevel.currentRegion.name == "Join") {
+			// TODO hoppa in i playern (?) för att despawna snyggt
+			if (Math.sqrt(Math.pow(this.x - controller.player.x, 2) + 
+				Math.pow(this.y - controller.player.y, 2)) < 10)
+				this.despawn();
+		}
 	}
 
 	damage() {

@@ -366,11 +366,15 @@ Level.levels.set("DD1396", (infoOnly) => {
 	if (infoOnly)
 		return level;
 
+	const font = "32px Nunito, sans-serif";
+	const textCol = "#222222";
+
 	let width = controller.gameArea.gridWidth;
 	let spacing = 250;
-	const start = level.defineRegion("Lead in");
+	const fork = level.defineRegion("Fork");
 
-	start.wait(spacing)
+	fork.wait(spacing)
+
 		.spawn(Platform, 3, (e,h,l) => [
 			width/3-30,
 			level.yCurrent])
@@ -380,20 +384,27 @@ Level.levels.set("DD1396", (infoOnly) => {
 			50 + width*0.1 + (h.length-6)*width*0.8/5,
 			level.yCurrent
 		]).immediately()
-		.wait(spacing)
+		.wait(spacing/2)
+		.spawn(Hint, 1, (e,h,l) => [
+			width/2,
+			level.yCurrent,
+			"player2 = player.fork();",
+			font, textCol
+			]).immediately()
+		.wait(spacing/2)
 		.spawn(Platform, 4, (e,h,l) => [
 			width/2-30,
 			level.yCurrent])
 		.spaced(spacing);
 
-	start.interleave(new Region()
+	fork.interleave(new Region()
 		.wait(spacing*5)
 		.spawn(Platform, 4, (e,h,l) => [
 			width/2+30,
 			level.yCurrent])
 		.spaced(spacing));
 
-	start.interleave(new Region()
+	fork.interleave(new Region()
 		.wait(spacing)
 		.spawn(Platform, 3, (e,h,l) => [
 			width *2/3+30,
@@ -407,25 +418,62 @@ Level.levels.set("DD1396", (infoOnly) => {
 
 	// Än så länge trasigt
 	const region = level.defineRegion("region");
-
 	let left = new Region();
-	left.spawn(Platform, 5, (e,h,l) => [
-		width/3 - width/5/(h.length + 2),
-		level.yCurrent
-		]).spaced(spacing);
-
 	let right = new Region();
-	right.spawn(Platform, 5, (e,h,l) => [
-		width*2/3 + width/5/(h.length + 1),
+
+	for (var i = 0; i < 6; i++) {
+		let offset = Math.random()*width/2;
+		left.wait(spacing).spawn(Platform, 1, (e,h,l) => [
+			width/2 - offset,
+			level.yCurrent
+			]).immediately();
+		right.wait(spacing).spawn(Platform, 1, (e,h,l) => [
+			width/2 + offset,
+			level.yCurrent
+			]).immediately();
+	}
+
+	const wings = level.defineRegion("doublejump");
+
+	wings.wait(spacing)
+		.spawn(Platform, 2, (e,h,l) => [
+		width/3 * (1+h.length),
+		level.yCurrent
+		]).immediately()
+		.spawn(JumpShootToken, 1, (e,h,l) => [
+			h[h.length-1].xSpawn,
+			h[h.length-1].ySpawn + 25
+			]).immediately()
+		.wait(spacing)
+		.spawn(Platform, 6, (e,h,l) => [
+			width * Math.random(),
+			level.yCurrent
+			]).spaced(spacing);
+
+	const join = level.defineRegion("Join");
+	join.wait(spacing)
+		.spawn(Hint, 1, (e,h,l) => [
+			width/2,
+			level.yCurrent,
+			"player.join(player2);",
+			font, textCol
+			]).immediately()
+		.spawn(Platform, 3, (e,h,l) => [
+		width/2,
 		level.yCurrent
 		]).spaced(spacing);
 
 	region.append(left);
 	region.interleave(right);
 
-	level.initialRegion(start);
-	start.follower(region);
-	region.follower(region);
+	level.initialRegion(fork);
+	fork.follower(region);
+	region.follower(wings);
+	
+	wings.follower(region);
+	wings.follower(join, 1, l => l.ksCurrent >= 3);
+	
+	join.follower(join);
 
 	return level;
 });

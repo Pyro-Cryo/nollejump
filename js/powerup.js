@@ -179,13 +179,13 @@ class JumpShoot extends PowerUp {
 	init(player) {
 		super.init(player);
 
-		controller.player.keyActionMap.set("Space", JumpPlayer.ACTION_SPACEJUMP);
-		controller.player.isPressed.set(JumpPlayer.ACTION_SHOOT, false);
+		player.keyActionMap.set("Space", JumpPlayer.ACTION_SPACEJUMP);
+		player.isPressed.set(JumpPlayer.ACTION_SHOOT, false);
 	}
 
 	remove(player) {
-		controller.player.keyActionMap.set("Space", JumpPlayer.ACTION_SHOOT);
-		controller.player.isPressed.set(JumpPlayer.ACTION_SPACEJUMP, false);
+		player.keyActionMap.set("Space", JumpPlayer.ACTION_SHOOT);
+		player.isPressed.set(JumpPlayer.ACTION_SPACEJUMP, false);
 		super.remove(player);
 	}
 }

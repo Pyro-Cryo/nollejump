@@ -100,39 +100,4 @@ class Hint extends GameObject {
         super.prerender();
     }
 
-    // prerender() {
-    //     if (!this.imagecache)
-	// 		this.imagecache = document.createElement("canvas");
-	// 	else
-    //         this.imagecontext.clearRect(0, 0, this.imagecache.width, this.imagecache.height);
-        
-    //     this.imagecontext = this.imagecache.getContext("2d");
-    //     this.imagecontext.font = this._font;
-    //     this.imagecontext.textAlign = "center";
-    //     this.imagecontext.textBaseline = "middle";
-    //     const metrics = this.imagecontext.measureText(this._text);
-    //     const width = metrics.width;
-    //     const height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-        
-	// 	this.imagecache.width = Math.ceil((height * Math.abs(Math.sin(this.angle)) + width * Math.abs(Math.cos(this.angle)))/* * this.scale*/);
-    //     this.imagecache.height = Math.ceil((height * Math.abs(Math.cos(this.angle)) + width * Math.abs(Math.sin(this.angle)))/* * this.scale*/);
-    //     this.imagecontext = this.imagecache.getContext("2d");
-        
-	// 	this.imagecontext.translate(this.imagecache.width / 2, this.imagecache.height / 2);
-    //     this.imagecontext.rotate(this.angle);
-        
-    //     this.imagecontext.fillStyle = this._color;
-    //     this.imagecontext.font = this._font;
-    //     this.imagecontext.textAlign = "center";
-    //     this.imagecontext.textBaseline = "middle";
-
-    //     console.log(width, height, metrics, this.imagecache.style.lineHeight);
-    //     this.imagecontext.fillText(this._text, 0, 0);
-    //     // this.imagecontext.fillRect(-this.imagecache.width / 2, this.imagecache.height / 2, 5, 5);
-    //     document.body.appendChild(this.imagecache);
-    //     this.imagecache.style = "border: 1px solid red";
-
-	// 	this._imageDirty = false;
-	// 	this._lastDrawnAngle = this.angle;
-    // }
 }
