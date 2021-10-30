@@ -66,7 +66,7 @@ Level.levels.set("Placeholder:", infoOnly => {
     ]).spawn(Hint, 1, (e, sH, level) => [
         controller.gameArea.gridWidth / 2, level.yCurrent - 40, "göra fler banor än", font, textCol
     ]).spawn(Hint, 1, (e, sH, level) => [
-        controller.gameArea.gridWidth / 2, level.yCurrent - 80, "Kolla igen senare under veckan!", font, textCol
+        controller.gameArea.gridWidth / 2, level.yCurrent - 80, "Kolla igen senare under hösten!", font, textCol
     ]).immediately().call(() => ScoreReporter.report(false));
 
     empty.wait(controller.gameArea.gridHeight * 10);

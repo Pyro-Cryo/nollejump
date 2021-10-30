@@ -540,6 +540,56 @@ class MovingGraphPlatform extends GraphPlatform {
 	}
 }
 
+class AngledPlatform extends Platform {
+	constructor(x, y, angle, movingAngle = null) {
+		super(x, y);
+		const amplitude = 100;
+		const speed = 1;
+		if (movingAngle !== null) {
+			this.image = Resource.getAsset(platformImgs.green);
+			this.path = [
+				[x, y],
+				[x + amplitude * Math.cos(angle + movingAngle), y - amplitude * Math.sin(angle + movingAngle)],
+				[x, y],
+				[x - amplitude * Math.cos(angle + movingAngle), y + amplitude * Math.sin(angle + movingAngle)],
+				[x, y]
+			];
+			this.speed = speed / 1000; // Path steps / ms
+			this.t = 0;
+			this.interpolation = t => Splines.interpolateLinear(t, this.path);
+		}
+		this.angle = angle;
+	}
+
+	update(delta) {
+		super.update(delta);
+		if (this.interpolation) {
+			this.t = (this.t + delta * this.speed / (this.path.length - 1)) % 1;
+			[this.x, this.y] = this.interpolation(this.t);
+
+			if (controller.screenWrap)
+				screenWrap(this);
+		}
+	}
+
+	onCollision(player) {
+		// If the player was above us and is going down
+		let xdiff = (player.x - this.x);
+		if (controller.gameArea.gridWidth - Math.abs(xdiff) < Math.abs(xdiff))
+			xdiff = controller.gameArea.gridWidth - xdiff;
+		if (player.physics.vy - Math.sin(this.angle) * player.physics.vx <= this.physics.vy && player.lastY - player.height / 2 >= this.y - Math.sin(this.angle) * xdiff)
+			this.onPlayerBounce(player, xdiff);
+		else
+			this.onPlayerPass(player);
+	}
+
+	onPlayerBounce(player, xdiff) {
+		// player.y = this.y + this.height * Math.cos(this.angle) / 4 - Math.sin(this.angle) * xdiff + player.height / 2;
+		player.physics.vy = player.physics.bounce_speed * Math.cos(this.angle);
+		player.physics.tempSpeedX += player.physics.bounce_speed * Math.sin(this.angle);
+	}
+}
+
 // Ja, de här skulle bara ärvt från varann...
 class LaserColumn extends GameObject {
 	static get image() { return null; }

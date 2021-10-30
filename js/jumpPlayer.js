@@ -270,6 +270,7 @@ class PlayerPhysics extends StandardPhysics {
 		this.proportional_decay_x = 0.55;
 		this._tempAccX = 0;
 		this._tempAccY = 0;
+		this.tempSpeedX = 0;
 	}
 
 	bounceObject(other) {
@@ -293,6 +294,14 @@ class PlayerPhysics extends StandardPhysics {
 			this._tempAccX = 0;
 			this._tempAccY = 0;
 		}
-		return super.update(dt);
+		if (!this.tempSpeedX)
+			return super.update(dt);
+		
+		this.previous_vx += this.tempSpeedX;
+		const res = super.update(dt);
+		// this.previous_vx -= this.tempSpeedX;
+		this.tempSpeedX /= Math.exp((dt/100) * this.proportional_decay_x / 4);
+		this.tempSpeedX = Math.sign(this.tempSpeedX) * Math.max(0, Math.abs(this.tempSpeedX) - this.linear_decay_x * (dt/100) / 4);
+		return res;
 	}
 }
