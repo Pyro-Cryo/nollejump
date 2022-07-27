@@ -1,7 +1,7 @@
 # nØllejump
 
 ## Hur man spelar
-1. Öppna [index.html](https://helmernylen.github.io/nollejump).
+1. Öppna [index.html](https://pyro-cryo.github.io/nollejump).
 2. TODO
 
 ## Lore primer & beskrivning
