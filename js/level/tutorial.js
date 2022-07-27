@@ -183,7 +183,7 @@ Level.tutorial = (infoOnly) => {
 		}
 		if (i === 0)
 			end.spawn(KS, 1, (e, sH, level) => [
-				controller.gameArea.gridWidth / 2, level.yCurrent + 20
+				controller.gameArea.gridWidth / 2 + 10, level.yCurrent + 20
 			]);
 		end.immediately();
 		end.wait(stairSpacing);

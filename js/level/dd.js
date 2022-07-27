@@ -238,8 +238,8 @@ Level.levels.set("DD1320", (infoOnly) => {
 			"name": "Tillämpad datalogi",
 			"hp": 6
 		},
-		10, // Homework-tokens
-		5, // KS-tokens
+		7, // Homework-tokens
+		3, // KS-tokens
 		0  // Tenta-tokens
 	);
 	if (infoOnly)
@@ -313,34 +313,33 @@ Level.levels.set("DD1320", (infoOnly) => {
 
 	const platforms = [GraphPlatform, MovingGraphPlatform];
 	const tokenorder = [
-		[ImmortalToken], 
 		[Homework], 
+		[ImmortalToken], 
 		[SFPassive],
 		[Homework],
 		[TFPassive, ImmortalToken],
 		[OFPassive, KS],
 		];
 
-	for (var k = 0; k < 2; k ++){
-		for (var j = 0; j < platforms.length; j++) {
-			for (var i = 0; i < tokenorder.length; i++) {
-				let nplatforms = 2 + Math.floor(Math.random()*4);
-				bfs.wait(spacing)
-				.spawn(platforms[j], nplatforms, (e,h,l) => [
-					width * (0.1 + Math.random()*0.8),
-					level.yCurrent,
-					(h.length > 0 ? h[h.length-1].object : null)
-					])
-				.spaced(spacing)
-				.wait(spacing)
-				.spawn(platforms[j], 1, (e,h,l) => [
-					width * (0.1 + Math.random()*0.8),
-					level.yCurrent,
-					h[h.length-1].object,
-					tokenorder[i]
-					])
-				.spaced(spacing);
-			}
+	for (let j = 0; j < platforms.length; j++) {
+		for (let i = 0; i < tokenorder.length; i++) {
+			const nplatforms = 1 + Math.floor(Math.random()*2);
+			const spawnedToken = tokenorder[i];
+			bfs.wait(spacing)
+			.spawn(platforms[j], nplatforms, (e,h,l) => [
+				width * (0.1 + Math.random()*0.8),
+				level.yCurrent,
+				(h.length > 0 ? h[h.length-1].object : null)
+				])
+			.spaced(spacing)
+			.wait(spacing)
+			.spawn(platforms[j], 1, (e,h,l) => [
+				width * (0.1 + Math.random()*0.8),
+				level.yCurrent,
+				h[h.length-1].object,
+				spawnedToken
+				])
+			.spaced(spacing);
 		}
 	}
 
@@ -348,7 +347,8 @@ Level.levels.set("DD1320", (infoOnly) => {
 	start.follower(middle);
 	middle.follower(start, 1, level => level.homeworkCurrent == 0);
 	middle.follower(bfs, 1, level => level.homeworkCurrent > 0);
-	bfs.follower(middle);
+	bfs.follower(middle, 1);
+	bfs.follower(bfs, 2);
 
 	return level;
 });

@@ -64,7 +64,7 @@ class Immortal extends PowerUp {
 	static get scale() { return 0.24; }
 	static get imgOffset() { return [0, -25]; }
 	static get drawBefore() { return true; }
-	static get cooldown() { return 7500; }
+	static get cooldown() { return 10000; }
 	static get prettyName() { return "Skyddsdräkt"; }
 
 	init(player) {

@@ -409,7 +409,7 @@ class VectorFieldArrow extends GameObject {
 
 class GraphPlatform extends Platform {
 
-	constructor(x,y,parent,siblings=[]){
+	constructor(x,y,parent,siblings=null){
 		super(x,y);
 
 		this.parent = parent;
@@ -422,7 +422,7 @@ class GraphPlatform extends Platform {
 		
 		this.children = [];
 		this.tokens = [];
-		this.toSpawn = siblings; // Yes
+		this.toSpawn = siblings !== null ? Array.from(siblings) : []; // Yes++
 
 		// tillgängliga  x-koordinater
 		const screenwidth = controller.gameArea.gridWidth;
@@ -439,7 +439,7 @@ class GraphPlatform extends Platform {
 		// Shuffle by sorting randomly.
 		this.pos = pos.sort((a,b) => Math.random()-1/2);
 
-		if (siblings.length > pos.length)
+		if (this.toSpawn.length > pos.length)
 			throw Exception("Cannot have this many children");
 
 	}
@@ -516,7 +516,7 @@ class MovingGraphPlatform extends GraphPlatform {
 
 	static get image() { return BasicMovingPlatform.image; }
 
-	constructor(x, y, parent, siblings=[], amplitude = 100, speed = 1) {
+	constructor(x, y, parent, siblings = null, amplitude = 100, speed = 1) {
 		super(x, y, parent, siblings);
 		this.path = [
 			[x, y],
