@@ -359,7 +359,7 @@ Level.levels.set("DD1396", (infoOnly) => {
 			"name": "Parallellprogrammering i introduktion till datalogi",
 			"hp": 3
 		},
-		0, // Homework-tokens
+		1, // Homework-tokens
 		3, // KS-tokens
 		0  // Tenta-tokens
 	);
@@ -493,34 +493,39 @@ Level.levels.set("DD1396", (infoOnly) => {
 	join.wait(spacing)
 		.spawn(Hint, 1, (e,h,l) => [
 			width/2,
-			level.yCurrent,
+			level.yCurrent + 40,
 			"player.join(player2);",
 			font, textCol
 			]).immediately()
 		.spawn(Platform, 3, (e,h,l) => [
-		width/2,
-		level.yCurrent
+			width/2,
+			level.yCurrent
+		]).spaced(spacing)
+		.spawn(Homework, 1, (e,h,l) => [0, 20, h[h.length - 1].object])
+		.immediately()
+		.wait(spacing)
+		.spawn(Platform, 4, (e,h,l) => [
+			width/2,
+			level.yCurrent
 		]).spaced(spacing);
 
 
 	level.initialRegion(fork);
 	fork.follower(region);
 
-	region.follower(region, 1, level => level.ksCurrent < 3);
-	region.follower(wings, 3, level => level.ksCurrent < 3);
-	region.follower(monster, 1, level => level.ksCurrent < 3);
-	// TODO: join kommer aldrig visas eftersom nästa nivå prioriteras över.
-	// Kan lösas genom att öka ks-kravet till 4 och ha den sista ksen i join.
-	region.follower(join, 1, level => level.ksCurrent >= 3);
+	region.follower(region, 1, level => level.ksCurrent < level.ksNeeded);
+	region.follower(wings, 3, level => level.ksCurrent < level.ksNeeded);
+	region.follower(monster, 1, level => level.ksCurrent < level.ksNeeded);
+	region.follower(join, 1, level => level.ksCurrent >= level.ksNeeded);
 	
 	wings.follower(region, 2);
 	wings.follower(monster, 2, level => level.ksCurrent > 0);
-	wings.follower(wings, 1, level => level.ksCurrent < 3)
-	wings.follower(region, 1, l => l.ksCurrent >= 3);
+	wings.follower(wings, 1, level => level.ksCurrent < level.ksNeeded)
+	wings.follower(region, 1, level => level.ksCurrent >= level.ksNeeded);
 
 	monster.follower(region, 3);
-	monster.follower(monster, 1, level => level.ksCurrent < 3);
-	monster.follower(wings, 3, level => level.ksCurrent < 3);
+	monster.follower(monster, 1, level => level.ksCurrent < level.ksNeeded);
+	monster.follower(wings, 3, level => level.ksCurrent < level.ksNeeded);
 	
 	join.follower(join);
 

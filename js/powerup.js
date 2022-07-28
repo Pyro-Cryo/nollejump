@@ -171,7 +171,7 @@ const wingsimg = Resource.addAsset("img/wings.png");
 class JumpShoot extends PowerUp {
 	static get image() { return Resource.getAsset(wingsimg); }
 	static get scale() { return 0.17; }
-	static get cooldown() { return 7500; }
+	static get cooldown() { return 7800; }
 	static get prettyName() { return "Vingar"; }
 	static get imgOffset() { return [0, 0]; }
 	static get drawBefore() { return true; }
