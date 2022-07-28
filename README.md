@@ -2,7 +2,8 @@
 
 ## Hur man spelar
 1. Öppna [index.html](https://pyro-cryo.github.io/nollejump).
-2. TODO
+2. Luta mobilen, alternativt använd A/D eller piltangenter för att styra Jennie-Jan.
+3. Använd mellanslag eller tryck på mobilskärmen för att kasta frukter på Föhsare.
 
 ## Lore primer & beskrivning
 Inspirerat av nåt som rimmar på Noodle Jump. Maskoten hoppar på plattformar för att klättra upp för Föhseriets statusgraf (vi borde ju egentligen gjort detta förra året då det var en känguru, och inte nu när det är en sengångare, men hindsight är 2020 som man säger). Föhseriet dyker upp som fiender, rör man dem så dör man. Dör man gör man också om man missar plattformarna och trillar ner. Nivån på statusgrafen är ens poäng.
