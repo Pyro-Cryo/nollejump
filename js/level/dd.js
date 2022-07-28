@@ -509,6 +509,8 @@ Level.levels.set("DD1396", (infoOnly) => {
 	region.follower(region, 1, level => level.ksCurrent < 3);
 	region.follower(wings, 3, level => level.ksCurrent < 3);
 	region.follower(monster, 1, level => level.ksCurrent < 3);
+	// TODO: join kommer aldrig visas eftersom nästa nivå prioriteras över.
+	// Kan lösas genom att öka ks-kravet till 4 och ha den sista ksen i join.
 	region.follower(join, 1, level => level.ksCurrent >= 3);
 	
 	wings.follower(region, 2);

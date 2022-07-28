@@ -23,7 +23,6 @@ let _Level_ctmatLevels = [
 	"SF1674", // Flervarre
 	"DD1320", // Tildat
 	"SF1550", // Numme
-	"Placeholder:", // TODO: ta bort
 	"DD1396", // Parallellprogrammering
 	"SG1115", // Partikeldynamik
 ];
@@ -91,6 +90,7 @@ class Level {
 				break;
 
 			case Tenta:
+			case YeetedTenta:
 				this.tentaCurrent = Math.min(this.tentaNeeded, this.tentaCurrent + 1);
 				break;
 

@@ -125,26 +125,23 @@ class FakePlatform extends Platform {
 
 }
 
-class GhostPlatform extends GameObject {
-
-	static get innerPlatform() { return DynamicPlatform; }
-	static get image() { return this.innerPlatform.image; }
+class DynamicPlatformSpawner extends GameObject {
+	static get image() { return DynamicPlatform.image; }
 	static get cooldown() { return 2000; }
 
-	constructor(x,y){
-		super(x,y);
+	constructor(x, y) {
+		super(x, y);
 		this.cdtimer = 0;
 	}
 
-	update(delta){
+	update(delta) {
 		super.update(delta);
-
 		this.cdtimer -= delta;
 
 		if (controller.gameArea.isInFrame(this.x, this.y) && this.cdtimer <= 0){
-			let platform = new this.constructor.innerPlatform(
+			new DynamicPlatform(
 				this.x,
-				controller.gameArea.canvasToGridY(960, true),
+				controller.gameArea.bottomEdgeInGrid - 100,
 				(Math.random()-1/2) * Math.abs(this.x - controller.gameArea.gridWidth/2)/2,
 				controller.player.physics.bounce_speed * (1.1-0.3*Math.random())
 			);
@@ -154,7 +151,7 @@ class GhostPlatform extends GameObject {
 		despawnIfBelowBottom(this);
 	}
 
-	draw(gameArea){
+	draw(gameArea) {
 		// Nope
 	}
 }
@@ -175,7 +172,6 @@ class DynamicPlatform extends Platform {
 		this.physics = new StandardPhysics(this);
 		this.physics.gy /= 2;
 		this.physics.setSpeed(vx, vy);
-
 	}
 
 	despawnCheck(){
@@ -198,6 +194,13 @@ class DynamicPlatform extends Platform {
 	onPlayerBounce(player) {
 		super.onPlayerBounce(player);
 		this.physics.vy -= player.physics.bounce_speed/2;
+	}
+
+	update(delta) {
+		super.update(delta);
+
+		if (controller.screenWrap)
+			screenWrap(this);
 	}
 }
 
@@ -243,10 +246,11 @@ class CompanionCubePlatform extends Platform {
 
 class CloakingPlatform extends Platform {
 	static get image() { return Resource.getAsset(platformImgs.violet); }
-	constructor(x, y) {
+	constructor(x, y, cloakLimit = 0.6, uncloakLimit = 0.5) {
 		super(x, y);
-		this.cloakLimit = 0.6;
-		this.uncloakLimit = 0.5;
+		// De här verkar ha fått helt omvända namn
+		this.cloakLimit = cloakLimit;
+		this.uncloakLimit = uncloakLimit;
 		this.t = 0;
 		this.alphaPath = null;
 		this.alphaSpeed = 1 / 250;
@@ -254,14 +258,14 @@ class CloakingPlatform extends Platform {
 
 	update(delta) {
 		super.update(delta);
+		// t går från 1 i toppen av skärmen till 0 i botten.
 		const t = (this.y - controller.gameArea.bottomEdgeInGrid) / controller.gameArea.gridHeight;
 		const oldAlpha = this.alpha;
 		if (this.alphaPath) {
+			this.alpha = Splines.interpolateLinear(this.t, this.alphaPath)[0];
 			if (this.t === 1) {
 				this.alphaPath = null;
-				this.alpha = 0;
 			} else {
-				this.alpha = Splines.interpolateLinear(this.t, this.alphaPath)[0];
 				this.t = Math.min(1, this.t + this.alphaSpeed * delta);
 			}
 		} else {
@@ -278,15 +282,15 @@ class CloakingPlatform extends Platform {
 
 	onPlayerBounce(player) {
 		super.onPlayerBounce(player);
-		this.alphaPath = [[0], [1], [0]];
+		this.alphaPath = [[this.alpha], [1], [this.alpha]];
 		this.t = 0;
 	}
 }
 
 class ScrollingCloakingPlatform extends CloakingPlatform {
 	static get image() { return Resource.getAsset(platformImgs.violet); }
-	constructor(x, y, speed = 100) {
-		super(x, y);
+	constructor(x, y, speed = 100, cloakLimit = 0.6, uncloakLimit = 0.5) {
+		super(x, y, cloakLimit, uncloakLimit);
 		this.speed = speed;
 	}
 	update(delta) {
@@ -739,3 +743,154 @@ const LASER_DEFAULT_PATHS = {
 		[obj.x, obj.y, obj.scale]
 	]
 };
+
+
+class CloakingParticlePlatform extends CloakingPlatform {
+	update(delta) {
+		super.update(delta);
+		if (!controller.gameArea.isInFrame(this.x, this.y, this.width, this.height))
+			return;
+		for (const particle of PlatformDetectionParticle.instances) {
+			if (collisionCheckScreenWrap(this, particle)) {
+				particle.bounce(this);
+			}
+		}
+	}
+}
+
+class ScrollingCloakingParticlePlatform extends ScrollingCloakingPlatform {
+	update(delta) {
+		super.update(delta);
+		if (!controller.gameArea.isInFrame(this.x, this.y, this.width, this.height))
+			return;
+		for (const particle of PlatformDetectionParticle.instances) {
+			if (collisionCheckScreenWrap(this, particle)) {
+				particle.bounce(this);
+			}
+		}
+	}
+}
+
+class InvisiblePlatform extends CloakingParticlePlatform {
+	// static get scale() { return 0.3; }
+	constructor(x, y) {
+		super(x, y, 1.51, 1.5);
+	}
+}
+
+
+class InvisibleScrollingPlatform extends ScrollingCloakingParticlePlatform {
+	// static get scale() { return 0.3; }
+	constructor(x, y, speed = 100) {
+		super(x, y, speed, 1.51, 1.5);
+	}
+}
+
+
+let _PlatformDetectionParticle__instances = [];
+class PlatformDetectionParticle extends GameObject {
+	static get instances() { return _PlatformDetectionParticle__instances;}
+	static set instances(value) { _PlatformDetectionParticle__instances = value;}
+
+	get width() { return 5; }
+	get height() { return 5; }
+	constructor(x, y, color = "#000000") {
+		super(x, y);
+		this.color = color;
+		this.hasBeenSeen = false;
+		this.randomizeSpeed();
+		this.dieAsSoonAsPossible = false;
+
+		PlatformDetectionParticle.instances.push(this);
+	}
+
+	static startRemovingParticles() {
+		for (const particle of PlatformDetectionParticle.instances) {
+			particle.dieAsSoonAsPossible = true;
+		}
+	}
+
+	randomizeSpeed() {
+		const dx = Math.random() * 0.15;
+		const dy = Math.random() * 0.15 + 0.1;
+		this.speedX = Math.random() > 0.5 ? dx : -dx;
+		this.speedY = -dy;
+		this.color = `#${Math.floor(Math.random() * 255).toString(16)}${Math.floor(Math.random() * 255).toString(16)}${Math.floor(Math.random() * 255).toString(16)}`;
+		this.track = null;
+		this.offsetX = 0;
+		this.offsetY = 0;
+	}
+
+	bounce(obj) {
+		if (this.track !== null)
+			return;
+		// Två procents chans att partikeln fastnar på plattformen (plastisk kollision).
+		if (Math.random() < 0.02) {
+			if (obj instanceof ScrollingCloakingParticlePlatform) {
+				this.stick(obj);
+			} else {
+				this.speedX = 0;
+				this.speedY = 0;
+				this.color = "#000000";
+			}
+		} else if (this.speedX !== 0 && this.speedY !== 0) {
+			// Prickar partikeln precis på sidan studsar den i x-led.
+			if (Math.round(this.x - obj.x) === 0) {
+				this.x -= this.speedX;
+				this.speedX *= -1;
+			// Annars studsar den i y-led.
+			} else {
+				this.y -= this.speedY;
+				this.speedY *= -1;
+			}
+			this.color = `#${Math.floor(Math.random() * 255).toString(16)}${Math.floor(Math.random() * 255).toString(16)}${Math.floor(Math.random() * 255).toString(16)}`;
+		}
+	}
+
+	stick(obj) {
+		this.offsetX = this.x - obj.x;
+		this.offsetY = this.y - obj.y;
+		this.track = obj;
+		this.color = "#000000";
+	}
+
+	update(delta) {
+		if (this.track !== null) {
+			this.x = this.track.x + this.offsetX;
+			this.y = this.track.y + this.offsetY;
+		} else {
+			this.x += this.speedX * delta;
+			this.y += this.speedY * delta;
+		}
+
+		if (controller.screenWrap && !this.dieAsSoonAsPossible) {
+			screenWrap(this);
+			if (!this.hasBeenSeen && this.y < controller.gameArea.topEdgeInGrid) {
+				this.hasBeenSeen = true;
+			}
+			if (this.hasBeenSeen) {
+				if (this.y >= controller.gameArea.topEdgeInGrid) {
+					this.x = Math.random() * controller.gameArea.gridWidth;
+					this.randomizeSpeed();
+				}
+				else if (this.y < controller.gameArea.bottomEdgeInGrid) {
+					this.y += controller.gameArea.gridHeight;
+					this.randomizeSpeed();
+				}
+			}
+		} else if (this.dieAsSoonAsPossible
+				&& !controller.gameArea.isInFrame(this.x, this.y, this.width, this.height)
+				&& Math.random() < 0.5) {
+			this.despawn();
+			if (PlatformDetectionParticle.instances.every(p => p.id === null)) {
+				PlatformDetectionParticle.instances = [];
+				console.log('All particles despawned.');
+			}
+		}
+	}
+
+	draw(gameArea) {
+		gameArea.square(this.x, this.y, this.width, this.color);
+	}
+}
+

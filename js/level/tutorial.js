@@ -247,7 +247,7 @@ Level.levels.set("test", infoOnly => {
 		]).over(regular.length);
 
 	const dynamic = new Region()
-	.spawn(GhostPlatform, 100, (elapsed, spawnHistory, level) => [
+	.spawn(DynamicPlatformSpawner, 100, (elapsed, spawnHistory, level) => [
 			Math.random() * controller.gameArea.gridWidth,
 			level.yCurrent + Math.random() * 200
 		]).over(regular.length);

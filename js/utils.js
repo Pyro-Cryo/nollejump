@@ -23,8 +23,9 @@ function drawScreenWrap(gameArea, obj, superDraw) {
 }
 
 function collisionCheckScreenWrap(obj, other) {
-    return (Math.abs(obj.x - other.x) <= (obj.width + other.width) / 2
-        || Math.abs(obj.x - other.x) >= controller.gameArea.gridWidth - (obj.width + other.width) / 2)
+    const xDiff = Math.abs(obj.x - other.x);
+    const halfWidthSum = (obj.width + other.width) / 2;
+    return (xDiff <= halfWidthSum || xDiff >= controller.gameArea.gridWidth - halfWidthSum)
         && Math.abs(obj.y - other.y) <= (obj.height + other.height) / 2;
 }
 
