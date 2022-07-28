@@ -122,6 +122,20 @@ body.dark {
 		margin-right: 0.5em;
 	}
 
+	.menu > .footnoteLeft {
+		font-size: 10px;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		text-align: left;
+		margin-left: 0.5em;
+	}
+
+	.menu a {
+		color: #ff6b74;
+		text-decoration: none;
+	}
+
 .menuButton {
 	text-align: center;
 	font-size: 24px;
