@@ -412,7 +412,7 @@ class JumpController extends Controller {
 		this.toggleFastForward();
 		setTimeout(() => {
 			// TODO: snyggare vinstskärm
-			alert(`Du har guidat Jennie-Jan genom hela sitt första år på KTH, och tjänat ihop ${ScoreReporter.currentScore(true)} poäng. Grattis!`);
+			alert(`Du har guidat ${MASKOT_FIRSTNAME} genom hela sitt första år på KTH, och tjänat ihop ${ScoreReporter.currentScore(true)} poäng. Grattis!`);
 			let reset = () => {
 				this.toggleFastForward();
 				this.clearState();
@@ -459,46 +459,22 @@ class JumpController extends Controller {
 		const pausemenuinfo = document.getElementById("pausemenuinfo");
 		while (pausemenuinfo.hasChildNodes())
 			pausemenuinfo.removeChild(pausemenuinfo.lastChild);
-		// Fyll på med rolig info
-		// \u00AD = soft hyphen, kan användas för att avstava långa ord
-		const staticTidbits = [
-			// visste du att...
-			"tomater är bär",
-			"tomatplantan är en slags potatisväxt",
-			'Potatisakademien har mottot "för potatisen i tiden"',
-			"potatisens dag infaller den 26 oktober",
-			"hallon är stenfrukter",
-			"ananaser är så kallade fruktförband",
-			"äpplen är falska frukter",
-			"potatis också kallas jordpäron",
-			"avokado också kallas alligatorpäron eller advokatpäron",
-			'ordet "avokado" kommer från aztekernas språk och betyder "testikel"',
-			"avokador är bär, liksom gurkor",
-			"nötter är äkta frukter",
-			"om du inte har A-vitaminbrist förbättrar inte morötter synen - det är en myt som spreds av brittiska flygvapnet under andra världskriget för att dölja att de uppfunnit radarn",
-			"örter är växter med oförvedade stammar, som till exempel morötter, bananer och squasher",
-			"tomater och gurkor inte ska förvaras tillsammans, då tomater avger etylengas som gör gurkor sega",
-			"i squash väger bollen 23 gram",
-			"durian också kallas stinkfrukt, och är förbjuden i bland annat Singapores tunnelbana",
-			"blåbärsris täcker ungefär 11 % av Sveriges yta",
-			"jordgubbar inte är bär, utan fruktförband med nötter",
-			"Mikael Lyth fyller år idag",
-		];
+
 		const tidbits = [];
 
 		// Generera statistikfakta
 		const totalShots = Object.keys(this.stats.shots).reduce((sum, key) => sum + this.stats.shots[key], 0);
 		const hits = totalShots - this.stats.shots.miss;
 		if (totalShots > 0) {
-			tidbits.push(`du har prickat ${Math.round(100 * hits / totalShots)} % av dina kast`);
-			tidbits.push(`du har kastat ${totalShots} frukter`);
+			tidbits.push(PROJECTILES_HIT_PERCENTAGE(Math.round(100 * hits / totalShots)));
+			tidbits.push(PROJECTILES_THROWN(totalShots));
 			// TODO: kan ha mer detaljerat vem man prickat osv
 			if (hits > 0)
-				tidbits.push(`du har prickat ${hits} Föhsare`);
+				tidbits.push(PROJECTILES_HIT(hits));
 			if (this.stats.shots.miss > 0)
 				tidbits.push(`du har missat ${this.stats.shots.miss} kast`);
 		} else
-			tidbits.push("du inte kastat en enda frukt ännu");
+			tidbits.push(NO_PROJECTILES_THROWN);
 
 		const totalDeaths = Object.keys(this.stats.deaths).reduce((sum, key) => sum + this.stats.deaths[key], 0);
 		const currentLevelDeaths = this.currentLevel.code in this.stats.deaths ? 0 : this.stats.deaths[this.currentLevel.code];
@@ -572,11 +548,7 @@ class JumpController extends Controller {
 			chosenTidbits.push(tidbits[index]);
 			tidbits.splice(index, 1);
 		}
-		for (let i = 0; i < 1; i++) {
-			const index = Math.floor(Math.random() * staticTidbits.length);
-			chosenTidbits.push(staticTidbits[index]);
-			staticTidbits.splice(index, 1);
-		}
+		chosenTidbits.push(...STATIC_TIDBITS(1));
 
 		// Populera listan
 		for (const tidbit of chosenTidbits) {

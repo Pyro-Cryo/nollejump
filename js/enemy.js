@@ -35,9 +35,9 @@ class Enemy extends EffectObject {
     }
 }
 
-const tfImg = Resource.addAsset("img/tf.png");
-const ofImg = Resource.addAsset("img/of.png");
-const sfImg = Resource.addAsset("img/sf.png");
+const tfImg = Resource.addAsset("img/tf22.png");
+const ofImg = Resource.addAsset("img/of22_squished.png");
+const sfImg = Resource.addAsset("img/sf22.png");
 
 class Boss extends Enemy {
     constructor(x, y, register = true) {

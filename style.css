@@ -26,7 +26,7 @@ body.dark {
 }
 #topbar {
 	width: 100%;
-	background-color: #df3c48;
+	background-color: #e94a42;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -78,7 +78,7 @@ body.dark {
 		background-color: #dfb5b8;
 	}
 	#playButton:active {
-		color: #df3c48;
+		color: #e94a42;
 	}
 
 .menu {
@@ -147,7 +147,7 @@ body.dark {
 	border-radius: 10px;
 }
 	.menuButton:hover {
-		background-color: #df3c48;
+		background-color: #e94a42;
 	}
 	.menuButton:active {
 		color: #dfb5b8;

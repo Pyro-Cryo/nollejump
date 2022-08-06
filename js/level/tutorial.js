@@ -111,9 +111,9 @@ Level.tutorial = (infoOnly) => {
 			]).spawn(Hint, 1, (elapsed, spawnHistory, level) => [
 				0, -48, "och ställer sig i vägen", font, textCol, spawnHistory[spawnHistory.length - 1].object
 			]).spawn(Hint, 1, (elapsed, spawnHistory, level) => [
-				0, -48, "Tur då att Jennie-Jan har med sig", font, textCol, spawnHistory[spawnHistory.length - 1].object
+				0, -48, PROJECTILE_HINT[0], font, textCol, spawnHistory[spawnHistory.length - 1].object
 			]).spawn(Hint, 1, (elapsed, spawnHistory, level) => [
-				0, -48, "en massa frukt att kasta", font, textCol, spawnHistory[spawnHistory.length - 1].object
+				0, -48, PROJECTILE_HINT[1], font, textCol, spawnHistory[spawnHistory.length - 1].object
 			]).immediately();
 		initialStairs.wait(stairSpacing);
 	}
@@ -130,7 +130,7 @@ Level.tutorial = (infoOnly) => {
 		controller.player.deviceTiltAvailable ? "Tryck på skärmen för att" : "Tryck på mellanslag för att",
 		font, textCol
 	]).spawn(Hint, 1, (elapsed, spawnHistory, level) => [
-		0, -48, "kasta frukt", font, textCol, spawnHistory[spawnHistory.length - 1].object
+		0, -48, THROW_PROJECTILE_INSTRUCTION, font, textCol, spawnHistory[spawnHistory.length - 1].object
 	]);
 	for (let x = controller.gameArea.gridWidth - platWidth * 0.6; x > controller.gameArea.gridWidth * 2 / 3; x -= platWidth)
 		initialStairs.spawn(Platform, 1, [x, stairSpacing * step]);

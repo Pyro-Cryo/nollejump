@@ -17,7 +17,8 @@ let _JumpPlayer_NON_SCREENWRAP_TRACKING = [
 	100, // Margin left
 ]
 
-const jenniejanImg = Resource.addAsset("img/jenniejan.png");
+// const jenniejanImg = Resource.addAsset("img/jenniejan.png");
+const jenniejanImg = Resource.addAsset("img/maskot22.png");
 class JumpPlayer extends Player {
 	static get image() { return Resource.getAsset(jenniejanImg); }
 	static get scale() { return 0.25; }
