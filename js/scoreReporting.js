@@ -22,6 +22,7 @@ class ScoreReporter {
         }
         return highscoreData.your_highscore;
     }
+    /** @type {any[]} */
     static get highscoreList() {
         if (!highscoreData) {
             return null;
@@ -43,6 +44,24 @@ class ScoreReporter {
             if (onNoParams) onNoParams();
             return;
         }
+
+        // Dummy data
+        // highscoreData = {
+        //     highscore_list: [
+        //         {score: 400, name: 'Adam', teamname: 'DSVG'},
+        //         {score: 397, name: 'Berit', teamname: 'Orden'},
+        //         {score: 256, name: 'Cecil', teamname: 'Också DSVG'},
+        //         {score: 404, name: 'Dagny', teamname: 'Area 52'},
+        //         {score: 400, name: 'Eskil', teamname: 'DSVG'},
+        //         {score: 397, name: 'Frida', teamname: 'Orden'},
+        //         {score: 256, name: 'Göran', teamname: 'Också DSVG'},
+        //         {score: 404, name: 'Hanna', teamname: 'Area 52'},
+        //         {score: 400, name: 'Ivar', teamname: 'DSVG'},
+        //         {score: 397, name: 'Jessica', teamname: 'Orden'},
+        //     ],
+        //     your_highscore: 12,
+        // };
+        // if (onSuccess) onSuccess();
 
         fetch(
             ENDPOINT_GET_HIGHSCORES,

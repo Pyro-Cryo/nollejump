@@ -47,6 +47,7 @@ class JumpController extends Controller {
 		this.margin = 0;
 		this.flipX = false;
 		this.muted = !!window.localStorage.getItem(JumpController.STORAGE_PREFIX + "mute");
+		this.highscoreMenuPrevious = null;
 	}
 
 	set screenWrap(value) {
@@ -120,6 +121,7 @@ class JumpController extends Controller {
 		this.spawnPlayer();
 		this.startLevel();
 		this.setupElements();
+		this.updateHighscores();
 		if (this.ctfys === null)
 			document.getElementById("choicemenu").classList.remove("hidden");
 		else
@@ -197,6 +199,32 @@ class JumpController extends Controller {
 			document.getElementById("choicemenu").classList.add("hidden");
 			e.preventDefault();
 		}, true);
+		// Highscoreknappar finns på både start- och du dog-sidan
+		document.getElementById("choicemenuHighscoreButton").addEventListener("click", e => {
+			this.updateHighscores();
+			this.highscoreMenuPrevious = "choicemenu";
+			document.getElementById("highscoremenu").classList.remove("hidden");
+			document.getElementById("choicemenu").classList.add("hidden");
+			e.preventDefault();
+		});
+		document.getElementById("deathmenuHighscoreButton").addEventListener("click", e => {
+			this.updateHighscores();
+			this.highscoreMenuPrevious = "deathmenu";
+			document.getElementById("highscoremenu").classList.remove("hidden");
+			document.getElementById("deathmenu").classList.add("hidden");
+			e.preventDefault();
+		});
+		// Tillbaka-knappen
+		document.getElementById("returnFromHighscoreButton").addEventListener("click", e => {
+			if (!this.highscoreMenuPrevious) {
+				console.error("Returning from highscore menu, but previous menu not set");
+			} else {
+				document.getElementById(this.highscoreMenuPrevious).classList.remove("hidden");
+			}
+			document.getElementById("highscoremenu").classList.add("hidden");
+			this.highscoreMenuPrevious = null;
+			e.preventDefault();
+		});
 
 		// Mute / unmute
 		document.getElementById("muteButton").addEventListener("click", e => {
@@ -250,6 +278,49 @@ class JumpController extends Controller {
 				once: true,
 				passive: true
 			});
+		}
+	}
+
+	updateHighscores() {
+		const highscoreList = document.getElementById('highscoreList');
+		while (highscoreList.children.length > 0) {
+			highscoreList.removeChild(highscoreList.children.item(0));
+		}
+		
+		if (ScoreReporter.highscoreList) {
+			for (const highscoreEntry of ScoreReporter.highscoreList.sort((a, b) => parseFloat(b.score) - parseFloat(a.score))) {
+				const tr = document.createElement("tr");
+				const score = document.createElement("td");
+				const name = document.createElement("td");
+				const group = document.createElement("td");
+
+				score.innerText = Math.floor(parseFloat(highscoreEntry.score));
+				name.innerText = highscoreEntry.name;
+				group.innerText = highscoreEntry.teamname;
+
+				tr.appendChild(score);
+				tr.appendChild(name);
+				tr.appendChild(group);
+				highscoreList.appendChild(tr);
+			}
+		}
+		
+		if (highscoreList.children.length === 0) {
+			const tr = document.createElement("tr");
+			const score = document.createElement("td");
+			const name = document.createElement("td");
+			const group = document.createElement("td");
+
+			name.innerText = "Bli först på denna lista!"
+
+			tr.appendChild(score);
+			tr.appendChild(name);
+			tr.appendChild(group);
+			highscoreList.appendChild(tr);
+		}
+
+		if (ScoreReporter.myHighscore !== null) {
+			document.getElementById("yourScore").innerText = Math.floor(parseFloat(ScoreReporter.myHighscore));
 		}
 	}
 
@@ -404,7 +475,9 @@ class JumpController extends Controller {
 
 		this.currentMusic.pause();
 		this.currentMusic.currentTime = 0;
-		ScoreReporter.report(false);
+		ScoreReporter.report(false, () => {
+			ScoreReporter.updateHighscoreData();
+		});
 	}
 
 	playerWon() {
@@ -425,6 +498,7 @@ class JumpController extends Controller {
 				super.onPause();
 				this.currentMusic.currentTime = 0;
 				document.getElementById("choicemenu").classList.remove("hidden");
+				ScoreReporter.updateHighscoreData();
 			};
 			let report;
 			report = () => ScoreReporter.report(true, reset, (reason) => {

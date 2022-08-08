@@ -124,6 +124,9 @@
 		<div class="menuButton restartButton">
 			Börja om <span style="font-size: 32px;" class="material-icons-round">&#xe042;</span>
 		</div>
+		<div id="deathmenuHighscoreButton" class="menuButton hidden">
+			Highscores <span style="font-size: 32px;" class="material-icons-round">&#xea23;</span>
+		</div>
 	</div>
 	<!-- Välja program-meny -->
 	<div id="choicemenu" class="menu hidden">
@@ -140,8 +143,34 @@
 		<div id="ctmatButton" class="menuButton">
 			Teknisk Matematik <span style="font-size: 32px;" class="material-icons-round">&#xe24a;</span>
 		</div>
+		<br />
+		<div id="choicemenuHighscoreButton" class="menuButton hidden">
+			Highscores <span style="font-size: 32px;" class="material-icons-round">&#xea23;</span>
+		</div>
 		<div class="footnote">*Enligt utvecklarna själva.</div>
 		<div class="footnoteLeft">nØllejump version 1.1.0 - ett spel av <a href="https://github.com/pyro-cryo/nollejump" target="_blank">Pyro &amp; Cryo</a></div>
+	</div>
+	<!-- Highscoremeny -->
+	<div id="highscoremenu" class="menu hidden">
+		<h2>Hopp 10-lista</h2>
+		<div>
+			<table id="highscoreTable">
+				<thead>
+					<tr>
+						<th id="highscoreScore">Poäng</th>
+						<th id="highscoreName">Namn</th>
+						<th id="highscoreGroup">nØllegrupp</th>
+					</tr>
+				</thead>
+				<tbody id="highscoreList"></tbody>
+			</table>
+		</div>
+		<div>
+			Ditt personbästa: <span id="yourScore"></span> poäng
+		</div>
+		<div id="returnFromHighscoreButton" class="menuButton">
+			Tillbaka <span style="font-size: 32px;" class="material-icons-round">&#xe5c4;</span>
+		</div>
 	</div>
 	<script type="text/javascript">
 		let controller;
@@ -150,6 +179,10 @@
 				.then(statusGraph => {
 					controller = new JumpController(statusGraph);
 				}).catch(reason => alert(JSON.stringify(reason)));
+			ScoreReporter.updateHighscoreData(() => {
+				document.getElementById("choicemenuHighscoreButton").classList.remove("hidden");
+				document.getElementById("deathmenuHighscoreButton").classList.remove("hidden");
+			});
 		});
 	</script>
 </body>

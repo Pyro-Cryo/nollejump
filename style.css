@@ -157,3 +157,7 @@ body.dark {
 		margin-left: 0.5ex;
 		padding-right: 0.4ex;
 	}
+
+#highscoreTable {
+	width: 100%;
+}

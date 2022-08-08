@@ -98,7 +98,8 @@ const STATIC_TIDBITS = num_tidbits => {
         "som om ingen skulle lägga märke till dem", "i Ugglevikskällan", "på Borggården",
         "vid badet i Brunnsviken", "(men inte särskilt bra)", "(och det var faktiskt ganska vackert)",
         "på ett inte helt Platoniskt sätt", "utan att hålla två meters avstånd", "virtuellt, i Metaverse",
-        "i Nymble", "när de trodde de var ensamma", "(och Force fick allt på bild)",
+        "i Nymble", "när de trodde de var ensamma", "(och Force fick allt på bild)", "i källaren till Vetenskapens hus",
+        "i Teknikringen 8-korridoren", "på en föreläsares kontor", "hemma hos en doktorand", "i bastun",
     ];
     if (new Date() > new Date(2022, 7, 16)) { // Månader är nollindexerade.
         scenarios.push("under TIM-buildingen");
@@ -139,6 +140,9 @@ const STATIC_TIDBITS = num_tidbits => {
         "åkte på romantisk weekend till", "funderar på att flytta till", "har gemensam släkt i",
         "aldrig har varit i", "båda växte upp i", "pluggade franska i",
         "har fått tag på en utsökt slags chokladtryfflar från",
+        "slagit vad om vem som kunde vara kvar längst i", "lärt sig trolleritrick av en häxa från",
+        "beställt exklusiva märken från", "tog ett sabbatsår i", "en gång cyklade hela vägen till",
+        "tror att man pratar italienska i", "försökt smuggla in surströmming i",
     ]);
 
     const locations = shuffle([
@@ -146,7 +150,8 @@ const STATIC_TIDBITS = num_tidbits => {
         "Arboga", "Stöde", "en charmig liten stuga i södra Tyskland",
         "Sandhamn", "Malung", "Australien", "ett hotell i Bukarest",
         "grupprummet i Konsulatet", "Maskins sektionslokal",
-        "kulvertarna under Albanova",
+        "kulvertarna under Albanova", "PQ-sqrubben", "PQ-bussen",
+        "Osqvik", "Sickla", "Las Vegas", "ETH",
     ]);
 
     const provider = {
