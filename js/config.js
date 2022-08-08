@@ -8,7 +8,7 @@ const PROJECTILES_HIT_PERCENTAGE = x => `du har lyckats med ${x} % av dina charm
 const THROW_PROJECTILE_INSTRUCTION = "flörta";
 
 window.addEventListener("load", () => {
-    document.getElementById("current_year").innerText = new Date().getFullYear();
+    document.getElementById("current_year").innerText = "2022";
     document.getElementById("maskot_fullname").innerText = MASKOT_FULLNAME;
     document.getElementById("maskot_fullname").innerText = MASKOT_FIRSTNAME;
 });

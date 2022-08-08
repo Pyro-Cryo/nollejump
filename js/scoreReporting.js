@@ -1,17 +1,74 @@
 const SCORE_MAX = 2000;
 const SCORE_MIN_ON_WIN = 1200;
-const SCORE_REDUCTION_PER_DEATH = 32;
+const SCORE_REDUCTION_PER_DEATH = 8;
 const SCORE_PARTIAL_MAX = 1000;
-const ENDPOINT_USER = "https://f.kth.se/cyberfohs/user/";
+const ENDPOINT_REPORT_SCORE = "https://f.kth.se/cyberfohs/set_nollejump_highscore";
+const ENDPOINT_GET_HIGHSCORES = "https://f.kth.se/cyberfohs/get_nollejump_highscore";
 let ApiSettings = null;
+let highscoreData = null;
 
 class ScoreReporter {
     static set apiSettings(value) {
         ApiSettings = value;
         console.log("Satte API-parametrar:", value);
+        this.updateHighscoreData();
     }
     static get apiSettings() {
         return ApiSettings;
+    }
+    static get myHighscore() {
+        if (!highscoreData) {
+            return null;
+        }
+        return highscoreData.your_highscore;
+    }
+    static get highscoreList() {
+        if (!highscoreData) {
+            return null;
+        }
+        return highscoreData.highscore_list;
+    }
+
+    static updateHighscoreData(onSuccess = null, onFail = null, onNoParams = null) {
+        const url = new URL(window.location.href);
+        const token = url.searchParams.get("token");
+
+        if (!this.apiSettings && token !== null)
+            this.apiSettings = {
+                token: token,
+            };
+
+        if (!this.apiSettings) {
+            console.warn("API-parametrarna är inte definierade, så kan inte hämta highscorelistan.");
+            if (onNoParams) onNoParams();
+            return;
+        }
+
+        fetch(
+            ENDPOINT_GET_HIGHSCORES,
+            {
+                method: "GET",
+                headers: new Headers({
+                    "Authorization": `Token ${this.apiSettings.token}`,
+                }),
+            }
+        ).then(response => {
+            if (response.status >= 200 && response.status < 300) {
+                response.json().then(data => {
+                    console.log("Hämtade highscorelista:", data);
+    
+                    highscoreData = data;
+                    if (onSuccess) onSuccess();
+                });
+            }
+            else {
+                console.error("Oväntad respons vid hämtning av highscorelista:", response);
+                if (onFail) onFail(response);
+            }
+        }).catch(reason => {
+            console.error("Kunde inte hämta highscorelistan:", reason);
+            if (onFail) onFail(reason);
+        });
     }
 
     static currentScore(won) {
@@ -28,11 +85,9 @@ class ScoreReporter {
     static report(won, onSuccess = null, onFail = null, onNoParams = null) {
         const url = new URL(window.location.href);
         const token = url.searchParams.get("token");
-        const userId = url.searchParams.get("userId");
         if (!this.apiSettings && token !== null)
             this.apiSettings = {
                 token: token,
-                userId: userId
             };
         
         // alert("API-inställningar: " + JSON.stringify(this.apiSettings));
@@ -46,11 +101,11 @@ class ScoreReporter {
         console.log("Rapporterar poäng:", score);
 
         // Rapportera in individuell poäng
-        const data = { "nollejump_score": score };
+        const data = { "score": score };
         fetch(
-            `${ENDPOINT_USER}${this.apiSettings.userId}`,
+            ENDPOINT_REPORT_SCORE,
             {
-                method: "PATCH",
+                method: "POST",
                 body: JSON.stringify(data),
                 headers: new Headers({
                     "Authorization": `Token ${this.apiSettings.token}`,
