@@ -176,7 +176,7 @@ const STATIC_TIDBITS = num_tidbits => {
     for (const gossip of gossips) {
         options.push(gossip(provider));
     }
-    if (Math.random() < 0.3) {
+    if (Math.random() < 0.8) {
         options.push((p => `${p.name()} fick höra att ${p.nameOrEntity()} och ${p.nameOrEntity()} ${p.actionTogetherLocation()} ${p.location()}`)(provider));
     }
     if (Math.random() < 0.1) {
@@ -186,7 +186,7 @@ const STATIC_TIDBITS = num_tidbits => {
         ];
         options.push(`Rebecca Remling fyller år den ${new Date().getDate()} ${months[new Date().getMonth()]}`);
     }
-    if (Math.random() < 0.2) {
+    if (Math.random() < 0.3) {
         options.push("allt skvaller är autogenererat och eventuella likheter med verkligheten är sammanträffanden");
     }
 

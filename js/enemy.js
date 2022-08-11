@@ -164,6 +164,7 @@ class SFFlappyBird extends SFBoss {
         this.leftSideFlappies.forEach(flappy => {
             flappy.path.reverse();
             flappy.t = 0;
+            flappy.goingLeft = true;
         });
         super.leave();
     }

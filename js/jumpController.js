@@ -788,4 +788,14 @@ class cheat {
 			}
 		}
 	}
+
+	static get monitorObjects() {
+		setInterval(() => {
+			const arr = controller.objects.toArray();
+			console.log(arr, JSON.stringify(arr.map(o => o.constructor.name).reduce((counter, current) => {
+				counter[current] = (counter[current] || 0) + 1;
+				return counter;
+			}, {})));
+		}, 4000);
+	}
 };
