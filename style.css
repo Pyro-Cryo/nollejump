@@ -140,6 +140,7 @@ body.dark {
 	text-align: center;
 	font-size: 24px;
 	display: flex;
+	position: relative;
 	align-items: center;
 	justify-content: center;
 	width: fit-content !important;
@@ -160,4 +161,18 @@ body.dark {
 
 #highscoreTable {
 	width: 100%;
+}
+
+.cleared {
+	font-size: small;
+	font-weight: bold;
+    color: #ff6b74;
+    position: absolute;
+    display: flow-root;
+    right: -2em;
+    top: 0;
+    transform: rotate(10deg);
+    background: #000000;
+    padding: 0 0.4em;
+    border-radius: 0.4em;
 }

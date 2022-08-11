@@ -122,6 +122,7 @@ class JumpController extends Controller {
 		this.startLevel();
 		this.setupElements();
 		this.updateHighscores();
+		this.updateClearedMessages();
 		if (this.ctfys === null)
 			document.getElementById("choicemenu").classList.remove("hidden");
 		else
@@ -179,6 +180,7 @@ class JumpController extends Controller {
 						super.onPause(); // Pausa utan att öppna pausmenyn, eftersom vi vill visa choicemenu istället
 					} else // Pausmenyn är uppe
 						document.getElementById("pausemenu").classList.add("hidden");
+					this.updateClearedMessages();
 					document.getElementById("choicemenu").classList.remove("hidden");
 				}
 				e.preventDefault();
@@ -324,6 +326,27 @@ class JumpController extends Controller {
 		}
 	}
 
+	updateClearedMessages() {
+		if (this.ctfysBestRun !== null) {
+			const ctfysCleared = document.getElementById("ctfysCleared");
+			if (this.ctfysBestRun === 0)
+				ctfysCleared.innerText = "Examen på första försöket!!";
+			else
+				ctfysCleared.innerText = `Examen efter ${this.ctfysBestRun + 1} försök!`;
+			if (ctfysCleared.classList.contains("hidden"))
+				ctfysCleared.classList.remove('hidden');
+		}
+		if (this.ctmatBestRun !== null) {
+			const ctmatCleared = document.getElementById("ctmatCleared");
+			if (this.ctmatBestRun === 0)
+				ctmatCleared.innerText = "Examen på första försöket!!";
+			else
+				ctmatCleared.innerText = `Examen efter ${this.ctmatBestRun + 1} försök!`;
+			if (ctmatCleared.classList.contains("hidden"))
+				ctmatCleared.classList.remove('hidden');
+		}
+	}
+
 	setLevelMessage() {
 		if (this.levelIndex === 0)
 			this.setMessage(`${this.currentLevel.code}: ${this.currentLevel.name}`);
@@ -413,6 +436,18 @@ class JumpController extends Controller {
 				console.warn(`Property ${prop} missing in saved state`);
 			this[prop] = data[prop];
 		}
+
+		const ctfysBestRun = window.localStorage.getItem(JumpController.STORAGE_PREFIX + "ctfysBestrun");
+		if (ctfysBestRun)
+			this.ctfysBestRun = JSON.parse(ctfysBestRun);
+		else
+			this.ctfysBestRun = null;
+		const ctmatBestRun = window.localStorage.getItem(JumpController.STORAGE_PREFIX + "ctmatBestrun");
+		if (ctmatBestRun)
+			this.ctmatBestRun = JSON.parse(ctmatBestRun);
+		else
+			this.ctmatBestRun = null;
+		
 		// console.log("Loaded state", data);
 	}
 
@@ -422,6 +457,8 @@ class JumpController extends Controller {
 			data[prop] = this[prop];
 
 		window.localStorage.setItem(JumpController.STORAGE_PREFIX + "state", JSON.stringify(data));
+		window.localStorage.setItem(JumpController.STORAGE_PREFIX + "ctfysBestrun", JSON.stringify(this.ctfysBestRun));
+		window.localStorage.setItem(JumpController.STORAGE_PREFIX + "ctmatBestrun", JSON.stringify(this.ctmatBestRun));
 		// console.log("Saved state", data);
 	}
 
@@ -484,6 +521,13 @@ class JumpController extends Controller {
 		this.fastForwardFactor = 0.2;
 		this.toggleFastForward();
 		setTimeout(() => {
+			const totalDeaths = Object.keys(this.stats.deaths).reduce((sum, key) => sum + this.stats.deaths[key], 0);
+			if (this.ctfys) {
+				this.ctfysBestRun = this.ctfysBestRun === null ? totalDeaths : Math.min(this.ctfysBestRun, totalDeaths);
+			} else {
+				this.ctmatBestRun = this.ctmatBestRun === null ? totalDeaths : Math.min(this.ctmatBestRun, totalDeaths);
+			}
+			this.saveState();
 			// TODO: snyggare vinstskärm
 			alert(`Du har guidat ${MASKOT_FIRSTNAME} genom hela sitt första år på KTH, och tjänat ihop ${ScoreReporter.currentScore(true)} poäng. Grattis!`);
 			let reset = () => {
@@ -497,6 +541,8 @@ class JumpController extends Controller {
 				this.startLevel();
 				super.onPause();
 				this.currentMusic.currentTime = 0;
+				this.currentMusic.pause();
+				this.updateClearedMessages();
 				document.getElementById("choicemenu").classList.remove("hidden");
 				ScoreReporter.updateHighscoreData();
 			};
