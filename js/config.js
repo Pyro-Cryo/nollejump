@@ -10,7 +10,9 @@ const THROW_PROJECTILE_INSTRUCTION = "flörta";
 window.addEventListener("load", () => {
     document.getElementById("current_year").innerText = "2022";
     document.getElementById("maskot_fullname").innerText = MASKOT_FULLNAME;
-    document.getElementById("maskot_fullname").innerText = MASKOT_FIRSTNAME;
+    for (const element of document.getElementsByClassName("maskot_firstname")) {
+        element.innerText = MASKOT_FIRSTNAME;
+    }
 });
 
 /**
@@ -184,7 +186,7 @@ const STATIC_TIDBITS = num_tidbits => {
             'januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli',
             'augusti', 'september', 'oktober', 'november', 'december',
         ];
-        options.push(`Rebecca Remling fyller år den ${new Date().getDate()} ${months[new Date().getMonth()]}`);
+        options.push(`ordförande Rebecca fyller år den ${new Date().getDate()} ${months[new Date().getMonth()]}`);
     }
     if (Math.random() < 0.3) {
         options.push("allt skvaller är autogenererat och eventuella likheter med verkligheten är sammanträffanden");

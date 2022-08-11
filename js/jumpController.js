@@ -23,6 +23,13 @@ const music = Resource.addAsset(
 		return audio;
 	});
 
+	
+const countWord = index => index < 20 ? [
+	"nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+	"tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde", "sjuttonde",
+	"artonde", "nittonde"
+][index] : (index + ":" + "eaaeeeeeee"[index % 10]);
+
 class JumpController extends Controller {
 	static get WIDTH_PX() { return _JumpController_WIDTH_PX;}
 	static set WIDTH_PX(value) { _JumpController_WIDTH_PX = value;}
@@ -201,7 +208,7 @@ class JumpController extends Controller {
 			document.getElementById("choicemenu").classList.add("hidden");
 			e.preventDefault();
 		}, true);
-		// Highscoreknappar finns på både start- och du dog-sidan
+		// Highscoreknappar finns på start-, vinst- och du dog-sidan
 		document.getElementById("choicemenuHighscoreButton").addEventListener("click", e => {
 			this.updateHighscores();
 			this.highscoreMenuPrevious = "choicemenu";
@@ -214,6 +221,13 @@ class JumpController extends Controller {
 			this.highscoreMenuPrevious = "deathmenu";
 			document.getElementById("highscoremenu").classList.remove("hidden");
 			document.getElementById("deathmenu").classList.add("hidden");
+			e.preventDefault();
+		});
+		document.getElementById("winmenuHighscoreButton").addEventListener("click", e => {
+			this.updateHighscores();
+			this.highscoreMenuPrevious = "winmenu";
+			document.getElementById("highscoremenu").classList.remove("hidden");
+			document.getElementById("winmenu").classList.add("hidden");
 			e.preventDefault();
 		});
 		// Tillbaka-knappen
@@ -333,7 +347,6 @@ class JumpController extends Controller {
 				ctfysCleared.innerText = "Examen på första försöket!!";
 			else
 				ctfysCleared.innerText = `Examen efter ${this.ctfysBestRun + 1} försök!`;
-			if (ctfysCleared.classList.contains("hidden"))
 				ctfysCleared.classList.remove('hidden');
 		}
 		if (this.ctmatBestRun !== null) {
@@ -342,7 +355,6 @@ class JumpController extends Controller {
 				ctmatCleared.innerText = "Examen på första försöket!!";
 			else
 				ctmatCleared.innerText = `Examen efter ${this.ctmatBestRun + 1} försök!`;
-			if (ctmatCleared.classList.contains("hidden"))
 				ctmatCleared.classList.remove('hidden');
 		}
 	}
@@ -487,12 +499,6 @@ class JumpController extends Controller {
 	}
 
 	playerDied() {
-		const countWord = index => index < 20 ? [
-			"nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
-			"tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde", "sjuttonde",
-			"artonde", "nittonde"
-		][index] : (index + ":" + "eaaeeeeeee"[index % 10]);
-
 		if (this.currentLevel.code in this.stats.deaths)
 			this.stats.deaths[this.currentLevel.code]++;
 		else
@@ -522,15 +528,28 @@ class JumpController extends Controller {
 		this.toggleFastForward();
 		setTimeout(() => {
 			const totalDeaths = Object.keys(this.stats.deaths).reduce((sum, key) => sum + this.stats.deaths[key], 0);
+			let beatPersonalBest = false;
 			if (this.ctfys) {
-				this.ctfysBestRun = this.ctfysBestRun === null ? totalDeaths : Math.min(this.ctfysBestRun, totalDeaths);
+				if (this.ctfysBestRun === null || totalDeaths < this.ctfysBestRun) {
+					beatPersonalBest = true;
+					this.ctfysBestRun = totalDeaths;
+				}
 			} else {
-				this.ctmatBestRun = this.ctmatBestRun === null ? totalDeaths : Math.min(this.ctmatBestRun, totalDeaths);
+				if (this.ctmatBestRun === null || totalDeaths < this.ctmatBestRun) {
+					beatPersonalBest = true;
+					this.ctmatBestRun = totalDeaths;
+				}
 			}
 			this.saveState();
-			// TODO: snyggare vinstskärm
-			alert(`Du har guidat ${MASKOT_FIRSTNAME} genom hela sitt första år på KTH, och tjänat ihop ${ScoreReporter.currentScore(true)} poäng. Grattis!`);
-			let reset = () => {
+			document.getElementById("program").innerText = this.ctfys ? "Teknisk Fysik" : "Teknisk Matematik";
+			document.getElementById("attempts").innerText = countWord(totalDeaths + 1);
+			document.getElementById("score").innerText = ScoreReporter.currentScore(true);
+			if (beatPersonalBest) {
+				document.getElementById("personalBest").innerText = "Det är nytt personrekord!";
+			} else {
+				document.getElementById("personalBest").innerText = "";
+			}
+			const reset = e => {
 				this.toggleFastForward();
 				this.clearState();
 				this.loadState(); // Laddar defaultstate
@@ -543,17 +562,27 @@ class JumpController extends Controller {
 				this.currentMusic.currentTime = 0;
 				this.currentMusic.pause();
 				this.updateClearedMessages();
+				document.getElementById("winmenu").classList.add("hidden");
 				document.getElementById("choicemenu").classList.remove("hidden");
 				ScoreReporter.updateHighscoreData();
+				document.getElementById("winRestartButton").onclick = undefined;
+				e.preventDefault();
 			};
 			let report;
-			report = () => ScoreReporter.report(true, reset, (reason) => {
-				if (confirm("Kunde inte rapportera in poängen\n" + JSON.stringify(reason) + "\n\nFörsök rapportera in igen? (Annars börjar spelet om)"))
-					report();
-				else
-					reset();
-			}, reset);
+			report = () => {
+				ScoreReporter.report(true, () => {
+					document.getElementById("winRestartButton").onclick = reset;
+				}, reason => {
+					if (confirm("Kunde inte rapportera in poängen. Felmeddelande:\n" + JSON.stringify(reason) + "\n\nFörsök rapportera in igen?"))
+						report();
+					else
+						document.getElementById("winRestartButton").onclick = reset;
+				}, () => {
+					document.getElementById("winRestartButton").onclick = reset;
+				});
+			}
 			report();
+			document.getElementById("winmenu").classList.remove("hidden");
 		}, 2000);
 	}
 
