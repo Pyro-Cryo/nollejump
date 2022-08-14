@@ -46,48 +46,48 @@ class ScoreReporter {
         }
 
         // Dummy data
-        highscoreData = {
-            highscore_list: [
-                {score: 400, name: 'Adam', teamname: 'DSVG'},
-                {score: 397, name: 'Berit', teamname: 'Orden'},
-                {score: 256, name: 'Cecil', teamname: 'Också DSVG'},
-                {score: 404, name: 'Dagny', teamname: 'Area 52'},
-                {score: 400, name: 'Eskil', teamname: 'DSVG'},
-                {score: 397, name: 'Frida', teamname: 'Orden'},
-                {score: 256, name: 'Göran', teamname: 'Också DSVG'},
-                {score: 404, name: 'Hanna', teamname: 'Area 52'},
-                {score: 400, name: 'Ivar', teamname: 'DSVG'},
-                {score: 397, name: 'Jessica', teamname: 'Orden'},
-            ],
-            your_highscore: 12,
-        };
-        if (onSuccess) onSuccess();
+        // highscoreData = {
+        //     highscore_list: [
+        //         {score: 400, name: 'Adam', teamname: 'DSVG'},
+        //         {score: 397, name: 'Berit', teamname: 'Orden'},
+        //         {score: 256, name: 'Cecil', teamname: 'Också DSVG'},
+        //         {score: 404, name: 'Dagny', teamname: 'Area 52'},
+        //         {score: 400, name: 'Eskil', teamname: 'DSVG'},
+        //         {score: 397, name: 'Frida', teamname: 'Orden'},
+        //         {score: 256, name: 'Göran', teamname: 'Också DSVG'},
+        //         {score: 404, name: 'Hanna', teamname: 'Area 52'},
+        //         {score: 400, name: 'Ivar', teamname: 'DSVG'},
+        //         {score: 397, name: 'Jessica', teamname: 'Orden'},
+        //     ],
+        //     your_highscore: 12,
+        // };
+        // if (onSuccess) onSuccess();
 
-        // fetch(
-        //     ENDPOINT_GET_HIGHSCORES,
-        //     {
-        //         method: "GET",
-        //         headers: new Headers({
-        //             "Authorization": `Token ${this.apiSettings.token}`,
-        //         }),
-        //     }
-        // ).then(response => {
-        //     if (response.status >= 200 && response.status < 300) {
-        //         response.json().then(data => {
-        //             console.log("Hämtade highscorelista:", data);
+        fetch(
+            ENDPOINT_GET_HIGHSCORES,
+            {
+                method: "GET",
+                headers: new Headers({
+                    "Authorization": `Token ${this.apiSettings.token}`,
+                }),
+            }
+        ).then(response => {
+            if (response.status >= 200 && response.status < 300) {
+                response.json().then(data => {
+                    console.log("Hämtade highscorelista:", data);
     
-        //             highscoreData = data;
-        //             if (onSuccess) onSuccess();
-        //         });
-        //     }
-        //     else {
-        //         console.error("Oväntad respons vid hämtning av highscorelista:", response);
-        //         if (onFail) onFail(response);
-        //     }
-        // }).catch(reason => {
-        //     console.error("Kunde inte hämta highscorelistan:", reason);
-        //     if (onFail) onFail(reason);
-        // });
+                    highscoreData = data;
+                    if (onSuccess) onSuccess();
+                });
+            }
+            else {
+                console.error("Oväntad respons vid hämtning av highscorelista:", response);
+                if (onFail) onFail(response);
+            }
+        }).catch(reason => {
+            console.error("Kunde inte hämta highscorelistan:", reason);
+            if (onFail) onFail(reason);
+        });
     }
 
     static currentScore(won) {
@@ -117,6 +117,11 @@ class ScoreReporter {
         }
         // Räkna ut poäng
         const score = this.currentScore(won);
+        if (ScoreReporter.myHighscore !== null && score <= ScoreReporter.myHighscore) {
+            console.log(`Rapporterar inte in poäng eftersom den är lägre än personbästa: ${score} <= ${ScoreReporter.myHighscore}`);
+            onSuccess();
+            return;
+        }
         console.log("Rapporterar poäng:", score);
 
         // Rapportera in individuell poäng
@@ -137,7 +142,7 @@ class ScoreReporter {
                 if (onSuccess) onSuccess();
             }
             else {
-                console.error("Oväntad respons vid poänginrapportering:", response);
+                console.error("Oväntat svar vid poänginrapportering:", response);
                 if (onFail) onFail(response);
             }
         }).catch(reason => {

@@ -112,7 +112,7 @@ class JumpBoostToken extends PowerupToken {
 	static get powerup() { return JumpBoost; };
 }
 
-const albumimg = Resource.addAsset("img/album.png");
+const albumimg = Resource.addAsset("img/album22.png");
 const musicnotesimgs = new Map(["a", "b", "c", "d", "e", "f"]
 	.map(file => [file, Resource.addAsset(`img/note_${file}.png`)]));
 class Rocket extends PowerUp {

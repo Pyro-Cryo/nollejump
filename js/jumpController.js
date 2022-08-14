@@ -2,12 +2,12 @@ let _JumpController_WIDTH_PX = 576;
 let _JumpController_HEIGHT_PX = _JumpController_WIDTH_PX * 15 / 9;
 let _JumpController_STORAGE_PREFIX = "nollejump_";
 
-const MUSIC_BPM = 151;
-const INTRO_BEATS = 237;
-const LOOP_BEATS = 140;
+const MUSIC_BPM = 158;
+const INTRO_BEATS = 177;
+const LOOP_BEATS = 160;
 const MUSIC_VOLUME = 0.2;
 const music = Resource.addAsset(
-	"audio/myrstacken.mp3",
+	"audio/myrstacken22.mp3",
 	LoopableAudioWithTail,
 	audio => {
 		audio.volume = MUSIC_VOLUME;
@@ -15,8 +15,8 @@ const music = Resource.addAsset(
 
 		audio.onLoop = () => {
 			audio.currentTime = INTRO_BEATS * 60 / MUSIC_BPM
-				+ (audio.currentTime - audio.length)
-				+ (audio.currentTime - audio.currentTimeLast);
+			+ (audio.currentTime - audio.length)
+			+ (audio.currentTime - audio.currentTimeLast);
 			
 			audio.play();
 		};
