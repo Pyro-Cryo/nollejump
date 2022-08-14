@@ -3,7 +3,7 @@ let _JumpController_HEIGHT_PX = _JumpController_WIDTH_PX * 15 / 9;
 let _JumpController_STORAGE_PREFIX = "nollejump_";
 
 const MUSIC_BPM = 158;
-const INTRO_BEATS = 177;
+const INTRO_BEATS = 176.5;
 const LOOP_BEATS = 160;
 const MUSIC_VOLUME = 0.2;
 const music = Resource.addAsset(
